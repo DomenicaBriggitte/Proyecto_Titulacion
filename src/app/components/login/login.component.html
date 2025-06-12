@@ -1,6 +1,6 @@
   <div class="login-card p-4">
     <div class="text-center mb-4">
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#ffffff" 
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#f47c00" 
           class="bi bi-person-fill" viewBox="0 0 16 16" style="filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));">
         <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
       </svg>
@@ -10,15 +10,15 @@
       <div class="mb-3">
         <label for="user" class="form-label fw-bold">Usuario</label>
         <input type="user" id="user" name="user" class="form-control" placeholder="Ingresa tu Usuario" required [(ngModel)]="user" #userInput="ngModel" />
-        <div *ngIf="userInput.invalid && userInput.touched" class="text-danger small">Usuario válido es requerido.</div>
+        <div *ngIf="userInput.invalid && userInput.touched" class="text-danger">Usuario válido es requerido.</div>
       </div>
 
       <div class="mb-3">
         <label for="password" class="form-label fw-bold">Contraseña</label>
         <input type="password" id="password" name="password" class="form-control" placeholder="Ingresa tu contraseña" required [(ngModel)]="password" #passwordInput="ngModel" />
-        <div *ngIf="passwordInput.invalid && passwordInput.touched" class="text-danger small">La contraseña es requerida.</div>
+        <div *ngIf="passwordInput.invalid && passwordInput.touched" class="text-danger">La contraseña es requerida.</div>
       </div>
       
-      <button type="submit" class="btn btn-warning w-100 fw-bold" [disabled]="loginForm.invalid">Iniciar Sesión</button>
+      <button type="submit" class="btn btn-warning w-100 fw-bold">Iniciar Sesión</button>
     </form>
   </div>

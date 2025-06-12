@@ -1,34 +1,36 @@
+:host {
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh; 
+background-color: #f47a00d7;
+}
+
 .login-card {
-  background: #ffffff;
-  border-radius: 8px;
-  width: 100%;
-  box-shadow: none;
-  padding: 0;
-  background-color: #d96800;
+background-color: #ffffffe8;
+border-radius: 10px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.26);
+width: 100%;
+max-width: 400px;
+padding: 30px;
 }
 
 .login-card input {
-  border-radius: 4px;
-  padding: 10px;
-  margin-bottom: 10px;
+border-radius: 4px;
+padding: 10px;
+margin-bottom: 10px;
 }
 
 .login-card button {
-  background-color: #ff7f00;
-  color: white;
-  font-weight: bold;
-  border-radius: 4px;
-  padding: 10px;
-  transition: background-color 0.3s ease;
+background-color: #ff7f00;
+color: white;
+font-weight: bold;
+border-radius: 4px;
+padding: 10px;
+transition: background-color 0.3s ease;
+border-color: #ff7c02;
 }
 
 .login-card button:hover {
-  background-color: #e06d00;
-}
-
-.login-background {
-  background-color: #d96800;
-  padding: 0;
-  height: auto;
-  display: block;
+background-color: #e06d00;
 }
