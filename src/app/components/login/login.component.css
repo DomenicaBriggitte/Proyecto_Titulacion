@@ -19,6 +19,8 @@ padding: 30px;
 border-radius: 4px;
 padding: 10px;
 margin-bottom: 10px;
+border: 1px solid #ccc;
+box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .login-card button {
@@ -29,8 +31,16 @@ border-radius: 4px;
 padding: 10px;
 transition: background-color 0.3s ease;
 border-color: #ff7c02;
+border-style: solid;
 }
 
 .login-card button:hover {
 background-color: #e06d00;
+}
+
+.bi-person-fill {
+  width: 70px;
+  height: 70px;
+  fill: #f47c00;
+  filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));
 }
