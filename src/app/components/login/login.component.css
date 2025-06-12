@@ -1,0 +1,34 @@
+.login-card {
+  background: #ffffff;
+  border-radius: 8px;
+  width: 100%;
+  box-shadow: none;
+  padding: 0;
+  background-color: #d96800;
+}
+
+.login-card input {
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.login-card button {
+  background-color: #ff7f00;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.login-card button:hover {
+  background-color: #e06d00;
+}
+
+.login-background {
+  background-color: #d96800;
+  padding: 0;
+  height: auto;
+  display: block;
+}

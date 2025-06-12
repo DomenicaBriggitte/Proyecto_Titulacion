@@ -1,0 +1,41 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #343a40;
+  padding-top: 20px;
+  color: white;
+  box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link {
+  cursor: pointer;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 18px;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.nav-link:hover {
+  background-color: #495057;
+}
+
+.nav-link.active {
+  background-color: #ff7f00; /* Color naranja cuando se hace clic */
+  color: white;
+}
+
+.collapse {
+  margin-left: 20px;
+}
+
+.collapse .nav-link {
+  font-size: 16px;
+  text-transform: none;
+  padding-left: 20px;
+}

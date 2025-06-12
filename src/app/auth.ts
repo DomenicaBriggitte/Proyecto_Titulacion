@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthService {
   private isAuthenticated = false;
@@ -10,9 +10,10 @@ export class AuthService {
     if (user === 'admin' && password === 'admin') {
       this.isAuthenticated = true;
       return true;
+    } else {
+      this.isAuthenticated = false;
+      return false;
     }
-    this.isAuthenticated = false;
-    return false;
   }
 
   isLoggedIn(): boolean {

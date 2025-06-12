@@ -1,1 +1,36 @@
-<p>cliente works!</p>
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Gestión de Clientes</h2>
+
+  <div class="d-flex justify-content-between mb-3">
+    <button class="btn btn-primary">+ Nuevo Cliente</button>
+    <button class="btn btn-success">XLS</button>
+    <input class="form-control w-25" type="text" placeholder="Buscar Cliente..." />
+  </div>
+
+  <table class="table table-bordered">
+    <thead class="thead-dark">
+      <tr>
+        <th>Cédula/RUC</th>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Teléfono</th>
+        <th>Correo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cliente of clientes">
+        <td>{{ cliente.cedula }}</td>
+        <td>{{ cliente.nombre }}</td>
+        <td><span class="badge" [ngClass]="cliente.tipo === 'Fijo' ? 'bg-primary' : 'bg-warning'">{{ cliente.tipo }}</span></td>
+        <td>{{ cliente.telefono }}</td>
+        <td>{{ cliente.correo }}</td>
+        <td>
+          <button class="btn btn-info btn-sm">Editar</button>
+          <button class="btn btn-danger btn-sm">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<app-sidebar></app-sidebar>

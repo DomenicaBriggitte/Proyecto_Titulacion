@@ -1,1 +1,35 @@
-<p>sidebar works!</p>
+<div class="sidebar">
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/cliente" routerLinkActive="active">
+        Clientes
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/pedido" routerLinkActive="active">
+        Pedidos
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#volquetasMenu" aria-expanded="false">
+        Volquetas
+      </a>
+      <div class="collapse" id="volquetasMenu">
+        <ul>
+          <li><a class="nav-link" routerLink="/registro-volqueta" routerLinkActive="active">Registro</a></li>
+          <li><a class="nav-link" routerLink="/reporte-diario" routerLinkActive="active">Reporte Diario</a></li>
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/factura" routerLinkActive="active">
+        Facturas
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" (click)="logout()">
+        Cerrar Sesión
+      </a>
+    </li>
+  </ul>
+</div>
