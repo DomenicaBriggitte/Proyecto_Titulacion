@@ -1,36 +1,80 @@
-<div class="container mt-5">
-  <h2 class="text-center mb-4">Gestión de Clientes</h2>
-
-  <div class="d-flex justify-content-between mb-3">
-    <button class="btn btn-primary">+ Nuevo Cliente</button>
-    <button class="btn btn-success">XLS</button>
-    <input class="form-control w-25" type="text" placeholder="Buscar Cliente..." />
-  </div>
-
-  <table class="table table-bordered">
-    <thead class="thead-dark">
-      <tr>
-        <th>Cédula/RUC</th>
-        <th>Nombre</th>
-        <th>Tipo</th>
-        <th>Teléfono</th>
-        <th>Correo</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let cliente of clientes">
-        <td>{{ cliente.cedula }}</td>
-        <td>{{ cliente.nombre }}</td>
-        <td><span class="badge" [ngClass]="cliente.tipo === 'Fijo' ? 'bg-primary' : 'bg-warning'">{{ cliente.tipo }}</span></td>
-        <td>{{ cliente.telefono }}</td>
-        <td>{{ cliente.correo }}</td>
-        <td>
-          <button class="btn btn-info btn-sm">Editar</button>
-          <button class="btn btn-danger btn-sm">Eliminar</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
 <app-sidebar></app-sidebar>
+
+<div class="content">
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Gestión de Clientes</h2>
+
+    <div class="d-flex justify-content-between mb-3">
+      <button class="btn btn-primary">+ Nuevo Cliente</button>
+      <button class="btn btn-success">XLS</button>
+      <input class="form-control w-25" type="text" placeholder="Buscar Cliente..." />
+    </div>
+
+    <table class="table table-bordered">
+      <thead class="thead-dark">
+        <tr>
+          <th>Cédula/RUC</th>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Teléfono</th>
+          <th>Correo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientes">
+          <td>{{ cliente.cedula }}</td>
+          <td>{{ cliente.nombre }}</td>
+          <td><span class="badge" [ngClass]="cliente.tipo === 'Fijo' ? 'bg-primary' : 'bg-warning'">{{ cliente.tipo }}</span></td>
+          <td>{{ cliente.telefono }}</td>
+          <td>{{ cliente.correo }}</td>
+          <td>
+            <button class="btn btn-info btn-sm" (click)="editCliente(cliente)">Editar</button>
+            <button class="btn btn-danger btn-sm">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal editar cliente-->
+<div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editClientModalLabel">Editar Cliente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateCliente()" #editClientForm="ngForm">
+          <div class="mb-3">
+            <label for="cedula" class="form-label">Cédula/RUC</label>
+            <input type="text" class="form-control" id="cedula" [(ngModel)]="selectedCliente.cedula" name="cedula" required />
+          </div>
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" [(ngModel)]="selectedCliente.nombre" name="nombre" required />
+          </div>
+          <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="telefono" [(ngModel)]="selectedCliente.telefono" name="telefono" required />
+          </div>
+          <div class="mb-3">
+            <label for="correo" class="form-label">Correo</label>
+            <input type="email" class="form-control" id="correo" [(ngModel)]="selectedCliente.correo" name="correo" required />
+          </div>
+          <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo</label>
+            <select class="form-control" id="tipo" [(ngModel)]="selectedCliente.tipo" name="tipo" required>
+              <option value="Fijo">Fijo</option>
+              <option value="Ocasional">Ocasional</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,3 +1,4 @@
+/* sidebar.component.css */
 .sidebar {
   position: fixed;
   top: 0;
@@ -26,7 +27,7 @@
 }
 
 .nav-link.active {
-  background-color: #ff7f00; /* Color naranja cuando se hace clic */
+  background-color: #ff7f00;
   color: white;
 }
 
@@ -38,4 +39,8 @@
   font-size: 16px;
   text-transform: none;
   padding-left: 20px;
+}
+
+.collapse.show {
+  display: block;
 }

@@ -8,11 +8,25 @@ import { AuthService } from '../../auth.service';
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent {
+  isVolquetasMenuOpen: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {
+
+  const volquetasMenuState = localStorage.getItem('volquetasMenuState');
+    if (volquetasMenuState) {
+      this.isVolquetasMenuOpen = JSON.parse(volquetasMenuState);
+    }
+  }
+
+  //Alternar estado menú volquetas y guardar
+  toggleVolquetasMenu() {
+    this.isVolquetasMenuOpen = !this.isVolquetasMenuOpen;
+    localStorage.setItem('volquetasMenuState', JSON.stringify(this.isVolquetasMenuOpen));
+  }
+    
 
   logout() {
-    this.authService.logout(); // Limpiar el estado de autenticación
-    this.router.navigate(['/']); // Navegar a la página de inicio (o login)
+    this.authService.logout();
+    this.router.navigate(['/']); // Navegar a la página de inicio
   }
 }
