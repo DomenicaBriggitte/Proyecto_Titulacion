@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { InicioComponent } from './components/inicio/inicio.component';
@@ -10,16 +9,15 @@ import { FacturaComponent } from './components/factura/factura.component';
 import { VolquetaComponent } from './components/volqueta/volqueta.component';
 import { RegistroVolquetaComponent } from './components/volqueta/registro-volqueta/registro-volqueta.component';
 import { ReporteDiarioComponent } from './components/volqueta/reporte-diario/reporte-diario.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { CommonModule } from '@angular/common';
-import { SidebarComponent } from './components/sidebar/sidebar.component';
-
 
 @NgModule({
   declarations: [
     AppComponent,
     InicioComponent,
+    
     ClienteComponent,
     PedidoComponent,
     FacturaComponent,
@@ -32,8 +30,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
-    CommonModule
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

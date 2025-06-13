@@ -1,7 +1,7 @@
 <div class="main-container">
   <app-navbar></app-navbar>
     <!-- Sección ¿Quiénes somos? -->
-    <section class="about-us">
+    <section class="about-us" id="quienes-somos">
       <h2>¿Quiénes Somos?</h2>
       <p>
         Somos una empresa dedicada a ofrecer soluciones de transporte y suministro de
@@ -10,34 +10,58 @@
       </p>
     </section>
   
-    <!-- Sección Nuestros Servicios -->
-    <section class="services">
-      <h2>Nuestros Servicios</h2>
-      <div class="service-cards">
-        <div class="service-card">
-          <img src="assets/transport.jpg" alt="Transporte de Materiales" />
-          <h3>Transporte de Materiales</h3>
+<section class="services" id="nuestros-servicios">
+  <h2>Nuestros Servicios</h2>
+
+  <div id="servicesCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+
+      <!-- Primer item del carrusel -->
+      <div class="carousel-item active">
+        <img src="assets\images\nuestros_servicios\Ripio.jpg" class="d-block w-100" alt="Transporte de Materiales">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>Transporte de Materiales</h5>
           <p>Ofrecemos servicios de transporte de materiales como arena, grava, cemento, y otros productos para construcción.</p>
         </div>
-        <div class="service-card">
-          <img src="assets/logistics.jpg" alt="Logística de Entregas" />
-          <h3>Logística de Entregas</h3>
+      </div>
+
+      <!-- Segundo item del carrusel -->
+      <div class="carousel-item">
+        <img src="assets\images\nuestros_servicios\volqueta.jpeg" class="d-block w-100" alt="Logística de Entregas">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>Logística de Entregas</h5>
           <p>Gestionamos la entrega eficiente de tus materiales a través de nuestras volquetas y mulas.</p>
         </div>
-        <div class="service-card">
-          <img src="assets/consulting.jpg" alt="Consultoría de Transporte" />
-          <h3>Consultoría de Transporte</h3>
+      </div>
+
+      <div class="carousel-item">
+        <img src="assets\images\nuestros_servicios\Ruta.jpg" class="d-block w-100" alt="Consultoría de Transporte">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>Consultoría de Transporte</h5>
           <p>Brindamos asesoría sobre las mejores rutas de transporte, optimizando tiempos y costos en cada entrega.</p>
         </div>
       </div>
-    </section>
+
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#servicesCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#servicesCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</section>
 
     <!-- Contactenos -->
-    <section class="contac-us">
+    <section class="contac-us" id="contactenos">
         <h2>Contactenos</h2>
-        <p>
-          Para más información 
-        </p>
+        <p>Si necesitas más información, ¡no dudes en contactarnos! Haz clic en el siguiente botón para chatear con nosotros por WhatsApp.</p>
+        <a href="https://wa.me/+593964018301" target="_blank" class="whatsapp-btn">
+            <i class="fab fa-whatsapp"></i> ¡Escríbenos por WhatsApp!
+        </a>
       </section>
       <app-footer></app-footer>
   </div>
