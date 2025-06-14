@@ -1,9 +1,8 @@
-.container {
-    display: grid;
-    margin-left: 250px;
-    padding: 20px;
-    background-color: #f8f9fa;
-    height: 100%;
+.content {
+  margin-left: 250px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  height: 100%;
 }
 
 h2 {
@@ -53,27 +52,4 @@ button[type="submit"] {
 button[type="button"] {
   background-color: #dcdcdc;
   color: black;
-}
-
-
-/* Estilos de la tarjeta */
-.cliente-card {
-  margin: 20px;
-}
-
-/* Estilo para los botones */
-button {
-  margin: 5px;
-}
-
-/* Estilos para la tabla */
-.mat-table {
-  width: 100%;
-  margin-top: 20px;
-}
-
-/* Estilo de la tabla con encabezados */
-.mat-header-row {
-  background-color: #f47c00;
-  color: white;
 }

@@ -16,6 +16,7 @@
   padding: 10px 20px;
   font-size: 18px;
   text-transform: uppercase;
+  font-weight: bold;
   border-radius: 4px;
   transition: all 0.3s;
 }
