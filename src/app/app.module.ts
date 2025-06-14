@@ -12,6 +12,21 @@ import { ReporteDiarioComponent } from './components/volqueta/reporte-diario/rep
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { CommonModule } from '@angular/common';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { FormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatBadgeModule } from '@angular/material/badge';
+
 
 @NgModule({
   declarations: [
@@ -26,10 +41,24 @@ import { NavbarComponent } from './components/navbar/navbar.component';
     ReporteDiarioComponent,
     FooterComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
   ],
   imports: [
     BrowserModule,
+    AppRoutingModule,
+    CommonModule,
+    FormsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatInputModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatCardModule,
+    BrowserAnimationsModule,
+    MatChipsModule,
+    MatBadgeModule
     AppRoutingModule
   ],
   providers: [],

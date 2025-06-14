@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-cliente',
@@ -12,4 +13,23 @@ export class ClienteComponent {
     { cedula: '1413578642', nombre: 'Cliente 3', tipo: 'Fijo', telefono: '0913578642', correo: 'cliente3@gmail.com' },
     { cedula: '0912345678', nombre: 'Cliente 4', tipo: 'Ocasional', telefono: '0924687531', correo: 'cliente4@gmail.com' }
   ];
+
+  displayedColumns: string[] = ['cedula', 'nombre', 'tipo', 'telefono', 'correo', 'acciones'];
+
+  editCliente(cliente: any) {
+    alert(`Editando cliente: ${cliente.nombre}`);
+  }
+
+  deleteCliente(cliente: any) {
+    this.clientes = this.clientes.filter(c => c !== cliente);
+    alert(`Cliente eliminado: ${cliente.nombre}`);
+  }
+
+  onSubmit() {
+    alert('Los cambios fueron guardados correctamente.');
+  }
+
+  closeDialog() {
+    alert('Se ha cancelado la edición.');
+  }
 }

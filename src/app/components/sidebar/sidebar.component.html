@@ -11,10 +11,10 @@
       </a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#volquetasMenu" aria-expanded="false">
+      <a class="nav-link" (click)="toggleVolquetasMenu()">
         Volquetas
       </a>
-      <div class="collapse" id="volquetasMenu">
+      <div class="collapse" [ngClass]="{'show': isVolquetasMenuOpen}">
         <ul>
           <li><a class="nav-link" routerLink="/registro-volqueta" routerLinkActive="active">Registro</a></li>
           <li><a class="nav-link" routerLink="/reporte-diario" routerLinkActive="active">Reporte Diario</a></li>

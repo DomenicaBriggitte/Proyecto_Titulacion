@@ -16,7 +16,6 @@
   padding: 10px 20px;
   font-size: 18px;
   text-transform: uppercase;
-  font-weight: bold;
   border-radius: 4px;
   transition: all 0.3s;
 }
@@ -26,7 +25,7 @@
 }
 
 .nav-link.active {
-  background-color: #ff7f00; /* Color naranja cuando se hace clic */
+  background-color: #ff7f00;
   color: white;
 }
 
@@ -38,4 +37,8 @@
   font-size: 16px;
   text-transform: none;
   padding-left: 20px;
+}
+
+.collapse.show {
+  display: block;
 }

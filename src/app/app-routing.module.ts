@@ -12,9 +12,6 @@ const routes: Routes = [
   { path: '', component: InicioComponent },
   { path: 'login', component: LoginComponent },
   { path: 'cliente', component: ClienteComponent },
-  { path: 'quienes-somos', component: InicioComponent },  // Asegúrate de tener el componente para esta ruta
-  { path: 'nuestros-servicios', component: InicioComponent },  // Asegúrate de tener el componente para esta ruta
-  { path: 'contactenos', component: InicioComponent },  // Asegúrate de tener el componente para esta ruta
   { path: 'pedido', component: PedidoComponent },
   { path: 'registro-volqueta', component: RegistroVolquetaComponent },
   { path: 'reporte-diario', component: ReporteDiarioComponent },
