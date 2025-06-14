@@ -1,31 +1,66 @@
 /* Estilos generales */
 .main-container {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Sección ¿Quiénes somos? */
-  .about-us {
-    background-color: #ffffff;
-    padding: 50px 20px;
-    text-align: center;
-  
-  }
-  
-  .about-us h2 {
-    color: #f47c00;
-    font-size: 36px;
-    font-weight: bold;
-  }
-  
-  .about-us p {
-    color: #555;
-    font-size: 18px;
-    line-height: 1.6;
-  }
-  
- /* Sección Contactenos */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sección ¿Quiénes somos? */
+.about-us {
+  background-color: #ffffff;
+  padding: 50px 20px;
+}
+
+/* Contenedor para la imagen y la descripción */
+.about-us-content {
+  display: flex;             
+  justify-content: space-between; 
+  align-items: center;       
+  gap: 20px;                 
+  flex-wrap: wrap;            
+}
+
+.about-us-img-container {
+  flex: 1;                   
+}
+
+.about-us-img {
+  width: 100%;              
+  max-width: 300px;         
+  height: auto;             
+  border-radius: 40px;      
+  clip-path: ellipse(60% 60% at 50% 50%);  
+  object-fit: cover;        
+}
+
+/* Descripción del texto */
+.about-us-description {
+  flex: 2;                   
+  text-align: left;         
+  font-size: 18px;
+}
+
+.about-us-description p {
+  color: #555;
+  line-height: 1.6;
+}
+.about-us h2 {
+  color: #f47c00;
+  font-size: 50px;
+  padding-right: 300px;
+  font-weight: bold;                  
+  text-align: right;          
+ 
+}
+
+.about-us-description h1 {
+  color: #f47c00;
+  font-size: 25px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+/* Estilo para la sección de Contactenos */
 .contac-us {
   background-color: #ffffff;
   padding: 50px 20px;
@@ -34,7 +69,7 @@
 
 .contac-us h2 {
   color: #f47c00;
-  font-size: 36px;
+  font-size: 50px;
   font-weight: bold;
 }
 
@@ -48,8 +83,8 @@
 .whatsapp-btn {
   display: inline-flex;
   align-items: center;
-  background-color: #25D366;  
-  color: white;
+  background-color: #25D366;
+  color: #ffffff;
   font-size: 18px;
   padding: 12px 20px;
   border-radius: 25px;
@@ -58,62 +93,76 @@
 }
 
 .whatsapp-btn i {
-  margin-right: 10px; 
+  margin-right: 10px;
 }
 
 .whatsapp-btn:hover {
-  background-color: #128C7E;  
+  background-color: #128C7E;
   transition: background-color 0.3s ease;
 }
 
-
+/* Estilos del carrusel */
 .carousel-inner img {
-  object-fit: cover; 
-  height: 400px;       
+  object-fit: cover;
+  height: 400px;
 }
 
 /* Estilo de los captions */
 .carousel-caption {
-  background-color: #00000080;  
-  color: #ffffff;               
+  background-color: #00000080;
+  color: #ffffff;
   border-radius: 5px;
-  padding: 15px;                
-  margin-top: 20px;             
+  padding: 15px;
+  margin-top: 20px;
 }
 
 /* Estilos de la sección de servicios */
-
 .services h2 {
   text-align: center;
+  font-size: 50px;
   margin-bottom: 30px;
-  color: #ffffff;  
+  color: #ffffff;
   font-weight: bold;
 }
+
 /* Sección de Servicios */
 .services {
   padding: 50px 20px;
+ 
   text-align: center;
-  background: linear-gradient(to bottom, #4b4a4ab3, #e67d22bd,#e67d221c);
-  /* background-color: #d77c0c9d;*/ 
-
+  background: linear-gradient(to bottom, #4b4a4ab3, #e67d22bd, #e67d221c);
 }
 
+/* Ajustes del carrusel dentro de la sección de servicios */
 .carousel-item {
   position: relative;
 }
 
 .carousel-item img {
-  width: 80%;           
-  max-width: 900px;     
-  max-height: 400px;        
-  object-fit: contain;  
-  margin: 0 auto;       
-  display: block;       
+  width: 80%;
+  max-width: 900px;
+  max-height: 400px;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
 }
+
 .carousel-caption h5 {
-  font-size: 24px;  
+  font-size: 24px;
 }
 
 .carousel-caption p {
-  font-size: 16px; 
+  font-size: 16px;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+  .about-us-content {
+    flex-direction: column; 
+    text-align: center;    
+  }
+
+  .about-us-img-container {
+    margin-bottom: 20px;   
+  }
 }
