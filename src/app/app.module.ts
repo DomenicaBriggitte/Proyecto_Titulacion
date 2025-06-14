@@ -28,7 +28,7 @@ import { FormsModule } from '@angular/forms';
     ReporteDiarioComponent,
     FooterComponent,
     NavbarComponent,
-    SidebarComponent,
+    SidebarComponent
   ],
   imports: [
     BrowserModule,
@@ -36,6 +36,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     FormsModule,
     AppRoutingModule
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

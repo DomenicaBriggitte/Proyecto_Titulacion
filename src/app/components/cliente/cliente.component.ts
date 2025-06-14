@@ -14,22 +14,32 @@ export class ClienteComponent {
     { cedula: '0912345678', nombre: 'Cliente 4', tipo: 'Ocasional', telefono: '0924687531', correo: 'cliente4@gmail.com' }
   ];
 
-  displayedColumns: string[] = ['cedula', 'nombre', 'tipo', 'telefono', 'correo', 'acciones'];
+  selectedCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
 
   editCliente(cliente: any) {
-    alert(`Editando cliente: ${cliente.nombre}`);
+    this.selectedCliente = { ...cliente }; // Copiar la información del cliente seleccionado
+    const modalElement = document.getElementById('editClientModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show(); // Abrir el modal para editar el cliente
+    }
   }
 
-  deleteCliente(cliente: any) {
-    this.clientes = this.clientes.filter(c => c !== cliente);
-    alert(`Cliente eliminado: ${cliente.nombre}`);
-  }
+  updateCliente() {
+    // Guardar cambios, agregar cambios a BD después
+    const index = this.clientes.findIndex(cliente => cliente.cedula === this.selectedCliente.cedula);
+    if (index !== -1) {
+      this.clientes[index] = { ...this.selectedCliente }; // Actualizar
+    }
 
-  onSubmit() {
-    alert('Los cambios fueron guardados correctamente.');
-  }
+    // Mostrar mensaje de éxito
+    alert('Cliente actualizado exitosamente.');
 
-  closeDialog() {
-    alert('Se ha cancelado la edición.');
+    // Cerrar modal
+    const modalElement = document.getElementById('editClientModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.hide();
+    }
   }
 }
