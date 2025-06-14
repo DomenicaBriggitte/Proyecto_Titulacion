@@ -26,20 +26,38 @@ export class ClienteComponent {
   }
 
   updateCliente() {
-    // Guardar cambios, agregar cambios a BD después
+    // Aquí se guardan los cambios, se puede agregar lógica para actualizar la base de datos
     const index = this.clientes.findIndex(cliente => cliente.cedula === this.selectedCliente.cedula);
     if (index !== -1) {
-      this.clientes[index] = { ...this.selectedCliente }; // Actualizar
+      this.clientes[index] = { ...this.selectedCliente }; // Actualizar el cliente en la lista
     }
 
-    // Mostrar mensaje de éxito
-    alert('Cliente actualizado exitosamente.');
-
-    // Cerrar modal
-    const modalElement = document.getElementById('editClientModal');
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.hide();
+    // Cerrar el modal de editar
+    const editModalElement = document.getElementById('editClientModal');
+    if (editModalElement) {
+      const modal = new bootstrap.Modal(editModalElement);
+      modal.hide(); // Cerrar el modal de editar
     }
+
+    // Mostrar el modal de éxito
+    const successModalElement = document.getElementById('successModal');
+    if (successModalElement) {
+      const successModal = new bootstrap.Modal(successModalElement);
+      successModal.show(); // Mostrar modal de éxito
+      successModal.hide();
+    }
+
+      // Asegurarse de que el backdrop se elimine al cerrar el modal
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove(); // Eliminar la capa oscura
+      }
+
+      // Abrir de nuevo el modal de edición, por si el usuario necesita editar otro cliente
+      const newEditModalElement = document.getElementById('editClientModal');
+      if (newEditModalElement) {
+        const newEditModal = new bootstrap.Modal(newEditModalElement);
+        newEditModal.show();
+      }
   }
 }

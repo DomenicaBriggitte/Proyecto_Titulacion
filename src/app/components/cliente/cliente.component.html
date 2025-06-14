@@ -38,7 +38,7 @@
   </div>
 </div>
 
-<!-- Modal editar cliente-->
+<!-- Modal para editar cliente -->
 <div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content p-3">
@@ -50,7 +50,7 @@
         <form (ngSubmit)="updateCliente()" #editClientForm="ngForm">
           <div class="mb-3">
             <label for="cedula" class="form-label">Cédula/RUC</label>
-            <input type="text" class="form-control" id="cedula" [(ngModel)]="selectedCliente.cedula" name="cedula" required />
+            <input type="text" class="form-control" disabled="cedula" id="cedula" [(ngModel)]="selectedCliente.cedula" name="cedula" required />
           </div>
           <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
@@ -74,6 +74,26 @@
           <button type="submit" class="btn btn-primary">Guardar</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de éxito -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Cliente Actualizado</h5>
+      </div>
+      <div class="modal-body text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+          <path d="M16 8a8 8 0 1 1-8-8 8 8 0 0 1 8 8zM7.293 5.293a1 1 0 0 0-1.414 0L4 7.586 5.707 9.293l1.414-1.414L9 6.707l2.707 2.707 1.414-1.414L8 4l-3.707 3.707z"/>
+        </svg>
+        <h4>Cliente Actualizado Exitosamente</h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
   </div>

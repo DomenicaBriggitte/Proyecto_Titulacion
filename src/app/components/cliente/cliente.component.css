@@ -53,3 +53,7 @@ button[type="button"] {
   background-color: #dcdcdc;
   color: black;
 }
+
+.modal-footer {
+  justify-content: center;
+}
