@@ -12,13 +12,11 @@
     </li>
     <li class="nav-item">
       <a class="nav-link" (click)="toggleVolquetasMenu()">
-        Volquetas
+        Volquetas<i class="fas fa-caret-down"></i>
       </a>
       <div class="collapse" [ngClass]="{'show': isVolquetasMenuOpen}">
-        <ul>
           <li><a class="nav-link" routerLink="/registro-volqueta" routerLinkActive="active">Registro</a></li>
           <li><a class="nav-link" routerLink="/reporte-diario" routerLinkActive="active">Reporte Diario</a></li>
-        </ul>
       </div>
     </li>
     <li class="nav-item">

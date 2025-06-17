@@ -16,7 +16,7 @@
   padding: 10px 20px;
   font-size: 18px;
   text-transform: uppercase;
-  font-weight: bold;
+  font-weight: lighter  ;
   border-radius: 4px;
   transition: all 0.3s;
 }
@@ -28,10 +28,19 @@
 .nav-link.active {
   background-color: #ff7f00;
   color: white;
+  font-weight: normal;
 }
 
 .collapse {
   margin-left: 20px;
+  margin-right: 20px;
+  padding: 10px 0;
+  border-radius: 4px;
+  transition: max-height 0.3s ease;
+  overflow: hidden;
+  max-height: fit-content;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  font-weight: lighter;
 }
 
 .collapse .nav-link {
@@ -42,4 +51,12 @@
 
 .collapse.show {
   display: block;
+}
+
+.fas {
+  margin-right: 10px;
+  margin-left: 11px;
+  font-size: 24px;
+  vertical-align: top;
+  transition: transform 0.3s ease;
 }

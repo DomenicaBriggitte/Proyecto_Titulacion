@@ -1,43 +1,64 @@
 .content {
   margin-left: 250px;
-  padding: 20px;
+  padding: 10px;
   background-color: #f8f9fa;
   height: 100%;
+}
+
+.text-center {
+  text-align: center;
+  font-weight: bold;
 }
 
 h2 {
   color: #333;
 }
 
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  box-shadow: none;
+  transition: border-color 0.3s ease;
+  margin-left: auto;
+}
+
+.form-control:focus {
+  border-color: #f47c00;
+  box-shadow: 0 0 5px rgba(244, 124, 0, 0.5);
+}
+
+
 .table th, .table td {
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .table .thead-dark {
   background-color: #343a40;
-  color: white;
-}
-
-.btn {
-  margin: 5px;
+  color: #ffffff;
 }
 
 .badge.bg-primary {
-  background-color: #007bff;
+  background-color: #f47c00 !important;
+  color: white;
+  font-weight: normal;
+  font-size: medium;
 }
 
 .badge.bg-warning {
-  background-color: #ffc107;
+  background-color: #0b69cecb !important;
+  color: white;
+  font-weight: normal;
+  font-size: medium;
 }
 
 table th {
-  background-color: #ebe8e898;
+  background-color: #ebe8e8b2;
 }
 
 .modal-header {
   background-color: #f47c00;
-  color: white;
+  color: #ffffff;
 }
 
 .modal-body {
@@ -46,14 +67,83 @@ table th {
 
 button[type="submit"] {
   background-color: #ff7f00;
-  color: white;
+  color: #ffffff;
 }
 
 button[type="button"] {
   background-color: #dcdcdc;
-  color: black;
+  color: #000000;
 }
 
 .modal-footer {
   justify-content: center;
 }
+
+/* BOTONES */
+.btn {
+  margin: 5px;
+  border-radius: 8px;
+  font-weight: normal;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #f47c00;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Botón editar */
+.btn-info {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-info:hover {
+  background-color: #0056b3; 
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-info:active {
+  background-color: #003d8b;
+}
+
+/* Botón de eliminar */
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-danger:hover {
+  background-color: #c82333; 
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger:active {
+  background-color: #a71d2a; 
+}
+
+/* Íconos al botón editar y eliminar */
+.btn i {
+  margin-right: 2px;
+  font-size: 20px;
+  vertical-align: middle;
+  transition: transform 0.3s ease;
+}
+
