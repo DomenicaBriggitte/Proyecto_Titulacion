@@ -7,8 +7,9 @@ import { PedidoComponent } from './components/pedido/pedido.component';
 import { RegistroVolquetaComponent } from './components/volqueta/registro-volqueta/registro-volqueta.component';
 import { ReporteDiarioComponent } from './components/volqueta/reporte-diario/reporte-diario.component';
 import { FacturaComponent } from './components/factura/factura.component';
+import { MaterialesComponent } from './components/materiales/materiales.component'; 
 
-const routes: Routes = [
+const routes: Routes = [  
   { path: '', component: InicioComponent },
   { path: 'login', component: LoginComponent },
   { path: 'cliente', component: ClienteComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'registro-volqueta', component: RegistroVolquetaComponent },
   { path: 'reporte-diario', component: ReporteDiarioComponent },
   { path: 'factura', component: FacturaComponent },
+  { path: 'materiales', component: MaterialesComponent },
   { path: '**', redirectTo: '' }
 ];
 

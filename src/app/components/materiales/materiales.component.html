@@ -1,0 +1,182 @@
+<app-sidebar></app-sidebar>
+
+<div class="content">
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Gestión de Materiales</h2>
+
+    <div class="d-flex mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoMaterialesModal">+ Nuevo Material</button>
+        <button class="btn btn-success">XLS</button>
+        <input 
+          class="form-control w-25" 
+          type="text" 
+          placeholder="Buscar Material..." 
+          [(ngModel)]="searchQuery" 
+          (ngModelChange)="filterMateriales()"
+        />
+      </div>
+
+    <table class="table table-bordered">
+      <thead class="thead-dark">
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Costo sin IVA</th>
+          <th>Tipo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let materiales of filteredMateriales">
+          <td>{{ materiales.codigo }}</td>
+          <td>{{ materiales.nombre }}</td>
+          <td>{{ materiales.costoSinIva | currency }}</td>
+          <td>{{ materiales.tipo }}</td>
+          <td>
+            <button class="btn btn-info btn-sm" (click)="editMateriales(materiales)">
+              <i class="fas fa-edit"></i></button>
+            <button class="btn btn-danger btn-sm" (click)="deleteMateriales(materiales)">
+              <i class="fas fa-trash-alt"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Nuevo material -->
+<div class="modal fade" id="nuevoMaterialesModal" tabindex="-1" aria-labelledby="nuevoMaterialesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuevoMaterialesModalLabel">Nuevo Material</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="addMateriales()" #nuevoMaterialesForm="ngForm">
+          <div class="mb-3">
+            <label for="codigo" class="form-label">Código</label>
+            <input type="text" class="form-control" id="codigo" [(ngModel)]="nuevoMateriales.codigo" name="codigo" required />
+          </div>
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" [(ngModel)]="nuevoMateriales.nombre" name="nombre" required />
+          </div>
+          <div class="mb-3">
+            <label for="costo" class="form-label">Costo sin IVA</label>
+            <input type="text" class="form-control" id="costo" [(ngModel)]="nuevoMateriales.costoSinIva" name="costo" required />
+          </div>
+          <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo</label>
+            <select class="form-select" id="tipo" [(ngModel)]="nuevoMateriales.tipo" name="tipo" required>
+              <option value="" disabled selected>Seleccione un tipo...</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Arena">Arena</option>
+              <option value="Ripio">Ripio</option>
+              <option value="Cascajo">Cascajo</option>
+              <option value="Piedra 3/4">Piedra 3/4</option>
+              <option value="Piedra Chispa">Piedra Chispa</option>
+              <option value="Cisco">Cisco</option>
+              <option value="Piedra Base">Piedra Base</option>
+              <option value="Lavado de Carro">Lavado de Carro</option> 
+              <option value="Respuesto para Volqueta">Respuesto para Volqueta</option> 
+              <option value="Combustible">Combustible</option>
+              <option value="Arcilla">Arcilla</option> 
+              <option value="Sub Base">Sub Base</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Editar material -->
+<div class="modal fade" id="editMaterialesModal" tabindex="-1" aria-labelledby="editMaterialesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editMaterialesModalLabel">Editar Material</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateMateriales()" #editMaterialesForm="ngForm">
+          <div class="mb-3">
+            <label for="codigo" class="form-label">Código</label>
+            <input type="text" class="form-control" disabled="codigo" id="codigo" [(ngModel)]="selectedMateriales.codigo" name="codigo" required />
+          </div>
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" [(ngModel)]="selectedMateriales.nombre" name="nombre" required />
+          </div>
+          <div class="mb-3">
+            <label for="costoSinIva" class="form-label">Costo sin IVA</label>
+            <input type="text" class="form-control" id="costoSinIva" [(ngModel)]="selectedMateriales.costoSinIva" name="costoSinIva" required />
+          </div>
+          <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo</label>
+            <select class="form-select" id="tipo" [(ngModel)]="selectedMateriales.tipo" name="tipo" required>
+              <option value="" disabled selected>Seleccione un tipo...</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Arena">Arena</option>
+              <option value="Ripio">Ripio</option>
+              <option value="Cascajo">Cascajo</option>
+              <option value="Piedra 3/4">Piedra 3/4</option>
+              <option value="Piedra Chispa">Piedra Chispa</option>
+              <option value="Cisco">Cisco</option>
+              <option value="Piedra Base">Piedra Base</option>
+              <option value="Lavado de Carro">Lavado de Carro</option> 
+              <option value="Respuesto para Volqueta">Respuesto para Volqueta</option> 
+              <option value="Combustible">Combustible</option>
+              <option value="Arcilla">Arcilla</option> 
+              <option value="Sub Base">Sub Base</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de éxito -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Operación Exitosa</h5>
+      </div>
+      <div class="modal-body text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+          <path d="M16 8a8 8 0 1 1-8-8 8 8 0 0 1 8 8zM7.293 5.293a1 1 0 0 0-1.414 0L4 7.586 5.707 9.293l1.414-1.414L9 6.707l2.707 2.707 1.414-1.414L8 4l-3.707 3.707z"/>
+        </svg>
+        <h4>Material Guardado Exitosamente</h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de eliminado-->
+ <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Material Eliminado</h5>
+      </div>
+      <div class="modal-body text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+          <path d="M16 8a8 8 0 1 1-8-8 8 8 0 0 1 8 8zM7.293 5.293a1 1 0 0 0-1.414 0L4 7.586 5.707 9.293l1.414-1.414L9 6.707l2.707 2.707 1.414-1.414L8 4l-3.707 3.707z"/>
+        </svg>
+        <h4>Material Eliminado con Éxito</h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -38,7 +38,7 @@ export class ClienteComponent {
     const nuevoClienteModalElement = document.getElementById('newClientModal');
     if (nuevoClienteModalElement) {
       const modal = new bootstrap.Modal(nuevoClienteModalElement);
-      modal.hide(); // 
+      modal.hide();
     }
 
     // Mostrar el modal de éxito
@@ -95,12 +95,12 @@ export class ClienteComponent {
       backdrop.remove();
     }
 
-      // Abrir de nuevo el modal de edición, por si el usuario necesita editar otro cliente
-      const newEditModalElement = document.getElementById('editClientModal');
-      if (newEditModalElement) {
-        const newEditModal = new bootstrap.Modal(newEditModalElement);
-        newEditModal.show();
-      }
+    // Abrir de nuevo el modal de edición, por si el usuario necesita editar otro cliente
+    const newEditModalElement = document.getElementById('editClientModal');
+    if (newEditModalElement) {
+      const newEditModal = new bootstrap.Modal(newEditModalElement);
+      newEditModal.show();
+    }
   }
 
   deleteCliente(cliente: any) {
