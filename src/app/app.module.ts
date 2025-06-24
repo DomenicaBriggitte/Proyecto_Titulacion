@@ -15,6 +15,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaterialesComponent } from './components/materiales/materiales.component';
+import { CotizacionComponent } from './components/cotizacion/cotizacion.component';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { MaterialesComponent } from './components/materiales/materiales.componen
     FooterComponent,
     NavbarComponent,
     SidebarComponent,
-    MaterialesComponent
+    MaterialesComponent,
+    CotizacionComponent
   ],
   imports: [
     BrowserModule,

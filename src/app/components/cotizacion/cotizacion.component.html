@@ -1,0 +1,73 @@
+<app-sidebar></app-sidebar>
+
+<div class="content">
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Crear Nueva Cotización</h2>
+
+    <form (ngSubmit)="guardarCotizacion()" #cotizacionForm="ngForm">
+      <!-- Selección de Cliente -->
+      <div class="mb-3">
+        <label for="cliente" class="form-label">Cliente</label>
+        <select class="form-control" id="cliente" [(ngModel)]="nuevaCotizacion.cliente" name="cliente" required>
+          <option *ngFor="let cliente of clientes" [value]="cliente.nombre">{{ cliente.nombre }}</option>
+        </select>
+      </div>
+
+      <!-- Selección de Materiales -->
+      <div class="mb-3">
+        <label for="materiales" class="form-label">Selecciona Materiales</label>
+        <div *ngFor="let material of materiales">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" (change)="seleccionarMaterial(material)" [value]="material.codigo" id="material-{{material.codigo}}">
+            <label class="form-check-label" for="material-{{material.codigo}}">
+              {{ material.nombre }} - {{ material.costoSinIva | currency }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información de la Cotización -->
+      <div class="mb-3">
+        <label for="fecha" class="form-label">Fecha</label>
+        <input type="date" class="form-control" id="fecha" [(ngModel)]="nuevaCotizacion.fecha" name="fecha" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="subtotal" class="form-label">Subtotal</label>
+        <input type="text" class="form-control" id="subtotal" [value]="nuevaCotizacion.subtotal | currency" readonly>
+      </div>
+
+      <div class="mb-3">
+        <label for="iva" class="form-label">IVA (12%)</label>
+        <input type="text" class="form-control" id="iva" [value]="nuevaCotizacion.iva | currency" readonly>
+      </div>
+
+      <div class="mb-3">
+        <label for="total" class="form-label">Total</label>
+        <input type="text" class="form-control" id="total" [value]="nuevaCotizacion.total | currency" readonly>
+      </div>
+
+      <button type="submit" class="btn btn-success">Guardar Cotización</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de Éxito -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Cotización Guardada</h5>
+      </div>
+      <div class="modal-body text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+          <path d="M16 8a8 8 0 1 1-8-8 8 8 0 0 1 8 8zM7.293 5.293a1 1 0 0 0-1.414 0L4 7.586 5.707 9.293l1.414-1.414L9 6.707l2.707 2.707 1.414-1.414L8 4l-3.707 3.707z"/>
+        </svg>
+        <h4>Cotización Guardada Exitosamente</h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

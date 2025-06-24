@@ -73,3 +73,8 @@
   background-color: #dc3545;
   border: 0;
 }
+
+.modal-body{
+  font-size: larger;
+  font-weight: 500;
+}

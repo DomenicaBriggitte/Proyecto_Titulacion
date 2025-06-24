@@ -8,6 +8,7 @@ import { RegistroVolquetaComponent } from './components/volqueta/registro-volque
 import { ReporteDiarioComponent } from './components/volqueta/reporte-diario/reporte-diario.component';
 import { FacturaComponent } from './components/factura/factura.component';
 import { MaterialesComponent } from './components/materiales/materiales.component'; 
+import { CotizacionComponent } from './components/cotizacion/cotizacion.component';
 
 const routes: Routes = [  
   { path: '', component: InicioComponent },
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path: 'reporte-diario', component: ReporteDiarioComponent },
   { path: 'factura', component: FacturaComponent },
   { path: 'materiales', component: MaterialesComponent },
+  { path: 'cotizacion', component: CotizacionComponent },
   { path: '**', redirectTo: '' }
 ];
 

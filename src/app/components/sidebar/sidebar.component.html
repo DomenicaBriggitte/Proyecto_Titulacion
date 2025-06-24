@@ -9,9 +9,10 @@
       <a class="nav-link" routerLink="/materiales" routerLinkActive="active">Materiales</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" routerLink="/pedido" routerLinkActive="active">
-        Pedidos
-      </a>
+      <a class="nav-link" routerLink="/cotizacion" routerLinkActive="active">Cotización</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/pedido" routerLinkActive="active">Pedidos</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" (click)="toggleVolquetasMenu()">
@@ -37,17 +38,17 @@
 </div>
 
 <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
       <div class="modal-header">
         <h5 class="modal-title" id="logoutModalLabel">Confirmar Cierre de Sesión</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body text-center">
         ¿Está seguro que desea cerrar sesión?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success" (click)="logout()">Sí</button>
+        <button type="button" class="btn btn-success" dara-bs-dismiss="modal" (click)="logout()">Sí</button>
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
       </div>
     </div>

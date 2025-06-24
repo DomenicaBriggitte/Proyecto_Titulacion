@@ -44,3 +44,13 @@ background-color: #e06d00;
   fill: #f47c00;
   filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));
 }
+
+.nav-link {
+  color: #f47a008e;
+  text-decoration: underline;
+  font-weight: normal;
+  transition: color 0.3s ease;
+  padding-top: 7px;
+  padding-right: 0;
+  max-width: fit-content;
+}

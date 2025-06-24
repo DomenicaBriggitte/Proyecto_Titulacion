@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth.service';
-
+import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-sidebar',
@@ -29,25 +29,23 @@ export class SidebarComponent {
   const modalElement = document.getElementById('logoutModal');
 
   if (modalElement) {
-    const logoutModal = new window.bootstrap.Modal(modalElement);
+    const logoutModal = new bootstrap.Modal(modalElement);
     logoutModal.show();
-  } else {
-    console.error('Modal no encontrado');
   }
 }
+
   // Función de cierre de sesión
   logout() {
     this.authService.logout();  
-    this.router.navigate(['/']);
-   
+    this.router.navigate(['']);
 
-      // Eliminar el backdrop
-      const backdrop = document.querySelector('.modal-backdrop');
-      if (backdrop) {
-        backdrop.remove();  // Eliminar la capa oscura
-      }
+    // Eliminar backdrop
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();  // Eliminar la capa oscura
     }
-  }
-    
+  
+  }   
+}
 
 
