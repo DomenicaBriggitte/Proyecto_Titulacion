@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth.service';
 
+
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
@@ -11,22 +12,42 @@ export class SidebarComponent {
   isVolquetasMenuOpen: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {
-
-  const volquetasMenuState = localStorage.getItem('volquetasMenuState');
+    const volquetasMenuState = localStorage.getItem('volquetasMenuState');
     if (volquetasMenuState) {
       this.isVolquetasMenuOpen = JSON.parse(volquetasMenuState);
     }
   }
 
-  //Alternar estado menú volquetas y guardar
+  // Alternar estado del menú de volquetas y guardar en localStorage
   toggleVolquetasMenu() {
     this.isVolquetasMenuOpen = !this.isVolquetasMenuOpen;
     localStorage.setItem('volquetasMenuState', JSON.stringify(this.isVolquetasMenuOpen));
   }
-    
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/']); // Navegar a la página de inicio
+  // Función para abrir el modal de confirmación de cierre de sesión
+  openLogoutModal() {
+  const modalElement = document.getElementById('logoutModal');
+
+  if (modalElement) {
+    const logoutModal = new window.bootstrap.Modal(modalElement);
+    logoutModal.show();
+  } else {
+    console.error('Modal no encontrado');
   }
 }
+  // Función de cierre de sesión
+  logout() {
+    this.authService.logout();  
+    this.router.navigate(['/']);
+   
+
+      // Eliminar el backdrop
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();  // Eliminar la capa oscura
+      }
+    }
+  }
+    
+
+

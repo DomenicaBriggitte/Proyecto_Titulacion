@@ -60,3 +60,16 @@
   vertical-align: top;
   transition: transform 0.3s ease;
 }
+.modal-header{
+  background-color: #ff6600;
+  color:#fff
+}
+.btn.btn-success{
+  background-color: #0b69cecb;
+  border: 0;
+}
+
+.btn.btn-danger{
+  background-color: #dc3545;
+  border: 0;
+}
