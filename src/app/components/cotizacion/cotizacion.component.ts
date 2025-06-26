@@ -1,17 +1,7 @@
 import { Component } from '@angular/core';
-import { ClienteComponent } from '../cliente/cliente.component';  // Para obtener la lista de clientes
-import { MaterialesComponent } from '../materiales/materiales.component';  // Para obtener la lista de materiales
 import * as bootstrap from 'bootstrap';
-
-// Define la interfaz para los materiales seleccionados
-interface MaterialSeleccionado {
-  codigo: string;
-  nombre: string;
-  costoSinIva: number;
-  cantidad: number;
-  iva: number;
-  total: number;
-}
+import { ClienteService } from '../../services/cliente.service';
+import { MaterialesService } from 'src/app/services/materiales.service';
 
 @Component({
   selector: 'app-cotizacion',
@@ -19,38 +9,138 @@ interface MaterialSeleccionado {
   styleUrls: ['./cotizacion.component.css']
 })
 export class CotizacionComponent {
-  // Clientes y materiales
-  clientes = [
-    { cedula: '0993192686001', nombre: 'ABC MOTOR ABCM S.A.' },
-    { cedula: '0992768193001', nombre: 'ACERCORP S. A.' }
-    // Agrega la lista de clientes aquí, puede venir de un servicio
-  ];
+  clientes: any[] = [];
+  materiales: any[] = [];
 
-  materiales = [
-    { codigo: '001', nombre: 'TRANSPORTE DE 8M', costoSinIva: 50.00 },
-    { codigo: '002', nombre: 'TRANSPORTE DE 12M', costoSinIva: 50.00 }
-    // Agrega la lista de materiales aquí, puede venir de un servicio
-  ];
+  constructor(
+    private clienteService: ClienteService,
+    private materialesService: MaterialesService
+  ) {
+    this.clientes = this.clienteService.getClientes();
+    this.materiales = this.materialesService.getMateriales();
+  }
 
-  // Variables para la cotización
-  nuevaCotizacion = {
+  // Lista de cotizaciones
+  cotizaciones: any[] = [];
+
+  // Propiedad para la búsqueda
+  searchQuery: string = '';
+  filteredCotizaciones: any[] = [];
+
+  // Propiedad para una nueva cotización
+  nuevoCotizacion = {
+    numero: '',
     cliente: '',
-    numeroCotizacion: '',
-    materialesSeleccionados: [] as MaterialSeleccionado[],  // Array de materiales seleccionados con la interfaz
     fecha: '',
-    subtotal: 0,
+    materialesSeleccionados: [] as any[],
+    subTotal: 0,
     iva: 0,
     total: 0
   };
 
-  cotizacionCount = 1;  // Se debe gestionar de alguna manera, podría ser un contador en el servicio
+  // Filtrar las cotizaciones por número o cliente
+  filterCotizaciones() {
+    this.filteredCotizaciones = this.cotizaciones.filter(cotizacion =>
+      cotizacion.numero.includes(this.searchQuery) ||
+      cotizacion.cliente.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+  }
+
+  // Método para generar un número de cotización único
+  generarNumeroCotizacion(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    // Buscar el mayor correlativo existente para el año y mes actual
+    let maxSecuencia = 0;
+    this.cotizaciones.forEach(c => {
+      if (c.numero) {
+        const match = c.numero.match(/^COT_(\d{4})(\d{2})(\d{6})$/);
+        if (match && match[1] === year.toString() && match[2] === month) {
+          const secuencia = parseInt(match[3], 10);
+          if (secuencia > maxSecuencia) {
+            maxSecuencia = secuencia;
+          }
+        }
+      }
+    });
+    const nuevaSecuencia = (maxSecuencia + 1).toString().padStart(6, '0');
+    return `COT_${year}${month}${nuevaSecuencia}`;
+  }
+
+  // Método para agregar una cotización
+  addCotizacion() {
+    this.nuevoCotizacion.numero = this.generarNumeroCotizacion();
+    this.cotizaciones.push({ ...this.nuevoCotizacion });
+    this.filteredCotizaciones = [...this.cotizaciones];
+    this.nuevoCotizacion = { numero: '', cliente: '', fecha: '', materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
+
+    // Cerrar el modal de nueva cotización y luego mostrar el de éxito
+    const modalElement = document.getElementById('nuevoCotizacionModal');
+    if (modalElement) {
+      const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+      modal.hide();
+    // Esperar a que termine de cerrarse antes de mostrar el de éxito
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      const successModalElement = document.getElementById('successModal');
+        if (successModalElement) {
+          const successModal = bootstrap.Modal.getInstance(successModalElement) || new bootstrap.Modal(successModalElement);
+          successModal.show();
+        }
+      }, { once: true });
+      
+      const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+          backdrop.remove(); // Eliminar capa oscura
+        }
+    }
+  }
+
+  // Método para eliminar una cotización
+  deleteCotizacion(cotizacion: any) {
+    const index = this.cotizaciones.findIndex(c => c.numero === cotizacion.numero);
+    if (index !== -1) {
+      this.cotizaciones.splice(index, 1);
+      this.filteredCotizaciones = [...this.cotizaciones];  // Actualizar la lista filtrada para mostrar los cambios
+    }
+  }
+
+  // Método para ver una cotización
+  viewCotizacion(cotizacion: any) {
+    console.log(cotizacion);
+    // Mostrar detalles de la cotización
+  }
+
+  // Método para editar una cotización
+  editCotizacion(cotizacion: any) {
+    this.nuevoCotizacion = { ...cotizacion };
+    const modalElement = document.getElementById('editCotizacionModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
+  }
+
+  // Método para actualizar la cotización
+  updateCotizacion() {
+    const index = this.cotizaciones.findIndex(c => c.numero === this.nuevoCotizacion.numero);
+    if (index !== -1) {
+      this.cotizaciones[index] = { ...this.nuevoCotizacion };
+      this.filteredCotizaciones = [...this.cotizaciones];  // Actualizar la lista filtrada para mostrar los cambios
+    }
+    this.nuevoCotizacion = { numero: '', cliente: '', fecha: '', materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
+
+    const modalElement = document.getElementById('editCotizacionModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.hide();
+    }
+  }
 
   // Método para seleccionar los materiales
   seleccionarMaterial(material: any) {
-    this.nuevaCotizacion.materialesSeleccionados.push({
-      codigo: material.codigo,
-      nombre: material.nombre,
-      costoSinIva: material.costoSinIva,
+    this.nuevoCotizacion.materialesSeleccionados.push({
+      ...material,
       cantidad: 1,
       iva: material.costoSinIva * 0.12,  // Ejemplo: 12% IVA
       total: material.costoSinIva * 1.12 // Precio con IVA
@@ -60,40 +150,22 @@ export class CotizacionComponent {
 
   // Método para calcular los totales
   calcularTotales() {
-    this.nuevaCotizacion.subtotal = this.nuevaCotizacion.materialesSeleccionados.reduce((acc, material) => acc + (material.costoSinIva * material.cantidad), 0);
-    this.nuevaCotizacion.iva = this.nuevaCotizacion.subtotal * 0.12; // Ejemplo de IVA 12%
-    this.nuevaCotizacion.total = this.nuevaCotizacion.subtotal + this.nuevaCotizacion.iva;
+    this.nuevoCotizacion.subTotal = this.nuevoCotizacion.materialesSeleccionados.reduce((acc, material) => acc + (material.costoSinIva * material.cantidad), 0);
+    this.nuevoCotizacion.iva = this.nuevoCotizacion.subTotal * 0.12; // Ejemplo de IVA 12%
+    this.nuevoCotizacion.total = this.nuevoCotizacion.subTotal + this.nuevoCotizacion.iva;
   }
 
-  // Método para guardar la cotización
-  guardarCotizacion() {
-    // Aquí se guardan los datos en la base de datos o en un arreglo
-    console.log(this.nuevaCotizacion); // Solo para verificar los datos
-    // Agregar la cotización a la lista o base de datos
 
-    // Cerrar el modal
-    const modalElement = document.getElementById('cotizacionModal');
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.hide();
-    }
-
-    // Mostrar el modal de éxito
-    const successModalElement = document.getElementById('successModal');
-    if (successModalElement) {
-      const successModal = new bootstrap.Modal(successModalElement);
-      successModal.show();
-    }
-
-    // Resetear formulario después de guardar
-    this.nuevaCotizacion = {
-      cliente: '',
-      numeroCotizacion: '',
-      materialesSeleccionados: [],
-      fecha: '',
-      subtotal: 0,
-      iva: 0,
-      total: 0
-    };
+  onMaterialChange(material: any, event: any): void {
+  if (!this.nuevoCotizacion.materialesSeleccionados) {
+    this.nuevoCotizacion.materialesSeleccionados = [];
   }
+  if (event.target.checked) {
+    this.nuevoCotizacion.materialesSeleccionados.push(material);
+  } else {
+    this.nuevoCotizacion.materialesSeleccionados = this.nuevoCotizacion.materialesSeleccionados.filter((m: any) => m.codigo !== material.codigo);
+  }
+  // Optionally, recalculate subTotal and total here if needed
+}
+
 }

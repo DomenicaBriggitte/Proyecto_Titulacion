@@ -1,36 +1,44 @@
 .content {
   margin-left: 250px;
-  padding: 10px;
+  padding: 20px;
   background-color: #f8f9fa;
-  height: 100%;
 }
 
-.form-control {
-  border-radius: 8px;
-  margin-bottom: 10px;
-  padding: 12px;
+.table th, .table td {
+  text-align: center;
+  vertical-align: middle;
 }
 
-.btn-success {
-  background-color: #28a745;
-  border-color: #28a745;
-  font-weight: bold;
+.table .thead-dark {
+  background-color: #343a40;
+  color: white;
 }
 
-/* Estilo para los botones de modal */
-.btn-close {
-  background-color: transparent;
-  border: none;
+.btn {
+  margin: 5px;
 }
 
-/* Modal de éxito */
+.nav-link.active {
+  background-color: #ff7f00;
+}
+
 .modal-header {
-  background-color: #28a745;
+  background-color: #f47c00;
   color: white;
 }
 
 .modal-body {
   background-color: #f8f9fa;
+}
+
+button[type="submit"] {
+  background-color: #ff7f00;
+  color: white;
+}
+
+button[type="button"] {
+  background-color: #dcdcdc;
+  color: black;
 }
 
 .modal-footer {

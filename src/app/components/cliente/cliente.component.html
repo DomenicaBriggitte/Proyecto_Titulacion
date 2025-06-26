@@ -31,7 +31,7 @@
         <tr *ngFor="let cliente of filteredClientes">
           <td>{{ cliente.cedula }}</td>
           <td>{{ cliente.nombre }}</td>
-          <td><span class="badge" [ngClass]="cliente.tipo === 'Fijo' ? 'bg-primary' : 'bg-warning'">{{ cliente.tipo }}</span></td>
+          <td><span class="badge" [ngClass]="cliente.tipo === 'Jurídica' ? 'bg-primary' : 'bg-warning'">{{ cliente.tipo }}</span></td>
           <td>{{ cliente.telefono }}</td>
           <td>{{ cliente.correo }}</td>
           <td>
@@ -76,8 +76,8 @@
             <label for="tipo" class="form-label">Tipo</label>
             <select class="form-control" id="tipo" [(ngModel)]="nuevoCliente.tipo" name="tipo" required>
               <option value="" disabled selected>Seleccione un tipo...</option>
-              <option value="Fijo">Fijo</option>
-              <option value="Ocasional">Ocasional</option>
+              <option value="Natural">Natural</option>
+              <option value="Jurídica">Jurídica</option>
             </select>
           </div>
           <button type="submit" class="btn btn-success w-100">Guardar</button>
