@@ -12,13 +12,14 @@ export class SidebarComponent {
   isVolquetasMenuOpen: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {
+    // Recuperar el estado del menú de volquetas de localStorage
     const volquetasMenuState = localStorage.getItem('volquetasMenuState');
     if (volquetasMenuState) {
       this.isVolquetasMenuOpen = JSON.parse(volquetasMenuState);
     }
   }
 
-  // Alternar estado del menú de volquetas y guardar en localStorage
+  // Alternar el estado del menú de volquetas y guardarlo en localStorage
   toggleVolquetasMenu() {
     this.isVolquetasMenuOpen = !this.isVolquetasMenuOpen;
     localStorage.setItem('volquetasMenuState', JSON.stringify(this.isVolquetasMenuOpen));
@@ -26,26 +27,29 @@ export class SidebarComponent {
 
   // Función para abrir el modal de confirmación de cierre de sesión
   openLogoutModal() {
-  const modalElement = document.getElementById('logoutModal');
-
-  if (modalElement) {
-    const logoutModal = new bootstrap.Modal(modalElement);
-    logoutModal.show();
+    const modalElement = document.getElementById('logoutModal');
+    if (modalElement) {
+      const logoutModal = new bootstrap.Modal(modalElement);
+      logoutModal.show();
+    }
   }
-}
 
   // Función de cierre de sesión
   logout() {
-    this.authService.logout();  
-    this.router.navigate(['']);
+    this.authService.logout();  // Cerrar sesión utilizando el servicio de autenticación
+    this.router.navigate(['/']); // Redirigir al usuario a la página principal
 
-    // Eliminar backdrop
+    // Cerrar el modal de confirmación de cierre de sesión
+    const deleteModalElement = document.getElementById('logoutModal');
+    if (deleteModalElement) {
+      const logoutModal = new bootstrap.Modal(deleteModalElement);
+      logoutModal.hide();  // Cerrar el modal
+    }
+
+    // Eliminar la capa oscura (backdrop)
     const backdrop = document.querySelector('.modal-backdrop');
     if (backdrop) {
-      backdrop.remove();  // Eliminar la capa oscura
+      backdrop.remove(); // Eliminar capa oscura
     }
-  
-  }   
+  }
 }
-
-

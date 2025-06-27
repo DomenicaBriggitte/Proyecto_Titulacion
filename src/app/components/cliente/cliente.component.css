@@ -125,7 +125,7 @@ button[type="button"] {
   background-color: #dc3545;
   color: white;
   border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px #0000001a;
 }
 
 .btn-danger:hover {
@@ -147,3 +147,13 @@ button[type="button"] {
   transition: transform 0.3s ease;
 }
 
+.btn.btn-si{
+  color: #ffffff;
+  background-color: #0b69cecb;
+  border: 0;
+}
+.btn.btn-no{
+  color: #ffffff;
+  background-color: #dc3545;
+  border: 0;
+}

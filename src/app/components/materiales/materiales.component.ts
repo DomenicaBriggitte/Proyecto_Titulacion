@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import * as bootstrap from 'bootstrap';
 import { MaterialesService } from '../../services/materiales.service';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-materiales',
@@ -30,32 +31,50 @@ export class MaterialesComponent {
     );
   }
 
-  addMateriales() {
-    // Agregar un nuevo material al arreglo
+    validateCodigo(event: KeyboardEvent) {
+    const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+    const regex = /^[0-9]$/;
+
+    if (allowedKeys.includes(event.key)) return;
+    if (!regex.test(event.key)) event.preventDefault();
+  }
+
+    validateCosto(event: KeyboardEvent) {
+    const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
+    const regex = /^[0-9.]$/;
+
+    if (allowedKeys.includes(event.key)) return;
+    if (!regex.test(event.key)) event.preventDefault();
+  }
+    isValidCurrency(value: string): boolean {
+    return /^\d+(\.\d{1,2})?$/.test(value);
+  }
+
+  addMateriales(form: NgForm) {
+    if (form.invalid || !this.isValidCurrency(String(this.nuevoMateriales.costoSinIva))) {
+
+      return;
+    }
+
     this.materiales.push({ ...this.nuevoMateriales });
     this.filteredMateriales = [...this.materiales];
     this.nuevoMateriales = { codigo: '', nombre: '', costoSinIva: 0, tipo: '' };
 
-    // Cerrar el modal de agregar material
-    const nuevoMaterialesModalElement = document.getElementById('newMaterialesModal');
-    if (nuevoMaterialesModalElement) {
-      const modal = new bootstrap.Modal(nuevoMaterialesModalElement);
+
+    const modalEl = document.getElementById('nuevoMaterialesModal');
+    if (modalEl) {
+      const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
       modal.hide();
     }
 
-    // Mostrar el modal de éxito
-    const successModalElement = document.getElementById('successModal');
-    if (successModalElement) {
-      const successModal = new bootstrap.Modal(successModalElement);
-      successModal.show(); // Mostrar el modal de éxito
-
-      // backdrop
+    const successModalEl = document.getElementById('successModal');
+    if (successModalEl) {
+      const successModal = new bootstrap.Modal(successModalEl);
+      successModal.show();
       setTimeout(() => {
         const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-          backdrop.remove(); // Eliminar capa oscura
-        }
-      }, 300); //
+        if (backdrop) backdrop.remove();
+      }, 300);
     }
   }
 
@@ -104,6 +123,45 @@ export class MaterialesComponent {
       newEditModal.show();
     }
   }
+
+  materialToDelete: any = null;  // Nueva implementación: para guardar el material temporalmente
+
+// Muestra el modal de confirmación
+showDeleteConfirmationModal(material: any) {
+  this.materialToDelete = material;
+  const modalElement = document.getElementById('deleteConfirmationModal');
+  if (modalElement) {
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  }
+}
+
+// Elimina el material después de confirmar
+confirmDeleteMaterial() {
+  const index = this.materiales.findIndex(m => m.codigo === this.materialToDelete.codigo);
+  if (index !== -1) {
+    this.materiales.splice(index, 1);
+    this.filteredMateriales = [...this.materiales];
+  }
+
+  // Cierra el modal de confirmación
+  const confirmModalElement = document.getElementById('deleteConfirmationModal');
+  if (confirmModalElement) {
+    const modal = bootstrap.Modal.getInstance(confirmModalElement);
+    modal?.hide();
+  }
+
+  // Muestra el modal de éxito
+  const deleteModalElement = document.getElementById('deleteModal');
+  if (deleteModalElement) {
+    const deleteModal = new bootstrap.Modal(deleteModalElement);
+    deleteModal.show();
+  }
+
+  // Limpia la variable
+  this.materialToDelete = null;
+}
+
 
   deleteMateriales(materiales: any) {
     const index = this.materiales.findIndex((m) => m.codigo === materiales.codigo);

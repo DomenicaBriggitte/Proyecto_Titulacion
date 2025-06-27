@@ -147,3 +147,13 @@ button[type="button"] {
   transition: transform 0.3s ease;
 }
 
+.btn.btn-si{
+  color: #ffffff;
+  background-color: #0b69cecb;
+  border: 0;
+}
+.btn.btn-no{
+  color: #ffffff;
+  background-color: #dc3545;
+  border: 0;
+}
