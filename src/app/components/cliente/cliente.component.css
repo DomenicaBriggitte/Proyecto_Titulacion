@@ -145,6 +145,25 @@ button[type="button"] {
   transition: transform 0.3s ease;
 }
 
+.bi.bi-check-circle-fill{
+  width: 80px;
+  height: 80px;
+  color:#28a745
+}
+
+/*Animación check*/
+@keyframes rotateReverse {
+  0% {
+    transform: rotate(0deg); /* inicia */
+  }
+  100% {
+    transform: rotate(360deg); /* termina */
+  }
+}
+
+.animate-check {
+  animation: rotateReverse 0.5s ease-in-out forwards; /* duración */
+}
 /*Visto y Animación*/
 .bi.bi-check-circle-fill{
   width: 80px;
