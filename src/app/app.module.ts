@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { NgxPaginationModule } from 'ngx-pagination';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,6 +17,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaterialesComponent } from './components/materiales/materiales.component';
 import { CotizacionComponent } from './components/cotizacion/cotizacion.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 
 @NgModule({
@@ -32,7 +34,8 @@ import { CotizacionComponent } from './components/cotizacion/cotizacion.componen
     NavbarComponent,
     SidebarComponent,
     MaterialesComponent,
-    CotizacionComponent
+    CotizacionComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -40,7 +43,8 @@ import { CotizacionComponent } from './components/cotizacion/cotizacion.componen
     CommonModule,
     FormsModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    NgxPaginationModule
   ],
   providers: [],
   bootstrap: [AppComponent]

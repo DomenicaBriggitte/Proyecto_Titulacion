@@ -53,7 +53,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form (ngSubmit)="addMateriales(nuevoMaterialesForm)" #nuevoMaterialesForm="ngForm">
+        <form #nuevoMaterialesForm="ngForm" (ngSubmit)="addMateriales(nuevoMaterialesForm)" >
 
           <!-- Código-->
           <div class="mb-3">
@@ -150,7 +150,16 @@
         <form (ngSubmit)="updateMateriales()" #editMaterialesForm="ngForm">
           <div class="mb-3">
             <label for="codigo" class="form-label">Código</label>
-            <input type="text" class="form-control" disabled="codigo" id="codigo" [(ngModel)]="selectedMateriales.codigo" name="codigo" required />
+            <input type="text" 
+                   class="form-control" 
+                   id="codigo" 
+                   [(ngModel)]="selectedMateriales.codigo" 
+                   name="codigo" 
+                   disabled 
+                   required 
+                   maxlength="5" 
+                   pattern="^[0-9]+$"
+                   (keydown)="validateCodigo($event)" />
           </div>
           <!-- Nombre-->
           <div class="mb-3">
@@ -159,7 +168,7 @@
                     class="form-control"
                     id="nombre"
                     name="nombre"
-                    [(ngModel)]="nuevoMateriales.nombre"
+                    [(ngModel)]="selectedMateriales.nombre"
                     maxlength="50"
                     required
                     #nombre="ngModel">
@@ -174,7 +183,7 @@
                       class="form-control"
                       id="costo"
                       name="costo"
-                      [(ngModel)]="nuevoMateriales.costoSinIva"
+                      [(ngModel)]="selectedMateriales.costoSinIva"
                       pattern="^\d+(\.\d{1,2})?$"
                       (keydown)="validateCosto($event)"
                       required
@@ -202,7 +211,7 @@
               <option value="Sub Base">Sub Base</option>
             </select>
           </div>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="!editMaterialesForm.valid">Guardar</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         </form>
       </div>

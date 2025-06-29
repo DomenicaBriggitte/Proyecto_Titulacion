@@ -155,81 +155,108 @@
 <!-- Editar cliente -->
 <div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content p-3">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editClientModalLabel">Editar Cliente</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form #nuevoClienteForm="ngForm" (ngSubmit)="addClient(nuevoClienteForm)">
+        <form (ngSubmit)="updateCliente()" #editClientForm="ngForm">
+          <!-- Cédula/RUC -->
           <div class="mb-3">
             <label for="cedula" class="form-label">Cédula/RUC</label>
-            <input type="text" class="form-control" disabled="cedula" id="cedula" [(ngModel)]="selectedCliente.cedula" name="cedula" required />
+            <input type="text" 
+                   class="form-control" 
+                   id="cedula" 
+                   [(ngModel)]="selectedCliente.cedula" 
+                   name="cedula" 
+                   disabled 
+                   required 
+                   maxlength="13" 
+                   pattern="^\d{10,13}$"
+                   (keydown)="validateCedula($event)"
+                   #cedula="ngModel" />
+            <div *ngIf="cedula.invalid && cedula.touched" class="text-danger">
+              <div *ngIf="cedula.errors?.['required']">Este campo es obligatorio.</div>
+              <div *ngIf="cedula.errors?.['pattern']">La cédula debe tener entre 10 y 13 dígitos numéricos</div>
+            </div>
           </div>
+
+          <!-- Razón Social o nombre -->
           <div class="mb-3">
             <label for="nombre" class="form-label">Razón Social / Nombre</label>
             <input type="text" 
-                    class="form-control" 
-                    id="nombre" [(ngModel)]="nuevoCliente.nombre" 
-                    name="nombre" 
-                    required
-                    maxlength="40"
-                    pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ. ]+$"
-                    (keydown)="validateName($event)"
-                    #nombre="ngModel"
-                     />
-                     <div *ngIf="nombre.invalid && nombre.touched" class="text-danger">
-                      <div *ngIf="nombre.errors?.['required']">Este campo es obligatorio.</div>
-                    </div>
+                   class="form-control" 
+                   id="nombre" 
+                   [(ngModel)]="selectedCliente.nombre" 
+                   name="nombre" 
+                   required
+                   maxlength="40"
+                   pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ. ]+$"
+                   (keydown)="validateName($event)"
+                   #nombre="ngModel" />
+            <div *ngIf="nombre.invalid && nombre.touched" class="text-danger">
+              <div *ngIf="nombre.errors?.['required']">Este campo es obligatorio.</div>
             </div>
-            <div class="mb-3">
-              <label for="telefono" class="form-label">Teléfono</label>
-              <input type="text" 
-              class="form-control" 
-              id="telefono" [(ngModel)]="nuevoCliente.telefono" 
-              name="telefono" 
-              required 
-              maxlength="10"
-              pattern="^[0-9]{10}$"
-              (keydown)="validatePhone($event)"
-              #telefono="ngModel"
-              />
-              <div *ngIf="telefono.invalid && telefono.touched" class="text-danger">
-                <div *ngIf="telefono.errors?.['required']">Este campo es obligatorio.</div>
-                <div *ngIf="telefono.errors?.['maxlength']">Teléfono debe tener 10 dígitos</div>
-              </div>
-            </div>
+          </div>
+
+          <!-- Número de Teléfono -->
           <div class="mb-3">
-              <label for="correo" class="form-label">Correo</label>
-                <input 
-                  type="email" 
-                  class="form-control" 
-                  id="correo" 
-                  [(ngModel)]="nuevoCliente.correo" 
-                  name="correo" 
-                  required
-                  maxlength="50"
-                  (keydown)="validateEmail($event)" 
-                  #correo="ngModel"
-                />
-              <div *ngIf="correo.invalid && correo.touched" class="text-danger">
-                <div *ngIf="correo.errors?.['required']">Este campo es obligatorio.</div>
-              </div>
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" 
+                   class="form-control" 
+                   id="telefono" 
+                   [(ngModel)]="selectedCliente.telefono" 
+                   name="telefono" 
+                   required 
+                   maxlength="10"
+                   pattern="^[0-9]{10}$"
+                   (keydown)="validatePhone($event)"
+                   #telefono="ngModel" />
+            <div *ngIf="telefono.invalid && telefono.touched" class="text-danger">
+              <div *ngIf="telefono.errors?.['required']">Este campo es obligatorio.</div>
+              <div *ngIf="telefono.errors?.['maxlength']">Teléfono debe tener 10 dígitos</div>
             </div>
+          </div>
+
+          <!-- Correo Electrónico -->
+          <div class="mb-3">
+            <label for="correo" class="form-label">Correo</label>
+            <input type="email" 
+                   class="form-control" 
+                   id="correo" 
+                   [(ngModel)]="selectedCliente.correo" 
+                   name="correo" 
+                   required 
+                   maxlength="50"
+                   (keydown)="validateEmail($event)"
+                   #correo="ngModel" />
+            <div *ngIf="correo.invalid && correo.touched" class="text-danger">
+              <div *ngIf="correo.errors?.['required']">Este campo es obligatorio.</div>
+            </div>
+          </div>
+
+          <!-- Tipo -->
           <div class="mb-3">
             <label for="tipo" class="form-label">Tipo</label>
-            <select class="form-control" id="tipo" [(ngModel)]="selectedCliente.tipo" name="tipo" required>
-              <option value="Fijo">Fijo</option>
-              <option value="Ocasional">Ocasional</option>
+            <select class="form-select" 
+                    id="tipo" 
+                    [(ngModel)]="selectedCliente.tipo" 
+                    name="tipo" 
+                    required>
+              <option value="Natural">Natural</option>
+              <option value="Jurídica">Jurídica</option>
             </select>
           </div>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+
+          <button type="submit" class="btn btn-primary" [disabled]="!editClientForm.valid">Guardar</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
         </form>
       </div>
     </div>
   </div>
 </div>
+
 
 <!-- Modal de éxito -->
 <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
