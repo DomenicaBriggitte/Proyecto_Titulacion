@@ -1,66 +1,72 @@
-/* Estilos generales */
+/* ============================ */
+/* Estilos Generales */
+/* ============================ */
 .main-container {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
 
+/* ============================ */
 /* Sección ¿Quiénes somos? */
+/* ============================ */
 .about-us {
   background-color: #ffffff;
   padding: 50px 20px;
+  
 }
 
-/* Contenedor para la imagen y la descripción */
 .about-us-content {
-  display: flex;             
-  justify-content: space-between; 
-  align-items: center;       
-  gap: 20px;                 
-  flex-wrap: wrap;            
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .about-us-img-container {
-  flex: 1;                   
+  flex: 1;
 }
 
 .about-us-img {
-  width: 100%;              
-  max-width: 300px;         
-  height: auto;             
-  border-radius: 40px;      
-  clip-path: ellipse(60% 60% at 50% 50%);  
-  object-fit: cover;        
+  width: 100%;
+  max-width: 300px;
+  height: 300px; /* Altura fija para hacer la imagen cuadrada */
+  object-fit: cover;
+  border-radius: 20px;
 }
 
-/* Descripción del texto */
 .about-us-description {
-  flex: 2;                   
-  text-align: left;         
-  font-size: 18px;
+  flex: 2;
+  text-align: left;
+  font-size: 20px;
+  font-family: 'Lora', serif;
 }
 
 .about-us-description p {
   color: #555;
   line-height: 1.6;
 }
+
 .about-us h2 {
   color: #f47c00;
   font-size: 50px;
-  padding-right: 300px;
-  font-weight: bold;                  
-  text-align: right;          
- 
+  font-weight: bold;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  margin-top:30px;
 }
 
 .about-us-description h1 {
   color: #f47c00;
   font-size: 25px;
   font-weight: bold;
-  margin-top: 20px;
+  font-family: 'Lora', serif;
 }
 
-/* Estilo para la sección de Contactenos */
+/* ============================ */
+/* Sección de Contacto (Contactenos) */
+/* ============================ */
 .contac-us {
   background-color: #ffffff;
   padding: 50px 20px;
@@ -71,12 +77,16 @@
   color: #f47c00;
   font-size: 50px;
   font-weight: bold;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+   margin-top:30px;
 }
 
 .contac-us p {
   color: #555;
   font-size: 18px;
   line-height: 1.6;
+  font-family: 'Lora', serif;
 }
 
 /* Estilo para el botón de WhatsApp */
@@ -101,13 +111,103 @@
   transition: background-color 0.3s ease;
 }
 
-/* Estilos del carrusel */
-.carousel-inner img {
-  object-fit: cover;
-  height: 400px;
+/* ============================ */
+/* Sección de Servicios */
+/* ============================ */
+.services {
+  padding: 50px 20px;
+  text-align: center;
+  background: linear-gradient(to bottom, #000000aa, #0000003f, #00000000);
 }
 
-/* Estilo de los captions */
+.services h2 {
+  color: #ffffff;
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  margin-top:30px;
+}
+
+/* Contenedor de las tarjetas de servicio */
+.services-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 20px;
+}
+
+.service-card {
+  flex: 1 1 30%; /* Ocupa el 30% del ancho */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px #0000001a;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.service-card:hover {
+  transform: scale(1.05); /* Efecto de ampliación al pasar el mouse */
+}
+
+/* Estilo de la imagen dentro de la tarjeta de servicio */
+.service-img {
+  width: 500px;
+  height: 200px; /* Fija la altura de la imagen */
+  object-fit: cover;
+  margin-bottom: 15px;
+  border-radius: 10px;
+}
+
+.service-card h3 {
+  color: #f47c00;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-family: 'Lora', serif;
+}
+
+.service-card p {
+  color: #555;
+  font-size: 16px;
+  line-height: 1.6;
+  font-family: 'Lora', serif;
+}
+
+/* ============================ */
+/* Estilos de Carrusel */
+/* ============================ */
+
+
+.carousel-indicators li {
+  width: 12px;
+  height: 12px;
+  background-color: #f47c00; /* Color de los indicadores */
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.carousel-indicators li.active {
+  background-color: #ff6600; /* Color de los indicadores activos */
+}
+
+.carousel-indicators li:hover {
+  background-color: #ff6600; /* Color cuando se pasa el mouse por encima */
+}
+
+.carousel-inner img {
+  object-fit: cover;
+  height: 300px; /* Ajusta la altura de las imágenes */
+}
+
+/* Ajustes del carrusel dentro de la sección de servicios */
+.carousel-inner {
+  display: flex;
+  justify-content: space-between;
+}
+
 .carousel-caption {
   background-color: #00000080;
   color: #ffffff;
@@ -116,53 +216,32 @@
   margin-top: 20px;
 }
 
-/* Estilos de la sección de servicios */
-.services h2 {
-  text-align: center;
-  font-size: 50px;
-  margin-bottom: 30px;
-  color: #ffffff;
-  font-weight: bold;
+.carousel-control-prev-icon, .carousel-control-next-icon {
+  background-color: #f47a0000; /* Color de los controles */
 }
 
-/* Sección de Servicios */
-.services {
-  padding: 50px 20px;
- 
-  text-align: center;
-  background: linear-gradient(to bottom, #4b4a4ab3, #e67d22bd, #e67d221c);
-}
-
-/* Ajustes del carrusel dentro de la sección de servicios */
-.carousel-item {
-  position: relative;
-}
-
-.carousel-item img {
-  width: 80%;
-  max-width: 900px;
-  max-height: 400px;
-  object-fit: contain;
-  margin: 0 auto;
-  display: block;
-}
-
-.carousel-caption h5 {
-  font-size: 24px;
-}
-
-.carousel-caption p {
-  font-size: 16px;
-}
-
+/* ============================ */
 /* Responsividad para pantallas pequeñas */
+/* ============================ */
 @media (max-width: 768px) {
+  /* Ajustes en la sección ¿Quiénes somos? */
   .about-us-content {
-    flex-direction: column; 
-    text-align: center;    
+    flex-direction: column;
+    text-align: center;
   }
 
   .about-us-img-container {
-    margin-bottom: 20px;   
+    margin-bottom: 20px;
+  }
+
+  /* Ajustes en la sección de servicios */
+  .services-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .service-card {
+    margin-bottom: 20px;
+    text-align: center;
   }
 }

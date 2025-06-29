@@ -44,3 +44,21 @@ button[type="button"] {
 .modal-footer {
   justify-content: center;
 }
+
+/*Visto y Animación*/
+.bi.bi-check-circle-fill{
+  width: 80px;
+  height: 80px;
+  color:#28a745
+}
+@keyframes rotateReverse {
+  0% {
+    transform: rotate(0deg); /* inicia */
+  }
+  100% {
+    transform: rotate(360deg); /* termina */
+  }
+}
+.animate-check {
+  animation: rotateReverse 0.3s ease-in-out forwards; /* duración */
+}

@@ -15,6 +15,7 @@ import * as bootstrap from 'bootstrap';
 export class LoginComponent {
   user: string = '';
   password: string = '';
+  showError: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -26,13 +27,13 @@ export class LoginComponent {
       if(modalElement) {
         const modal = bootstrap.Modal.getInstance(modalElement);
         if (modal) {
-          modal.hide();  // Cierra el modal
+          modal.hide();
         }
       }
 
       this.router.navigate(['/cliente']);
     } else {
-      alert('Credenciales incorrectas');
-    }
+        this.showError = true;
+      }
   }
 }

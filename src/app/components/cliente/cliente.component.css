@@ -63,6 +63,8 @@ table th {
 
 .modal-body {
   background-color: #f8f9fa;
+  font-weight: normal;
+  font-size: larger;
 }
 
 button[type="submit"] {
@@ -102,40 +104,36 @@ button[type="button"] {
 }
 
 /* Botón editar */
-.btn-info {
+.btn-info, .btn.btn-si {
   background-color: #007bff;
   color: white;
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
-.btn-info:hover {
+.btn-info:hover, .btn.btn-si:hover {
   background-color: #0056b3; 
   color: white;
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
-
-.btn-info:active {
+.btn-info:active, .btn.btn-si:active {
   background-color: #003d8b;
 }
 
 /* Botón de eliminar */
-.btn-danger {
+.btn-danger, .btn.btn-no {
   background-color: #dc3545;
   color: white;
   border: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px #0000001a;
 }
-
-.btn-danger:hover {
+.btn-danger:hover, .btn.btn-no:hover {
   background-color: #c82333; 
   color: white;
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
-
-.btn-danger:active {
+.btn-danger:active, .btn.btn-no:active {
   background-color: #a71d2a; 
 }
 
@@ -165,4 +163,21 @@ button[type="button"] {
 
 .animate-check {
   animation: rotateReverse 0.5s ease-in-out forwards; /* duración */
+}
+/*Visto y Animación*/
+.bi.bi-check-circle-fill{
+  width: 80px;
+  height: 80px;
+  color:#28a745
+}
+@keyframes rotateReverse {
+  0% {
+    transform: rotate(0deg); /* inicia */
+  }
+  100% {
+    transform: rotate(360deg); /* termina */
+  }
+}
+.animate-check {
+  animation: rotateReverse 0.3s ease-in-out forwards; /* duración */
 }

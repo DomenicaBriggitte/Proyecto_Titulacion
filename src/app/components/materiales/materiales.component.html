@@ -35,7 +35,7 @@
           <td>
             <button class="btn btn-info btn-sm" (click)="editMateriales(materiales)">
               <i class="fas fa-edit"></i></button>
-            <button class="btn btn-danger btn-sm" (click)="deleteMateriales(materiales)">
+           <button class="btn btn-danger btn-sm" (click)="showDeleteConfirmationModal(materiales)">
               <i class="fas fa-trash-alt"></i></button>
           </td>
         </tr>
@@ -53,39 +53,85 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form (ngSubmit)="addMateriales()" #nuevoMaterialesForm="ngForm">
+        <form (ngSubmit)="addMateriales(nuevoMaterialesForm)" #nuevoMaterialesForm="ngForm">
+
+          <!-- Código-->
           <div class="mb-3">
             <label for="codigo" class="form-label">Código</label>
-            <input type="text" class="form-control" id="codigo" [(ngModel)]="nuevoMateriales.codigo" name="codigo" required />
+            <input type="text"
+                  class="form-control"
+                  id="codigo"
+                  name="codigo"
+                  [(ngModel)]="nuevoMateriales.codigo"
+                  pattern="^[0-9]+$"
+                  (keydown)="validateCodigo($event)"
+                  maxlength="5"
+                  required
+                  #codigo="ngModel">
+            <div *ngIf="codigo.invalid && codigo.touched" class="text-danger">
+              <div *ngIf="codigo.errors?.['required']">Este campo es obligatorio.</div>
+            </div>
           </div>
+          <!-- Nombre-->
           <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="nombre" [(ngModel)]="nuevoMateriales.nombre" name="nombre" required />
-          </div>
-          <div class="mb-3">
-            <label for="costo" class="form-label">Costo sin IVA</label>
-            <input type="text" class="form-control" id="costo" [(ngModel)]="nuevoMateriales.costoSinIva" name="costo" required />
-          </div>
-          <div class="mb-3">
-            <label for="tipo" class="form-label">Tipo</label>
-            <select class="form-select" id="tipo" [(ngModel)]="nuevoMateriales.tipo" name="tipo" required>
-              <option value="" disabled selected>Seleccione un tipo...</option>
-              <option value="Transporte">Transporte</option>
-              <option value="Arena">Arena</option>
-              <option value="Ripio">Ripio</option>
-              <option value="Cascajo">Cascajo</option>
-              <option value="Piedra 3/4">Piedra 3/4</option>
-              <option value="Piedra Chispa">Piedra Chispa</option>
-              <option value="Cisco">Cisco</option>
-              <option value="Piedra Base">Piedra Base</option>
-              <option value="Lavado de Carro">Lavado de Carro</option> 
-              <option value="Respuesto para Volqueta">Respuesto para Volqueta</option> 
-              <option value="Combustible">Combustible</option>
-              <option value="Arcilla">Arcilla</option> 
-              <option value="Sub Base">Sub Base</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-success w-100">Guardar</button>
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text"
+                    class="form-control"
+                    id="nombre"
+                    name="nombre"
+                    [(ngModel)]="nuevoMateriales.nombre"
+                    maxlength="50"
+                    required
+                    #nombre="ngModel">
+              <div *ngIf="nombre.invalid && nombre.touched" class="text-danger">
+                <div *ngIf="nombre.errors?.['required']">Este campo es obligatorio.</div>
+              </div>
+            </div>
+          <!-- Costo-->
+            <div class="mb-3">
+                <label for="costo" class="form-label">Costo sin IVA</label>
+                <input type="text"
+                      class="form-control"
+                      id="costo"
+                      name="costo"
+                      [(ngModel)]="nuevoMateriales.costoSinIva"
+                      pattern="^\d+(\.\d{1,2})?$"
+                      (keydown)="validateCosto($event)"
+                      required
+                      #costo="ngModel">
+                <div *ngIf="costo.invalid && costo.touched" class="text-danger">
+                  <div *ngIf="costo.errors?.['required']">Este campo es obligatorio.</div>
+                </div>
+              </div>
+              <!-- Tipo (select obligatorio) -->
+              <div class="mb-3">
+                <label for="tipo" class="form-label">Tipo</label>
+                <select class="form-select"
+                        id="tipo"
+                        name="tipo"
+                        [(ngModel)]="nuevoMateriales.tipo"
+                        required
+                        #tipo="ngModel">
+                  <option value="" disabled selected>Seleccione un tipo...</option>
+                  <option value="Transporte">Transporte</option>
+                  <option value="Arena">Arena</option>
+                  <option value="Ripio">Ripio</option>
+                  <option value="Cascajo">Cascajo</option>
+                  <option value="Piedra 3/4">Piedra 3/4</option>
+                  <option value="Piedra Chispa">Piedra Chispa</option>
+                  <option value="Cisco">Cisco</option>
+                  <option value="Piedra Base">Piedra Base</option>
+                  <option value="Lavado de Carro">Lavado de Carro</option>
+                  <option value="Respuesto para Volqueta">Respuesto para Volqueta</option>
+                  <option value="Combustible">Combustible</option>
+                  <option value="Arcilla">Arcilla</option>
+                  <option value="Sub Base">Sub Base</option>
+                </select>
+                <div *ngIf="tipo.invalid && tipo.touched" class="text-danger">
+                  <div *ngIf="tipo.errors?.['required']">Debe seleccionar un tipo.</div>
+                </div>
+              </div>
+          <button type="submit" class="btn btn-success w-100" [disabled]="!nuevoMaterialesForm.valid">Guardar</button>
         </form>
       </div>
     </div>
@@ -106,14 +152,37 @@
             <label for="codigo" class="form-label">Código</label>
             <input type="text" class="form-control" disabled="codigo" id="codigo" [(ngModel)]="selectedMateriales.codigo" name="codigo" required />
           </div>
+          <!-- Nombre-->
           <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="nombre" [(ngModel)]="selectedMateriales.nombre" name="nombre" required />
-          </div>
-          <div class="mb-3">
-            <label for="costoSinIva" class="form-label">Costo sin IVA</label>
-            <input type="text" class="form-control" id="costoSinIva" [(ngModel)]="selectedMateriales.costoSinIva" name="costoSinIva" required />
-          </div>
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text"
+                    class="form-control"
+                    id="nombre"
+                    name="nombre"
+                    [(ngModel)]="nuevoMateriales.nombre"
+                    maxlength="50"
+                    required
+                    #nombre="ngModel">
+              <div *ngIf="nombre.invalid && nombre.touched" class="text-danger">
+                <div *ngIf="nombre.errors?.['required']">Este campo es obligatorio.</div>
+              </div>
+            </div>
+          <!-- Costo-->
+            <div class="mb-3">
+                <label for="costo" class="form-label">Costo sin IVA</label>
+                <input type="text"
+                      class="form-control"
+                      id="costo"
+                      name="costo"
+                      [(ngModel)]="nuevoMateriales.costoSinIva"
+                      pattern="^\d+(\.\d{1,2})?$"
+                      (keydown)="validateCosto($event)"
+                      required
+                      #costo="ngModel">
+                <div *ngIf="costo.invalid && costo.touched" class="text-danger">
+                  <div *ngIf="costo.errors?.['required']">Este campo es obligatorio.</div>
+                </div>
+              </div>
           <div class="mb-3">
             <label for="tipo" class="form-label">Tipo</label>
             <select class="form-select" id="tipo" [(ngModel)]="selectedMateriales.tipo" name="tipo" required>
@@ -161,6 +230,26 @@
   </div>
 </div>
 
+
+<!-- Modal de Confirmación de Eliminación de Material -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmationLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>¿Está seguro que desea eliminar este material?</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-si" (click)="confirmDeleteMaterial()">Sí</button>
+        <button type="button" class="btn btn-no" data-bs-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal de eliminado-->
  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -169,8 +258,8 @@
         <h5 class="modal-title" id="successModalLabel">Material Eliminado</h5>
       </div>
       <div class="modal-body text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
-          <path d="M16 8a8 8 0 1 1-8-8 8 8 0 0 1 8 8zM7.293 5.293a1 1 0 0 0-1.414 0L4 7.586 5.707 9.293l1.414-1.414L9 6.707l2.707 2.707 1.414-1.414L8 4l-3.707 3.707z"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill animate-check" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
         </svg>
         <h4>Material Eliminado con Éxito</h4>
       </div>
