@@ -54,3 +54,13 @@ background-color: #e06d00;
   padding-right: 0;
   max-width: fit-content;
 }
+
+.btn.btn-warning{
+  margin-bottom: 10px;
+}
+
+.alert.alert-danger{
+  padding: 3px;
+  border-radius: 0px;
+  text-align: center;
+}

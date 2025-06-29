@@ -14,11 +14,13 @@
 
       <div class="mb-3">
         <label for="password" class="form-label fw-bold">Contraseña</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="Ingresa tu contraseña" required [(ngModel)]="password" #passwordInput="ngModel" />
+        <input type="password" id="password" name="password" class="form-control" placeholder="Ingresa tu Contraseña" required [(ngModel)]="password" #passwordInput="ngModel" />
         <div *ngIf="passwordInput.invalid && passwordInput.touched" class="text-danger">La contraseña es requerida.</div>
       </div>
+      <div *ngIf="showError" class="alert alert-danger" role="alert">
+        ¡Credenciales incorrectas!
+      </div> 
       
       <button type="submit" class="btn btn-warning w-100 fw-bold">Iniciar Sesión</button>
- 
     </form>
   </div>
