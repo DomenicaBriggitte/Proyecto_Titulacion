@@ -11,7 +11,7 @@ import { NgForm } from '@angular/forms';
 })
 export class ClienteComponent {
   clientes: any[] = [];
-  
+
   constructor(private clienteService: ClienteService) {
     this.clientes = this.clienteService.getClientes();
     this.filteredClientes = [...this.clientes];
@@ -45,7 +45,6 @@ export class ClienteComponent {
       event.preventDefault(); // Bloquear la tecla no permitida
     }
   }
-
 
     // Validación del nombre para asegurarse de que solo contenga letras y puntos
     validateName(event: KeyboardEvent) {
@@ -132,14 +131,17 @@ errorClienteExistente: boolean = false;
   }
   
 
-  editCliente(cliente: any) {
-    this.selectedCliente = { ...cliente }; // Copiar la información del cliente seleccionado
-    const modalElement = document.getElementById('editClientModal');
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show(); // Abrir el modal para editar el cliente
-    }
+// Función para editar un cliente
+editCliente(cliente: any) {
+  // Copiar los datos del cliente seleccionado en selectedCliente
+  this.selectedCliente = { ...cliente }; 
+  // Abrir el modal de edición
+  const modalElement = document.getElementById('editClientModal');
+  if (modalElement) {
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show(); // Mostrar el modal
   }
+}
 
   updateCliente() {
     // Aquí se guardan los cambios, se puede agregar lógica para actualizar la base de datos
