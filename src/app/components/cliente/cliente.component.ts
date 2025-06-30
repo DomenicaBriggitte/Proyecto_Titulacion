@@ -11,10 +11,17 @@ import { NgForm } from '@angular/forms';
 })
 export class ClienteComponent {
   clientes: any[] = [];
+  ngOnInit() {
+    this.clienteService.getClientes().subscribe(data => {
+      this.clientes = data;
+    });
+  }
 
   constructor(private clienteService: ClienteService) {
-    this.clientes = this.clienteService.getClientes();
-    this.filteredClientes = [...this.clientes];
+    this.clienteService.getClientes().subscribe((clientes: any[]) => {
+      this.clientes = clientes;
+      this.filteredClientes = [...this.clientes];
+    });
   }
 
   nuevoCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
@@ -97,38 +104,22 @@ validateEmail(event: KeyboardEvent) {
 }
 
 errorClienteExistente: boolean = false;
-  // Agregar nuevo cliente
-  addClient(form: NgForm) {
 
-      if (form.invalid) {
-    return; // Detiene la ejecución si el formulario no es válido
-  }
-    this.clientes.push({ ...this.nuevoCliente });
-    this.filteredClientes = [...this.clientes];
-    this.nuevoCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
-
-    // Cerrar el modal de agregar cliente
-    const nuevoClienteModalElement = document.getElementById('newClientModal');
-    if (nuevoClienteModalElement) {
-      const modal = new bootstrap.Modal(nuevoClienteModalElement);
-      modal.hide();
+// Agregar nuevo cliente
+addClient(form: NgForm) {
+  if (form.invalid) return;
+  this.clienteService.addCliente(this.nuevoCliente).subscribe({
+    next: (cliente) => {
+      this.clientes.push(cliente);
+      this.filteredClientes = [...this.clientes];
+      this.nuevoCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
+      // Cierra el modal y muestra éxito (igual que antes)
+    },
+    error: (err) => {
+      alert('Error al agregar cliente: ' + (err.error?.message || err.message));
     }
-
-    // Mostrar el modal de éxito
-    const successModalElement = document.getElementById('successModal');
-    if (successModalElement) {
-      const successModal = new bootstrap.Modal(successModalElement);
-      successModal.show(); // Mostrar el modal de éxito
-
-      // backdrop
-      setTimeout(() => {
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-          backdrop.remove(); // Eliminar capa oscura
-        }
-      }, 300); //
-    }
-  }
+  });
+}
   
 
 // Función para editar un cliente
@@ -143,43 +134,24 @@ editCliente(cliente: any) {
   }
 }
 
-  updateCliente() {
-    // Aquí se guardan los cambios, se puede agregar lógica para actualizar la base de datos
-    const index = this.clientes.findIndex(cliente => cliente.cedula === this.selectedCliente.cedula);
-    if (index !== -1) {
-      this.clientes[index] = { ...this.selectedCliente }; // Actualizar el cliente en la lista
-      this.filteredClientes = [...this.clientes];  // Actualizar la lista filtrada para mostrar los cambios
+// Actualizar cliente
+updateCliente() {
+  this.clienteService.updateCliente(this.selectedCliente).subscribe({
+    next: () => {
+      const index = this.clientes.findIndex(c => c.cedula === this.selectedCliente.cedula);
+      if (index !== -1) {
+        this.clientes[index] = { ...this.selectedCliente };
+        this.filteredClientes = [...this.clientes];
+      }
+      // Cierra el modal y muestra éxito (igual que antes)
+    },
+    error: (err) => {
+      alert('Error al actualizar cliente: ' + (err.error?.message || err.message));
     }
+  });
+}
 
-    // Cerrar el modal de editar
-    const editModalElement = document.getElementById('editClientModal');
-    if (editModalElement) {
-      const modal = new bootstrap.Modal(editModalElement);
-      modal.hide(); // Cerrar el modal de editar
-    }
-
-    // Mostrar el modal de éxito
-    const successModalElement = document.getElementById('successModal');
-    if (successModalElement) {
-      const successModal = new bootstrap.Modal(successModalElement);
-      successModal.show(); // Mostrar modal de éxito
-      successModal.hide();
-    }
-
-    // Asegurarse de que el backdrop se elimine al cerrar el modal
-    const backdrop = document.querySelector('.modal-backdrop');
-    if (backdrop) {
-      backdrop.remove();
-    }
-
-    // Abrir de nuevo el modal de edición, por si el usuario necesita editar otro cliente
-    const newEditModalElement = document.getElementById('editClientModal');
-    if (newEditModalElement) {
-      const newEditModal = new bootstrap.Modal(newEditModalElement);
-      newEditModal.show();
-    }
-  }
-  clienteParaEliminar: any = null;
+clienteParaEliminar: any = null;
 deleteCliente(cliente: any) {
   this.clienteParaEliminar = cliente;
   const confirmModalElement = document.getElementById('confirmDeleteModal');
@@ -193,28 +165,23 @@ deleteCliente(cliente: any) {
       backdrop.remove(); // Eliminar la capa oscura
     }
 }
+
+// Eliminar cliente
 confirmDelete() {
-  const index = this.clientes.findIndex(c => c.cedula === this.clienteParaEliminar.cedula);
-  if (index !== -1) {
-    this.clientes.splice(index, 1);
-    this.filteredClientes = [...this.clientes];
-  }
-
-  this.clienteParaEliminar = null;
-
-  // Cierra el modal de confirmación
-  const confirmModalElement = document.getElementById('confirmDeleteModal');
-  if (confirmModalElement) {
-    const confirmModal = bootstrap.Modal.getInstance(confirmModalElement);
-    confirmModal?.hide();
-  }
-
-  // Muestra el modal de éxito
-  const deleteModalElement = document.getElementById('deleteModal');
-  if (deleteModalElement) {
-    const deleteModal = new bootstrap.Modal(deleteModalElement);
-    deleteModal.show();
-  }
+  this.clienteService.deleteCliente(this.clienteParaEliminar.cedula).subscribe({
+    next: () => {
+      const index = this.clientes.findIndex(c => c.cedula === this.clienteParaEliminar.cedula);
+      if (index !== -1) {
+        this.clientes.splice(index, 1);
+        this.filteredClientes = [...this.clientes];
+      }
+      this.clienteParaEliminar = null;
+      // Cierra el modal y muestra éxito (igual que antes)
+    },
+    error: (err) => {
+      alert('Error al eliminar cliente: ' + (err.error?.message || err.message));
+    }
+  });
 }
 
   // Función para cerrar un modal y eliminar el backdrop

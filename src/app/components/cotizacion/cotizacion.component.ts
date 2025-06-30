@@ -16,7 +16,9 @@ export class CotizacionComponent {
     private clienteService: ClienteService,
     private materialesService: MaterialesService
   ) {
-    this.clientes = this.clienteService.getClientes();
+    this.clienteService.getClientes().subscribe((clientes: any[]) => {
+      this.clientes = clientes;
+    });
     this.materiales = this.materialesService.getMateriales();
   }
 
@@ -74,6 +76,16 @@ export class CotizacionComponent {
     this.cotizaciones.push({ ...this.nuevoCotizacion });
     this.filteredCotizaciones = [...this.cotizaciones];
     this.nuevoCotizacion = { numero: '', cliente: '', fecha: '', materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
+
+    this.nuevoCotizacion = {
+      numero: '',
+      cliente: '',
+      fecha: '',
+      materialesSeleccionados: [],
+      subTotal: 0,
+      iva: 0,
+      total: 0
+    };
 
     // Cerrar el modal de nueva cotización y luego mostrar el de éxito
     const modalElement = document.getElementById('nuevoCotizacionModal');
@@ -142,8 +154,8 @@ export class CotizacionComponent {
     this.nuevoCotizacion.materialesSeleccionados.push({
       ...material,
       cantidad: 1,
-      iva: material.costoSinIva * 0.12,  // Ejemplo: 12% IVA
-      total: material.costoSinIva * 1.12 // Precio con IVA
+      iva: material.costoSinIva * 0.15,  // Ejemplo: 12% IVA
+      total: material.costoSinIva * 1.15 // Precio con IVA
     });
     this.calcularTotales();
   }
@@ -165,7 +177,6 @@ export class CotizacionComponent {
   } else {
     this.nuevoCotizacion.materialesSeleccionados = this.nuevoCotizacion.materialesSeleccionados.filter((m: any) => m.codigo !== material.codigo);
   }
-  // Optionally, recalculate subTotal and total here if needed
 }
 
 }

@@ -18,6 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { MaterialesComponent } from './components/materiales/materiales.component';
 import { CotizacionComponent } from './components/cotizacion/cotizacion.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -44,7 +45,8 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     FormsModule,
     AppRoutingModule,
     FormsModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
