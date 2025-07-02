@@ -93,10 +93,17 @@ export class CotizacionComponent {
     this.nuevoCotizacion.materialesSeleccionados = [...this.materialesSeleccionados];
     this.cotizaciones.push({ ...this.nuevoCotizacion });
     this.filteredCotizaciones = [...this.cotizaciones];
-    this.nuevoCotizacion = { numero: this.generarNumeroCotizacion(), cliente: '', fecha: '', materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
+
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    const fechaActual = `${yyyy}-${mm}-${dd}`;
+    this.nuevoCotizacion = { numero: this.generarNumeroCotizacion(), cliente: '', fecha: fechaActual, materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
     this.materialesSeleccionados = [
       { nombre: '', codigo: '', cantidad: 1, precioUnitario: 0, subtotal: 0 }
     ];
+
 
     // Cerrar el modal de nueva cotización y luego mostrar el de éxito
     const modalElement = document.getElementById('nuevoCotizacionModal');

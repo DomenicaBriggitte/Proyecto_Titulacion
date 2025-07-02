@@ -33,7 +33,7 @@
           <tr *ngFor="let cotizacion of filteredCotizaciones">
             <td>{{ cotizacion.numero }}</td>
             <td>{{ cotizacion.cliente.nombre }}</td>
-            <td>{{ cotizacion.fecha | date }}</td>
+            <td>{{ cotizacion.fecha | date:'dd/MM/yyyy' }}</td>
             <td>{{ cotizacion.subTotal | currency }}</td>
             <td>{{ cotizacion.total | currency }}</td>
             <td>
