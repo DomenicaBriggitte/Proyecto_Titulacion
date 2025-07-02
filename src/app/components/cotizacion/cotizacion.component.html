@@ -32,7 +32,7 @@
       <tbody>
         <tr *ngFor="let cotizacion of filteredCotizaciones">
           <td>{{ cotizacion.numero }}</td>
-          <td>{{ cotizacion.cliente }}</td>
+          <td>{{ cotizacion.cliente.nombre }}</td>
           <td>{{ cotizacion.fecha | date }}</td>
           <td>{{ cotizacion.subTotal | currency }}</td>
           <td>{{ cotizacion.total | currency }}</td>
@@ -59,15 +59,26 @@
         <form (ngSubmit)="addCotizacion()" #nuevoCotizacionForm="ngForm">
           <div class="mb-3">
             <label for="cliente" class="form-label">Cliente</label>
-            <select class="form-control" id="cliente" [(ngModel)]="nuevoCotizacion.cliente" name="cliente" required>
-              <option *ngFor="let cliente of clientes" [value]="cliente.nombre">{{ cliente.nombre }}</option>
-            </select>
+            <!--obtener los clientes-->
+            <input
+              id="cliente"
+              type="text"
+              class="form-control"
+              name="cliente"
+              [(ngModel)]="nuevoCotizacion.cliente"
+              [ngbTypeahead]="searchClientes"
+              [resultFormatter]="nombreFormatter"
+              [inputFormatter]="nombreFormatter"
+              (selectItem)="onSelectCliente($event)"
+              placeholder="Buscar cliente..."
+              required
+            />
           </div>
 
           <div class="mb-3">
             <label for="numero" class="form-label">Número de Cotización</label>
             <input type="text" class="form-control" id="numero" [(ngModel)]="nuevoCotizacion.numero" name="numero" required readonly />
-          </div>
+            </div>
 
           <div class="mb-3">
             <label for="fecha" class="form-label">Fecha</label>

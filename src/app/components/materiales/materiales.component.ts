@@ -52,7 +52,6 @@ export class MaterialesComponent {
 
   addMateriales(form: NgForm) {
     if (form.invalid || !this.isValidCurrency(String(this.nuevoMateriales.costoSinIva))) {
-
       return;
     }
 
@@ -124,11 +123,11 @@ export class MaterialesComponent {
     }
   }
 
-  materialToDelete: any = null;  // Nueva implementación: para guardar el material temporalmente
+  materialParaEliminar: any = null;  // Nueva implementación: para guardar el material temporalmente
 
 // Muestra el modal de confirmación
 showDeleteConfirmationModal(material: any) {
-  this.materialToDelete = material;
+  this.materialParaEliminar = material;
   const modalElement = document.getElementById('deleteConfirmationModal');
   if (modalElement) {
     const modal = new bootstrap.Modal(modalElement);
@@ -138,7 +137,7 @@ showDeleteConfirmationModal(material: any) {
 
 // Elimina el material después de confirmar
 confirmDeleteMaterial() {
-  const index = this.materiales.findIndex(m => m.codigo === this.materialToDelete.codigo);
+  const index = this.materiales.findIndex(m => m.codigo === this.materialParaEliminar.codigo);
   if (index !== -1) {
     this.materiales.splice(index, 1);
     this.filteredMateriales = [...this.materiales];
@@ -159,7 +158,7 @@ confirmDeleteMaterial() {
   }
 
   // Limpia la variable
-  this.materialToDelete = null;
+  this.materialParaEliminar = null;
 }
 
 

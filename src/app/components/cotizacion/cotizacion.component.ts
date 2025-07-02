@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import * as bootstrap from 'bootstrap';
 import { ClienteService } from '../../services/cliente.service';
 import { MaterialesService } from 'src/app/services/materiales.service';
+import { Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-cotizacion',
@@ -48,6 +50,21 @@ export class CotizacionComponent {
     );
   }
 
+  //Obtener nombres para el listado
+  nombreFormatter = (cliente: any) => cliente && cliente.nombre ? cliente.nombre : cliente;
+  searchClientes = (text$: Observable<string>) =>
+  text$.pipe(
+    debounceTime(200),
+    distinctUntilChanged(),
+    map(term =>
+      term.length < 2 ? []
+        : this.clientes.filter(v => v.nombre.toLowerCase().includes(term.toLowerCase())).slice(0, 10)
+    )
+  );
+  onSelectCliente(event: any) {
+  this.nuevoCotizacion.cliente = event.item;
+  }
+
   // Método para generar un número de cotización único
   generarNumeroCotizacion(): string {
     const now = new Date();
@@ -75,17 +92,7 @@ export class CotizacionComponent {
     this.nuevoCotizacion.numero = this.generarNumeroCotizacion();
     this.cotizaciones.push({ ...this.nuevoCotizacion });
     this.filteredCotizaciones = [...this.cotizaciones];
-    this.nuevoCotizacion = { numero: '', cliente: '', fecha: '', materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
-
-    this.nuevoCotizacion = {
-      numero: '',
-      cliente: '',
-      fecha: '',
-      materialesSeleccionados: [],
-      subTotal: 0,
-      iva: 0,
-      total: 0
-    };
+    this.nuevoCotizacion = { numero: this.generarNumeroCotizacion(), cliente: '', fecha: '', materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
 
     // Cerrar el modal de nueva cotización y luego mostrar el de éxito
     const modalElement = document.getElementById('nuevoCotizacionModal');
@@ -115,6 +122,16 @@ export class CotizacionComponent {
       this.cotizaciones.splice(index, 1);
       this.filteredCotizaciones = [...this.cotizaciones];  // Actualizar la lista filtrada para mostrar los cambios
     }
+    //recalcula numero de cotización -1
+    this.nuevoCotizacion = {
+      numero: this.generarNumeroCotizacion(),
+      cliente: '',
+      fecha: '',
+      materialesSeleccionados: [],
+      subTotal: 0,
+      iva: 0,
+      total: 0
+    };
   }
 
   // Método para ver una cotización

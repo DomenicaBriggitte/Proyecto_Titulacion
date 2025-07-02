@@ -18,8 +18,8 @@ import { FormsModule } from '@angular/forms';
 import { MaterialesComponent } from './components/materiales/materiales.component';
 import { CotizacionComponent } from './components/cotizacion/cotizacion.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { HttpClientModule } from '@angular/common/http';
-
+import { HttpClientModule } from '@angular/common/http';  
+import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -46,7 +46,8 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     FormsModule,
     NgxPaginationModule,
-    HttpClientModule
+    HttpClientModule,
+    NgbTypeaheadModule
   ],
   providers: [],
   bootstrap: [AppComponent]

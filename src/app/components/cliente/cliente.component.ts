@@ -109,11 +109,29 @@ errorClienteExistente: boolean = false;
 addClient(form: NgForm) {
   if (form.invalid) return;
   this.clienteService.addCliente(this.nuevoCliente).subscribe({
-    next: (cliente) => {
-      this.clientes.push(cliente);
-      this.filteredClientes = [...this.clientes];
+    next: () => {
+      // Vuelve a cargar la lista desde la API
+      this.clienteService.getClientes().subscribe((clientes: any[]) => {
+        this.clientes = clientes;
+        this.filteredClientes = [...this.clientes];
+      });
       this.nuevoCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
-      // Cierra el modal y muestra éxito (igual que antes)
+      
+      // Cierra el modal y muestra éxito
+      const nuevoClienteModalElement = document.getElementById('nuevoClienteModal');
+      if (nuevoClienteModalElement) {
+        const modal = bootstrap.Modal.getInstance(nuevoClienteModalElement) || new bootstrap.Modal(nuevoClienteModalElement);
+        modal.hide();
+      }
+      const successModalElement = document.getElementById('successModal');
+      if (successModalElement) {
+        const successModal = new bootstrap.Modal(successModalElement);
+        successModal.show();
+        setTimeout(() => {
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
+        }, 300);
+      }
     },
     error: (err) => {
       alert('Error al agregar cliente: ' + (err.error?.message || err.message));
@@ -143,8 +161,27 @@ updateCliente() {
         this.clientes[index] = { ...this.selectedCliente };
         this.filteredClientes = [...this.clientes];
       }
-      // Cierra el modal y muestra éxito (igual que antes)
-    },
+    // Cerrar el modal de editar material
+    const editMaterialesModalElement = document.getElementById('editMaterialesModal');
+    if (editMaterialesModalElement) {
+      const modal = new bootstrap.Modal(editMaterialesModalElement);
+      modal.hide();
+    }
+
+    // Mostrar el modal de éxito
+    const successModalElement = document.getElementById('successModal');
+    if (successModalElement) {
+      const successModal = new bootstrap.Modal(successModalElement);
+      successModal.show(); // Mostrar el modal de éxito
+      successModal.hide();
+    }
+
+    // Asegurarse de que el backdrop se elimine al cerrar el modal
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+  },
     error: (err) => {
       alert('Error al actualizar cliente: ' + (err.error?.message || err.message));
     }
@@ -158,6 +195,7 @@ deleteCliente(cliente: any) {
   if (confirmModalElement) {
     const confirmModal = new bootstrap.Modal(confirmModalElement);
     confirmModal.show();
+    confirmModal.hide();
   }
       // Asegurarse de que el backdrop se elimine al cerrar el modal
     const backdrop = document.querySelector('.modal-backdrop');
@@ -176,7 +214,23 @@ confirmDelete() {
         this.filteredClientes = [...this.clientes];
       }
       this.clienteParaEliminar = null;
-      // Cierra el modal y muestra éxito (igual que antes)
+      // Cierra el modal de confirmación
+        const confirmModalElement = document.getElementById('confirmDeleteModal');
+          if (confirmModalElement) {
+            const modal = bootstrap.Modal.getInstance(confirmModalElement);
+            modal?.hide();
+          }
+      
+        // Muestra el modal de éxito
+        const deleteModalElement = document.getElementById('deleteModal');
+        if (deleteModalElement) {
+          const deleteModal = new bootstrap.Modal(deleteModalElement);
+          deleteModal.show();
+        }
+      
+        // Limpia la variable
+        this.clienteParaEliminar = null;
+        
     },
     error: (err) => {
       alert('Error al eliminar cliente: ' + (err.error?.message || err.message));
