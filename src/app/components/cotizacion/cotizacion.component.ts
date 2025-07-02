@@ -90,9 +90,13 @@ export class CotizacionComponent {
   // Método para agregar una cotización
   addCotizacion() {
     this.nuevoCotizacion.numero = this.generarNumeroCotizacion();
+    this.nuevoCotizacion.materialesSeleccionados = [...this.materialesSeleccionados];
     this.cotizaciones.push({ ...this.nuevoCotizacion });
     this.filteredCotizaciones = [...this.cotizaciones];
     this.nuevoCotizacion = { numero: this.generarNumeroCotizacion(), cliente: '', fecha: '', materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
+    this.materialesSeleccionados = [
+      { nombre: '', codigo: '', cantidad: 1, precioUnitario: 0, subtotal: 0 }
+    ];
 
     // Cerrar el modal de nueva cotización y luego mostrar el de éxito
     const modalElement = document.getElementById('nuevoCotizacionModal');
@@ -179,9 +183,10 @@ export class CotizacionComponent {
 
   // Método para calcular los totales
   calcularTotales() {
-    this.nuevoCotizacion.subTotal = this.nuevoCotizacion.materialesSeleccionados.reduce((acc, material) => acc + (material.costoSinIva * material.cantidad), 0);
-    this.nuevoCotizacion.iva = this.nuevoCotizacion.subTotal * 0.12; // Ejemplo de IVA 12%
-    this.nuevoCotizacion.total = this.nuevoCotizacion.subTotal + this.nuevoCotizacion.iva;
+    const subtotal = this.materialesSeleccionados.reduce((sum, mat) => sum + (mat.subtotal || 0), 0);
+    this.nuevoCotizacion.subTotal = subtotal;
+    this.nuevoCotizacion.iva = +(subtotal * 0.12).toFixed(2);
+    this.nuevoCotizacion.total = +(subtotal + this.nuevoCotizacion.iva).toFixed(2);
   }
 
 
@@ -195,5 +200,51 @@ export class CotizacionComponent {
     this.nuevoCotizacion.materialesSeleccionados = this.nuevoCotizacion.materialesSeleccionados.filter((m: any) => m.codigo !== material.codigo);
   }
 }
+
+  //Sección para Métodos de la Tabla de Cotización de Materiales
+    // Estructura de un material seleccionado
+    materialesSeleccionados = [
+      { nombre: '', codigo: '', cantidad: 1, precioUnitario: 0, subtotal: 0 }
+    ];
+
+    // Método para buscar materiales (ng-bootstrap typeahead)
+    searchMateriales = (text$: Observable<string>) =>
+      text$.pipe(
+        debounceTime(200),
+        distinctUntilChanged(),
+        map(term => term.length < 2 ? []
+          : this.materiales.filter(m => m.nombre.toLowerCase().includes(term.toLowerCase())).slice(0, 10))
+      );
+
+    // Formatea el nombre del material en el autocomplete
+    materialNombreFormatter = (x: any) => x && x.nombre ? x.nombre : x;
+
+    // Cuando seleccionas un material del autocomplete
+    onSelectMaterial(event: any, idx: number) {
+      const mat = event.item;
+      this.materialesSeleccionados[idx].nombre = mat.nombre;
+      this.materialesSeleccionados[idx].codigo = mat.codigo;
+      this.materialesSeleccionados[idx].precioUnitario = mat.costoSinIva;
+      this.updateSubtotal(idx);
+    }
+
+    // Actualiza el subtotal al cambiar cantidad o material
+    updateSubtotal(idx: number) {
+      const item = this.materialesSeleccionados[idx];
+      const cantidad = Number(item.cantidad) > 0 ? Number(item.cantidad) : 1;
+      item.subtotal = cantidad * (item.precioUnitario || 0);
+      this.calcularTotales();
+    }
+
+    // Añadir una fila nueva
+    addFilaMaterial() {
+      this.materialesSeleccionados.push({ nombre: '', codigo: '', cantidad: 1, precioUnitario: 0, subtotal: 0 });
+    }
+
+    // Eliminar una fila de la tabla de materiales
+    removeMaterial(idx: number) {
+      this.materialesSeleccionados.splice(idx, 1);
+      this.calcularTotales();
+    }
 
 }
