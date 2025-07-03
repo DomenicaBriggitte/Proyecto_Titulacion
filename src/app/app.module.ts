@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { NgxPaginationModule } from 'ngx-pagination';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -36,8 +35,6 @@ import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
     NavbarComponent,
     SidebarComponent,
     MaterialesComponent,
-    CotizacionComponent,
-    DashboardComponent
     CotizacionComponent,
     DashboardComponent
   ],
