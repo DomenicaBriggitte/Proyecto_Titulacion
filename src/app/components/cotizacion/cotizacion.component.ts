@@ -21,8 +21,10 @@ export class CotizacionComponent {
     this.clienteService.getClientes().subscribe((clientes: any[]) => {
       this.clientes = clientes;
     });
-    this.materiales = this.materialesService.getMateriales();
-  }
+    this.materialesService.getMateriales().subscribe((materiales: any[]) => {
+      this.materiales = this.materiales;
+  });
+}
 
   // Lista de cotizaciones
   cotizaciones: any[] = [];

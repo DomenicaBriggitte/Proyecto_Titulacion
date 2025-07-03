@@ -11,10 +11,17 @@ import { NgForm } from '@angular/forms';
 export class MaterialesComponent {
   materiales: any[] = [];
     
-  constructor(private materialesService: MaterialesService) {
-    this.materiales = this.materialesService.getMateriales();
-    this.filteredMateriales = [...this.materiales];
+  ngOnInit() {
+    this.materialesService.getMateriales().subscribe(data => {
+      this.materiales = data;
+    });
   }
+  constructor(private materialesService: MaterialesService) {
+      this.materialesService.getMateriales().subscribe((materiales: any[]) => {
+        this.materiales = materiales;
+        this.filteredMateriales = [...this.materiales];
+      });
+    }
 
   nuevoMateriales = { codigo: '', nombre: '', costoSinIva: 0, tipo: '' };
   selectedMateriales = { codigo: '', nombre: '', costoSinIva: 0, tipo: '' };
@@ -55,8 +62,13 @@ export class MaterialesComponent {
       return;
     }
 
-    this.materiales.push({ ...this.nuevoMateriales });
-    this.filteredMateriales = [...this.materiales];
+    this.materialesService.addMaterial(this.nuevoMateriales).subscribe({
+    next: () => {
+    // Vuelve a cargar la lista desde la API
+    this.materialesService.getMateriales().subscribe((materiales: any[]) => {
+        this.materiales = materiales;
+        this.filteredMateriales = [...this.materiales];
+      });
     this.nuevoMateriales = { codigo: '', nombre: '', costoSinIva: 0, tipo: '' };
 
 
@@ -75,7 +87,12 @@ export class MaterialesComponent {
         if (backdrop) backdrop.remove();
       }, 300);
     }
-  }
+    },
+    error: (err) => {
+      alert('Error al agregar el material: ' + (err.error?.message || err.message));
+    }
+  });
+}
 
   // Editar material
   editMateriales(materiales: any) {
@@ -88,11 +105,13 @@ export class MaterialesComponent {
   }
 
   updateMateriales() {
-    const index = this.materiales.findIndex((materiales) => materiales.codigo === this.selectedMateriales.codigo);
-    if (index !== -1) {
-      this.materiales[index] = { ...this.selectedMateriales };
-      this.filteredMateriales = [...this.materiales];
-    }
+    this.materialesService.updateMaterial(this.selectedMateriales).subscribe({
+    next: () => {
+      const index = this.materiales.findIndex(c => c.codigo === this.selectedMateriales.codigo);
+      if (index !== -1) {
+        this.materiales[index] = { ...this.selectedMateriales };
+        this.filteredMateriales = [...this.materiales];
+      }
 
     // Cerrar el modal de editar material
     const editMaterialesModalElement = document.getElementById('editMaterialesModal');
@@ -114,68 +133,22 @@ export class MaterialesComponent {
     if (backdrop) {
       backdrop.remove();
     }
-
-    // Abrir de nuevo el modal de edición, por si el usuario necesita editar otro material
-    const newEditModalElement = document.getElementById('editMaterialesModal');
-    if (newEditModalElement) {
-      const newEditModal = new bootstrap.Modal(newEditModalElement);
-      newEditModal.show();
+  },
+    error: (err) => {
+      alert('Error al actualizar materiales: ' + (err.error?.message || err.message));
     }
-  }
-
-  materialParaEliminar: any = null;  // Nueva implementación: para guardar el material temporalmente
-
-// Muestra el modal de confirmación
-showDeleteConfirmationModal(material: any) {
-  this.materialParaEliminar = material;
-  const modalElement = document.getElementById('deleteConfirmationModal');
-  if (modalElement) {
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
-  }
+  });
 }
 
-// Elimina el material después de confirmar
-confirmDeleteMaterial() {
-  const index = this.materiales.findIndex(m => m.codigo === this.materialParaEliminar.codigo);
-  if (index !== -1) {
-    this.materiales.splice(index, 1);
-    this.filteredMateriales = [...this.materiales];
-  }
-
-  // Cierra el modal de confirmación
-  const confirmModalElement = document.getElementById('deleteConfirmationModal');
-  if (confirmModalElement) {
-    const modal = bootstrap.Modal.getInstance(confirmModalElement);
-    modal?.hide();
-  }
-
-  // Muestra el modal de éxito
-  const deleteModalElement = document.getElementById('deleteModal');
-  if (deleteModalElement) {
-    const deleteModal = new bootstrap.Modal(deleteModalElement);
-    deleteModal.show();
-  }
-
-  // Limpia la variable
-  this.materialParaEliminar = null;
-}
-
-
-  deleteMateriales(materiales: any) {
-    const index = this.materiales.findIndex((m) => m.codigo === materiales.codigo);
-    if (index !== -1) {
-      this.materiales.splice(index, 1);
-      this.filteredMateriales = [...this.materiales];  // Actualizar la lista filtrada para mostrar los cambios
-    }
-
-    // Mostrar el modal de éxito
-    const deleteModalElement = document.getElementById('deleteModal');
-    if (deleteModalElement) {
-      const deleteModal = new bootstrap.Modal(deleteModalElement);
-      deleteModal.show(); // Mostrar modal de éxito
-      deleteModal.hide();
-    }
+materialParaEliminar: any = null;  // Nueva implementación: para guardar el material temporalmente
+deleteMateriales(materiales: any) {
+    this.materialParaEliminar = materiales;
+      const confirmModalElement = document.getElementById('deleteConfirmationModal');
+      if (confirmModalElement) {
+        const confirmModal = new bootstrap.Modal(confirmModalElement);
+        confirmModal.show();
+        confirmModal.hide();
+      }
   
     // Asegurarse de que el backdrop se elimine al cerrar el modal
     const backdrop = document.querySelector('.modal-backdrop');
@@ -183,6 +156,40 @@ confirmDeleteMaterial() {
       backdrop.remove(); // Eliminar la capa oscura
     }
   }
+
+// Elimina el material después de confirmar
+confirmDeleteMaterial() {
+  this.materialesService.deleteMaterial(this.materialParaEliminar.codigo).subscribe({
+    next: () => {
+      const index = this.materiales.findIndex(c => c.codigo === this.materialParaEliminar.codigo);
+      if (index !== -1) {
+        this.materiales.splice(index, 1);
+        this.filteredMateriales = [...this.materiales];
+      }
+      this.materialParaEliminar = null;
+
+      // Cierra el modal de confirmación
+      const confirmModalElement = document.getElementById('deleteConfirmationModal');
+      if (confirmModalElement) {
+        const modal = bootstrap.Modal.getInstance(confirmModalElement);
+        modal?.hide();
+      }
+
+      // Muestra el modal de éxito
+      const deleteModalElement = document.getElementById('deleteModal');
+      if (deleteModalElement) {
+        const deleteModal = new bootstrap.Modal(deleteModalElement);
+        deleteModal.show();
+      }
+
+      // Limpia la variable
+      this.materialParaEliminar = null;
+    },
+    error: (err) => {
+      alert('Error al eliminar material: ' + (err.error?.message || err.message));
+    }
+  });
+}
 
   // Función para cerrar un modal y eliminar el backdrop
   closeModalAndRemoveBackdrop(modalId: string) {
