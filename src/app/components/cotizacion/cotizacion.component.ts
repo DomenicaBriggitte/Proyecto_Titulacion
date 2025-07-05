@@ -22,7 +22,7 @@ export class CotizacionComponent {
       this.clientes = clientes;
     });
     this.materialesService.getMateriales().subscribe((materiales: any[]) => {
-      this.materiales = this.materiales;
+      this.materiales = materiales;
   });
 }
 
@@ -254,6 +254,12 @@ export class CotizacionComponent {
     removeMaterial(idx: number) {
       this.materialesSeleccionados.splice(idx, 1);
       this.calcularTotales();
+    }
+
+    recargarMateriales() {
+      this.materialesService.getMateriales().subscribe((materiales: any[]) => {
+        this.materiales = materiales;
+      });
     }
 
 }
