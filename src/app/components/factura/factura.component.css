@@ -1,0 +1,28 @@
+
+.content {
+  margin-left: 250px; 
+}
+.modal-header {
+  background-color: #f47c00;
+  color: #ffffff;
+}
+
+/* BOTONES */
+.btn-primary {
+  background-color: #f47c00;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px #00000033;
+}
+.btn-danger {
+  background-color: #ef2e41;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px #00000033;
+}
+.btn-success  {
+  background-color: #f47c00;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px #00000033;
+}

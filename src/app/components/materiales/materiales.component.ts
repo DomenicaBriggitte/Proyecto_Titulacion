@@ -61,22 +61,19 @@ export class MaterialesComponent {
     if (form.invalid || !this.isValidCurrency(String(this.nuevoMateriales.costoSinIva))) {
       return;
     }
-
     this.materialesService.addMaterial(this.nuevoMateriales).subscribe({
-    next: () => {
-    // Vuelve a cargar la lista desde la API
-    this.materialesService.getMateriales().subscribe((materiales: any[]) => {
-        this.materiales = materiales;
-        this.filteredMateriales = [...this.materiales];
-      });
-    this.nuevoMateriales = { codigo: '', nombre: '', costoSinIva: 0, tipo: '' };
-
+      next: () => {
+        this.materialesService.getMateriales().subscribe((materiales: any[]) => {
+          this.materiales = materiales;
+          this.filteredMateriales = [...this.materiales];
+        });
+        this.nuevoMateriales = { codigo: '', nombre: '', costoSinIva: 0, tipo: '' };
 
     const modalEl = document.getElementById('nuevoMaterialesModal');
-    if (modalEl) {
-      const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-      modal.hide();
-    }
+      if (modalEl) {
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+      }
 
     const successModalEl = document.getElementById('successModal');
     if (successModalEl) {
@@ -107,11 +104,10 @@ export class MaterialesComponent {
   updateMateriales() {
     this.materialesService.updateMaterial(this.selectedMateriales).subscribe({
     next: () => {
-      const index = this.materiales.findIndex(c => c.codigo === this.selectedMateriales.codigo);
-      if (index !== -1) {
-        this.materiales[index] = { ...this.selectedMateriales };
+      this.materialesService.getMateriales().subscribe((materiales: any[]) => {
+        this.materiales = materiales;
         this.filteredMateriales = [...this.materiales];
-      }
+      });
 
     // Cerrar el modal de editar material
     const editMaterialesModalElement = document.getElementById('editMaterialesModal');
@@ -161,11 +157,10 @@ deleteMateriales(materiales: any) {
 confirmDeleteMaterial() {
   this.materialesService.deleteMaterial(this.materialParaEliminar.codigo).subscribe({
     next: () => {
-      const index = this.materiales.findIndex(c => c.codigo === this.materialParaEliminar.codigo);
-      if (index !== -1) {
-        this.materiales.splice(index, 1);
+      this.materialesService.getMateriales().subscribe((materiales: any[]) => {
+        this.materiales = materiales;
         this.filteredMateriales = [...this.materiales];
-      }
+      });
       this.materialParaEliminar = null;
 
       // Cierra el modal de confirmación
@@ -202,7 +197,7 @@ confirmDeleteMaterial() {
       const backdrop = document.querySelector('.modal-backdrop');
       if (backdrop) {
         backdrop.remove();  // Eliminar la capa oscura
-      }
-    }
-  }
+      }
+    }
+  }
 }

@@ -151,17 +151,7 @@ editCliente(cliente: any) {
     modal.show(); // Mostrar el modal
   }
 }
-// Función para editar un cliente
-editCliente(cliente: any) {
-  // Copiar los datos del cliente seleccionado en selectedCliente
-  this.selectedCliente = { ...cliente }; 
-  // Abrir el modal de edición
-  const modalElement = document.getElementById('editClientModal');
-  if (modalElement) {
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show(); // Mostrar el modal
-  }
-}
+
 
 // Actualizar cliente
 updateCliente() {

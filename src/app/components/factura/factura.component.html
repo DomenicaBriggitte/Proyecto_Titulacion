@@ -1,2 +1,102 @@
 <app-sidebar></app-sidebar>
-<p>factura works!</p>
+
+<div class="content">
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Gestión de Facturación</h2>
+
+    <div class="d-flex mb-3 justify-content-between">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoFacturaModal">+ Nueva Factura</button>
+      <button class="btn btn-danger" (click)="exportarPDF()">PDF</button>
+      <input class="form-control w-25" type="text" placeholder="Buscar cliente..." [(ngModel)]="searchQuery" (ngModelChange)="filterFacturas()" />
+    </div>
+
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Estado de Pago</th>
+          <th>Archivo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let factura of filteredFacturas">
+          <td>{{ factura.fecha }}</td>
+          <td>{{ factura.cliente?.nombre }}</td>
+          <td>
+            <span [class.bg-success]="factura.estadoPago === 'Cancelado'" [class.bg-warning]="factura.estadoPago === 'Pendiente'" class="badge">
+              {{ factura.estadoPago }}
+            </span>
+          </td>
+          <td>{{ factura.archivoNombre }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Nueva Factura -->
+<div class="modal fade" id="nuevoFacturaModal" tabindex="-1" aria-labelledby="nuevoFacturaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title">Nueva Factura</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form #facturaForm="ngForm" (ngSubmit)="guardarFactura(facturaForm)">
+          <div class="mb-3">
+            <label>Fecha</label>
+            <input type="date" class="form-control" name="fecha" [(ngModel)]="nuevaFactura.fecha" required />
+          </div>
+
+          <div class="mb-3">
+            <label>Cliente</label>
+            <input
+              class="form-control"
+              name="cliente"
+              [(ngModel)]="clienteInput"
+              [ngbTypeahead]="searchClientes"
+              [resultFormatter]="nombreFormatter"
+              [inputFormatter]="nombreFormatter"
+              (selectItem)="onSelectCliente($event)"
+              required
+              placeholder="Buscar cliente..."
+            />
+          </div>
+
+          <div class="mb-3">
+            <label>Estado de Pago</label>
+            <select class="form-select" name="estadoPago" [(ngModel)]="nuevaFactura.estadoPago" required>
+              <option value="" disabled selected>Seleccione un estado</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label>Archivo</label>
+            <input type="file" class="form-control" (change)="subirArchivo($event)" accept=".pdf,image/*" required />
+          </div>
+
+          <button type="submit" class="btn btn-success w-100">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Éxito -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3 text-center">
+      <h5 class="modal-title">Factura Guardada</h5>
+      <div class="modal-body">
+         ¡La factura se guardó correctamente!
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -22,7 +22,7 @@ export class CotizacionComponent {
       this.clientes = clientes;
     });
     this.materialesService.getMateriales().subscribe((materiales: any[]) => {
-      this.materiales = this.materiales;
+      this.materiales = materiales;
   });
 }
 
