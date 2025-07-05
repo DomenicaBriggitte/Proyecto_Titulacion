@@ -256,4 +256,10 @@ export class CotizacionComponent {
       this.calcularTotales();
     }
 
+    recargarMateriales() {
+      this.materialesService.getMateriales().subscribe((materiales: any[]) => {
+        this.materiales = materiales;
+      });
+    }
+
 }
