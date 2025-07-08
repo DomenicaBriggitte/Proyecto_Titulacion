@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import * as bootstrap from 'bootstrap';
 import { ClienteService } from '../../services/cliente.service';
 import { NgForm } from '@angular/forms';
-
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-cliente',
@@ -11,11 +12,12 @@ import { NgForm } from '@angular/forms';
 })
 export class ClienteComponent {
   clientes: any[] = [];
-  ngOnInit() {
-    this.clienteService.getClientes().subscribe(data => {
-      this.clientes = data;
-    });
-  }
+ngOnInit() {
+  this.clienteService.getClientes().subscribe(data => {
+    this.clientes = data;
+    this.filteredClientes = [...this.clientes]; // Esto es importante para paginar
+  });
+}
 
   constructor(private clienteService: ClienteService) {
     this.clienteService.getClientes().subscribe((clientes: any[]) => {
@@ -23,6 +25,10 @@ export class ClienteComponent {
       this.filteredClientes = [...this.clientes];
     });
   }
+  abs(value: number): number {
+  return Math.abs(value);
+}
+  
 
   nuevoCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
   selectedCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
@@ -37,6 +43,50 @@ export class ClienteComponent {
       cliente.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
+  // Paginación
+currentPage: number = 1;
+itemsPerPage: number = 5;
+itemsPerPageOptions = [5, 10, 15];
+
+get totalPages(): number {
+  return Math.ceil(this.filteredClientes.length / this.itemsPerPage);
+}
+
+get paginatedClientes(): any[] {
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+  return this.filteredClientes.slice(start, start + this.itemsPerPage);
+}
+
+// Para mostrar solo 3 botones de página
+get paginationRange(): number[] {
+  const total = this.totalPages;
+  let start = Math.max(1, this.currentPage - 1);
+  let end = Math.min(total, start + 2);
+
+  if (end - start < 2) {
+    start = Math.max(1, end - 2);
+  }
+
+  const range: number[] = [];
+  for (let i = start; i <= end; i++) {
+    range.push(i);
+  }
+  return range;
+}
+exportarExcel() {
+  const worksheet = XLSX.utils.json_to_sheet(this.filteredClientes);
+  const workbook = {
+    Sheets: { 'Clientes': worksheet },
+    SheetNames: ['Clientes']
+  };
+  const excelBuffer: any = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array'
+  });
+
+  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  FileSaver.saveAs(blob, 'Clientes.xlsx');
+}
   // Validación de la cédula para asegurarse de que solo contiene números
   validateCedula(event: KeyboardEvent) {
     const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];

@@ -1,0 +1,37 @@
+[
+  {
+    "cotizacionId": 2,
+    "numeroCot": "COT_20250707772457",
+    "clienteCedula": "0101900330001",
+    "fecha": "2025-07-02T00:00:00",
+    "subTotal": 1132.58,
+    "iva": 135.91,
+    "total": 1268.49,
+    "materiales": [
+      {
+        "cotizacionMaterialId": 8,
+        "materialCodigo": "003",
+        "cantidad": 3,
+        "precioUnitario": 130,
+        "subtotal": 390,
+        "cotizacionId": 2
+      },
+      {
+        "cotizacionMaterialId": 9,
+        "materialCodigo": "010",
+        "cantidad": 2,
+        "precioUnitario": 157,
+        "subtotal": 314,
+        "cotizacionId": 2
+      },
+      {
+        "cotizacionMaterialId": 10,
+        "materialCodigo": "5001",
+        "cantidad": 3,
+        "precioUnitario": 142.86,
+        "subtotal": 428.58,
+        "cotizacionId": 2
+      }
+    ]
+  }
+]

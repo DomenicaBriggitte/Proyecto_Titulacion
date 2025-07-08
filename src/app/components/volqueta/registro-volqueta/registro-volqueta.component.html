@@ -1,2 +1,339 @@
 <app-sidebar></app-sidebar>
-<p>registro-volqueta works!</p>
+
+<div class="content">
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Gestión de Volquetas</h2>
+
+    <div class="d-flex mb-3 justify-content-between">
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoVolquetaModal">+ Nuevo Registro</button>
+            <button class="btn btn-success-xls" (click)="exportarXLS()">XLS</button>
+        </div>
+      
+      <input 
+        class="form-control w-25" 
+        type="text" 
+        placeholder="Buscar por placa o tipo..." 
+        [(ngModel)]="searchQuery" 
+        (ngModelChange)="filtrarVolquetas()"
+      />
+    </div>
+
+    <table class="table table-bordered">
+      <thead class="thead-dark">
+        <tr>
+          <th>Placa</th>
+          <th>Tipo</th>
+          <th>Capacidad</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+       <tr *ngFor="let volqueta of paginatedVolquetas">
+          <td>{{ volqueta.placa }}</td>
+          <td>{{ volqueta.tipo }}</td>
+          <td>{{ volqueta.capacidad }} </td>
+                <td>
+                <span 
+                    class="badge"
+                    [ngClass]="{
+                    'badge-operativo': volqueta.estado === 'Operativo',
+                    'badge-mantenimiento': volqueta.estado === 'En mantenimiento'
+                    }">
+                    {{ volqueta.estado }}
+                </span>
+                </td>
+          <td>
+            <div class="d-flex justify-content-center gap-2">
+                <button class="btn btn-info btn-sm" (click)="editVolqueta(volqueta)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="deleteVolqueta(volqueta)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+            </div>
+            
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+  <!-- Tamaño de página -->
+  <div>
+    <label>Mostrar:
+      <select [(ngModel)]="pageSize" (change)="cambiarPageSize(pageSize)" class="form-select d-inline w-auto ms-2">
+        <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+      </select> registros
+    </label>
+  </div>
+
+  <!-- Navegación -->
+  <nav>
+    <ul class="pagination mb-0">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="cambiarPagina(currentPage - 1)">Anterior</button>
+      </li>
+      <li
+        class="page-item"
+        *ngFor="let p of [].constructor(totalPages); let i = index"
+        [class.active]="currentPage === (i + 1)"
+      >
+        <button class="page-link" (click)="cambiarPagina(i + 1)">{{ i + 1 }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="cambiarPagina(currentPage + 1)">Siguiente</button>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+  </div>
+</div>
+
+<!-- Modal Nuevo Registro -->
+<div class="modal fade" id="nuevoVolquetaModal" tabindex="-1" aria-labelledby="nuevoVolquetaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuevoVolquetaModalLabel">Nuevo Registro de Volqueta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form #volquetaForm="ngForm" (ngSubmit)="agregarVolqueta(volquetaForm)">
+          
+          <!-- Placa -->
+                        <div class="mb-3">
+                          <label for="placa" class="form-label">Placa</label>
+                          <input type="text"
+                                id="placa"
+                                name="placa"
+                                class="form-control"
+                                maxlength="8"
+                                [(ngModel)]="nuevaVolqueta.placa"
+                                (input)="mensajeError = ''"
+                                pattern="^[A-Z]{3}-\d{3,4}$"
+                                required
+                                placeholder="Ej: ABC-1234"
+                                #placa="ngModel" />
+
+                          <div *ngIf="placa.invalid && placa.touched" class="text-danger">
+                            Formato inválido. Ej: ABC-1234
+                          </div>
+
+                          <div *ngIf="mensajeError" class="text-danger mt-1">
+                            {{ mensajeError }}
+                          </div>
+                        </div>
+
+          <!-- Tipo -->
+          <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo</label>
+            <select id="tipo"
+                    name="tipo"
+                    class="form-select"
+                    [(ngModel)]="nuevaVolqueta.tipo"
+                    required
+                    #tipo="ngModel">
+              <option value="" disabled selected>Seleccione un tipo</option>
+              <option value="Normal">Normal</option>
+              <option value="Mula">Mula</option>
+            </select>
+            <div *ngIf="tipo.invalid && tipo.touched" class="text-danger">
+              Este campo es obligatorio.
+            </div>
+          </div>
+
+                  <!-- Capacidad (en m³) -->
+                    <select id="capacidad"
+                            name="capacidad"
+                            class="form-select"
+                            [(ngModel)]="nuevaVolqueta.capacidad"
+                            required
+                            #capacidad="ngModel">
+                      <option value="" disabled selected>Seleccione capacidad</option>
+                      <option *ngFor="let c of capacidades" [value]="c">{{ c }}</option>
+                    </select>
+
+
+          <!-- Estado -->
+          <div class="mb-3 estado">
+            <label for="estado" class="form-label">Estado</label>
+            <select id="estado"
+                    name="estado"
+                    class="form-select"
+                    [(ngModel)]="nuevaVolqueta.estado"
+                    required
+                    #estado="ngModel">
+              <option value="" disabled selected>Seleccione estado</option>
+              <option value="Operativo">Operativo</option>
+              <option value="En mantenimiento">En mantenimiento</option>
+            </select>
+            <div *ngIf="estado.invalid && estado.touched" class="text-danger">
+              Campo requerido.
+            </div>
+          </div>
+          <!-- Botón Guardar -->
+           <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success w-100" [disabled]="!volquetaForm.valid">Guardar </button>
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+           </div>
+          
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Éxito -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3 text-center">
+           <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Volqueta Registrada Exitosamente</h5>
+      </div>
+      <div class="modal-body text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill animate-check" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </svg>
+        <h4>Volqueta Registrada con Éxito</h4>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Volqueta -->
+<div class="modal fade" id="editVolquetaModal" tabindex="-1" aria-labelledby="editVolquetaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editVolquetaModalLabel">Editar Volqueta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateVolqueta()" #editVolquetaForm="ngForm">
+
+          <!-- Placa (deshabilitada) -->
+          <div class="mb-3">
+            <label for="editPlaca" class="form-label">Placa</label>
+            <input type="text"
+                   id="editPlaca"
+                   name="placa"
+                   class="form-control"
+                   [(ngModel)]="selectedVolqueta.placa"
+                   disabled
+                   required
+                   pattern="^[A-Z]{3}-\d{3,4}$"
+                   #placa="ngModel" />
+            <div *ngIf="placa.invalid && placa.touched" class="text-danger">
+              <div *ngIf="mensajeError" class="text-danger">
+  {{ mensajeError }}
+</div>
+              Formato inválido. Ej: ABC-1234
+            </div>
+          </div>
+
+          <!-- Tipo -->
+          <div class="mb-3">
+            <label for="editTipo" class="form-label">Tipo</label>
+            <select id="editTipo"
+                    name="tipo"
+                    class="form-select"
+                    [(ngModel)]="selectedVolqueta.tipo"
+                    required
+                    #tipo="ngModel">
+              <option value="" disabled selected>Seleccione un tipo</option>
+              <option value="Normal">Normal</option>
+              <option value="Mula">Mula</option>
+            </select>
+            <div *ngIf="tipo.invalid && tipo.touched" class="text-danger">
+              Campo requerido.
+            </div>
+          </div>
+
+                          <!-- Capacidad (en m³) -->
+                          <div class="mb-3">
+                            <label for="editCapacidad" class="form-label">Capacidad</label>
+                            <select id="editCapacidad"
+                                    name="capacidad"
+                                    class="form-select"
+                                    [(ngModel)]="selectedVolqueta.capacidad"
+                                    required
+                                    #capacidad="ngModel">
+                              <option value="" disabled selected>Seleccione capacidad</option>
+                              <option *ngFor="let c of capacidades" [value]="c">{{ c }}</option>
+                            </select>
+                            <div *ngIf="capacidad.invalid && capacidad.touched" class="text-danger">
+                              Campo requerido.
+                            </div>
+                          </div>
+
+
+          <!-- Estado -->
+          <div class="mb-3">
+            <label for="editEstado" class="form-label">Estado</label>
+            <select id="editEstado"
+                    name="estado"
+                    class="form-select"
+                    [(ngModel)]="selectedVolqueta.estado"
+                    required
+                    #estado="ngModel">
+              <option value="" disabled selected>Seleccione estado</option>
+              <option value="Operativo">Operativo</option>
+              <option value="En mantenimiento">En mantenimiento</option>
+            </select>
+            <div *ngIf="estado.invalid && estado.touched" class="text-danger">
+              Campo requerido.
+            </div>
+          </div>
+                <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary" [disabled]="!editVolquetaForm.valid">Guardar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación de volqueta -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header "  style="background-color: #f47c00;">
+        <h5 class="modal-title" id="deleteConfirmationLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>¿Está seguro que desea eliminar esta volqueta?</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-si" (click)="confirmDeleteVolqueta()">Sí</button>
+        <button type="button" class="btn btn-no" data-bs-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de eliminado-->
+ <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Volqueta Eliminada Exitosamente</h5>
+      </div>
+      <div class="modal-body text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill animate-check" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </svg>
+        <h4>Volqueta Eliminada con Éxito</h4>
+      </div>
+      <div class="modal-footer ">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

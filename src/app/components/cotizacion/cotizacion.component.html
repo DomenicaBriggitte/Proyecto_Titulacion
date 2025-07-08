@@ -1,190 +1,244 @@
-  <app-sidebar></app-sidebar>
-
-  <div class="content">
-    <div class="container mt-5">
-      <h2 class="text-center mb-4">Gestión de Cotizaciones</h2>
-
-      <!-- Filtros y botones -->
-      <div class="d-flex justify-content-between mb-3">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoCotizacionModal">+ Nueva Cotización</button>
-        <button class="btn btn-success">XLS</button>
-        <input 
-          class="form-control w-25" 
-          type="text" 
-          placeholder="Buscar Cotización..." 
-          [(ngModel)]="searchQuery" 
-          (ngModelChange)="filterCotizaciones()"
-        />
-      </div>
-
-      <!-- Tabla de Cotizaciones -->
-      <table class="table table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th># Cotización</th>
-            <th>Cliente</th>
-            <th>Fecha</th>
-            <th>Sub Total</th>
-            <th>Total</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let cotizacion of filteredCotizaciones">
-            <td>{{ cotizacion.numero }}</td>
-            <td>{{ cotizacion.cliente.nombre }}</td>
-            <td>{{ cotizacion.fecha | date:'dd/MM/yyyy' }}</td>
-            <td>{{ cotizacion.subTotal | currency }}</td>
-            <td>{{ cotizacion.total | currency }}</td>
-            <td>
-              <button class="btn btn-info btn-sm" (click)="viewCotizacion(cotizacion)">Ver</button>
-              <button class="btn btn-warning btn-sm" (click)="editCotizacion(cotizacion)">Editar</button>
-              <button class="btn btn-danger btn-sm" (click)="deleteCotizacion(cotizacion)">Eliminar</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<!-- cotizacion.component.html -->
+<app-sidebar></app-sidebar>
+<div class="content">
+  <h2 class="text-center mb-4">Gestión de Cotizaciones</h2>
+  <div class="d-flex mb-3 justify-content-between">
+    <button class="btn btn-primary" (click)="abrirModalNuevo()">+ Nueva Cotización</button>
+    <input type="text" class="form-control w-25" placeholder="Buscar por cliente o número" [(ngModel)]="searchQuery" (ngModelChange)="filtrarCotizaciones()">
   </div>
 
-  <!-- Modal Nueva Cotización -->
-  <div class="modal fade" id="nuevoCotizacionModal" tabindex="-1" aria-labelledby="nuevoCotizacionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="nuevoCotizacionModalLabel">Nueva Cotización</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form (ngSubmit)="addCotizacion()" #nuevoCotizacionForm="ngForm">
-            <div class="mb-3">
-              <label for="cliente" class="form-label">Cliente</label>
-              <!--obtener los clientes-->
-              <input
-                id="cliente"
-                type="text"
-                class="form-control"
-                name="cliente"
-                [(ngModel)]="nuevoCotizacion.cliente"
-                [ngbTypeahead]="searchClientes"
-                [resultFormatter]="nombreFormatter"
-                [inputFormatter]="nombreFormatter"
-                (selectItem)="onSelectCliente($event)"
-                placeholder="Buscar cliente..."
-                required
-              />
-            </div>
+  <table class="table table-bordered">
+    <thead class="thead-dark">
+      <tr>
+        <th># de Cotización</th>
+        <th>Fecha</th>
+        <th>Cliente</th>
+        <th>Total ($)</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of paginatedCotizaciones; let i = index">
+        <td>{{ c.numeroCot }}</td>
+        <td>{{ c.fecha | date:'yyyy-MM-dd' }}</td>
+        <td>{{ obtenerNombreCliente(c.clienteCedula) }}</td>
+        <td>${{ c.total.toFixed(2) }}</td>
+        <td class="text-center">
+          <div class="d-flex justify-content-center gap-2">
+            <button class="btn btn-info btn-sm" (click)="abrirModalEditar(i)"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-danger btn-sm" (click)="eliminarCotizacion(i)"><i class="fas fa-trash-alt"></i></button>
+            <button class="btn btn-secondary btn-sm" (click)="descargarPDF(c)"><i class="fas fa-file-pdf"></i></button>
+            <button class="btn btn-success btn-sm" (click)="enviarPorWhatsapp(c)"> <i class="fab fa-whatsapp"></i></button>
 
-            <div class="mb-3">
-              <label for="numero" class="form-label">Número de Cotización</label>
-              <input type="text" class="form-control" id="numero" [(ngModel)]="nuevoCotizacion.numero" name="numero" required readonly />
-              </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-            <div class="mb-3">
-              <label for="fecha" class="form-label">Fecha</label>
-              <input type="date" class="form-control" id="fecha" [(ngModel)]="nuevoCotizacion.fecha" name="fecha" required />
-            </div>
-
-          <!--Tabla para Cotizar Materiales-->
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+      <label>Mostrar:</label>
+      <select [(ngModel)]="itemsPerPage" (change)="currentPage = 1" class="form-select d-inline w-auto ms-2">
+        <option *ngFor="let size of itemsPerPageOptions" [value]="size">{{ size }} registros</option>
+      </select>
+    </div>
+    <nav>
+      <ul class="pagination m-0">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Anterior</button>
+        </li>
+        <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index" [class.active]="currentPage === i + 1">
+          <button class="page-link" (click)="currentPage = i + 1">{{ i + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <button class="page-link" (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages">Siguiente</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<!-- Modal Nueva Cotización -->
+<div class="modal fade" id="nuevoCotModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nueva Cotización</h5>
+        <button type="button" class="btn-close" (click)="cerrarModal('nuevoCotModal')"></button>
+      </div>
+      <div class="modal-body">
+        <form #formNuevo="ngForm" (ngSubmit)="guardarNuevaCotizacion()">
           <div class="mb-3">
-            <label class="form-label">Materiales a Cotizar</label>
-            <table class="table table-bordered table-sm align-middle">
-              <thead class="thead-light">
-                <tr>
-                  <th>Nombre del Material</th>
-                  <th>Código</th>
-                  <th>Cantidad</th>
-                  <th>Precio Unitario</th>
-                  <th>Subtotal</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let mat of materialesSeleccionados; let i = index">
-                  <td>
-                    <input 
-                      type="text"
-                      class="form-control"
-                      placeholder="Buscar material..."
-                      [ngbTypeahead]="searchMateriales"
-                      [(ngModel)]="mat.nombre"
-                      [resultFormatter]="materialNombreFormatter"
-                      [inputFormatter]="materialNombreFormatter"
-                      (selectItem)="onSelectMaterial($event, i)"
-                      [editable]="true"
-                      name="nombreMaterial{{i}}"
-                      required
-                    />
-                  </td>
-                  <td>
-                    <input type="text" class="form-control" [value]="mat.codigo" readonly />
-                  </td>
-                  <td>
-                    <input 
-                      type="number"
-                      class="form-control"
-                      [(ngModel)]="mat.cantidad"
-                      (ngModelChange)="updateSubtotal(i)"
-                      min="1"
-                      required
-                      name="cantidad{{i}}"  
-                    />
-                  </td>
-                  <td>
-                    <input type="text" class="form-control" [value]="mat.precioUnitario | currency" readonly />
-                  </td>
-                  <td>
-                    <input type="text" class="form-control" [value]="mat.subtotal | currency" readonly />
-                  </td>
-                  <td>
-                    <button type="button" class="btn btn-danger btn-sm" (click)="removeMaterial(i)">🗑️</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <button type="button" class="btn btn-primary btn-sm" (click)="addFilaMaterial()">
-              + Añadir Material
-            </button>
+            <label class="form-label">Fecha</label>
+            <input type="date" class="form-control" [(ngModel)]="cotizacionNuevo.fecha" name="fechaNuevo" required>
           </div>
 
+          <div class="mb-3">
+            <label class="form-label">Cliente</label>
+            <input type="text" class="form-control" [(ngModel)]="cotizacionNuevo.cliente" name="clienteNuevo"
+              [ngbTypeahead]="searchClientes" [resultFormatter]="nombreClienteFormatter" [inputFormatter]="nombreClienteFormatter"
+              (selectItem)="onSelectCliente($event, 'nuevo')" required />
+          </div>
 
-      <div class="mb-3">
-          <label for="subtotal" class="form-label">Subtotal</label>
-          <input type="text" class="form-control" id="subtotal" [value]="nuevoCotizacion.subTotal | currency" readonly>
-      </div>
+          <table class="table table-bordered text-center">
+            <thead class="table-light">
+              <tr>
+                <th>Material</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of cotizacionNuevo.materiales; let i = index">
+                <td>
+                  <input type="text" class="form-control" [(ngModel)]="m.material" [name]="'matNuevo' + i"
+                    [ngbTypeahead]="searchMateriales" [resultFormatter]="nombreMaterialFormatter" [inputFormatter]="nombreMaterialFormatter"
+                    (selectItem)="onSelectMaterial($event, i, 'nuevo')" required />
+                </td>
+                <td><input type="number" class="form-control" [(ngModel)]="m.cantidad" [name]="'cantNuevo' + i" (ngModelChange)="calcularTotales(cotizacionNuevo)" required></td>
+                <td><input type="number" class="form-control" [(ngModel)]="m.precioUnitario" [name]="'precioNuevo' + i" (ngModelChange)="calcularTotales(cotizacionNuevo)" required></td>
+                <td>{{ m.subtotal?.toFixed(2) || '0.00' }}</td>
+                <td><button type="button" class="btn btn-danger btn-sm" (click)="eliminarMaterial(cotizacionNuevo, i)">X</button></td>
+              </tr>
+            </tbody>
+          </table>
 
-      <div class="mb-3">
-          <label for="iva" class="form-label">IVA (12%)</label>
-          <input type="text" class="form-control" id="iva" [value]="nuevoCotizacion.iva | currency" readonly>
-      </div>
+          <button type="button" class="btn btn-secondary mb-3" (click)="agregarMaterial(cotizacionNuevo)">+ Agregar Material</button>
 
-      <div class="mb-3">
-          <label for="total" class="form-label">Total</label>
-          <input type="text" class="form-control" id="total" [value]="nuevoCotizacion.total | currency" readonly>
-      </div>
-            <button type="submit" class="btn btn-success w-100">Guardar Cotización</button>
-          </form>
-        </div>
+          <div class="text-end">
+            <p><strong>Subtotal:</strong> ${{ cotizacionNuevo.subTotal.toFixed(2) }}</p>
+            <p><strong>IVA (12%):</strong> ${{ cotizacionNuevo.iva.toFixed(2) }}</p>
+            <h5><strong>Total:</strong> ${{ cotizacionNuevo.total.toFixed(2) }}</h5>
+          </div>
+
+          <div class="d-flex justify-content-start gap-2">
+            <button type="submit" class="btn btn-success" [disabled]="formNuevo.invalid || cotizacionNuevo.materiales.length === 0">Guardar</button>
+            <button type="button" class="btn btn-secondary" (click)="cerrarModal('nuevoCotModal')">Cancelar</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal de Éxito -->
-  <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content p-3">
-        <div class="modal-header">
-          <h5 class="modal-title" id="successModalLabel">Operación Exitosa</h5>
-        </div>
-        <div class="modal-body text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill animate-check" viewBox="0 0 16 16">
-            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-          </svg>
-          <h4>Cotización Guardada Exitosamente</h4>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
-        </div>
+<!-- Modal de Éxito -->
+<div class="modal fade" id="successModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title">Cotización Guardada</h5>
+      </div>
+      <div class="modal-body text-center">
+        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+        <h4>Cotización guardada con éxito</h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
   </div>
+</div>
+
+<!-- Modal Confirmación de Eliminación -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>¿Está seguro que desea eliminar esta cotización?</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-danger" (click)="confirmDeleteCotizacion()">Sí</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminado con Éxito -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title">Cotización Eliminada</h5>
+      </div>
+      <div class="modal-body text-center">
+        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+        <h4>Cotización eliminada con éxito</h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Cotización -->
+<div class="modal fade" id="editarCotModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Cotización</h5>
+        <button type="button" class="btn-close" (click)="cerrarModal('editarCotModal')"></button>
+      </div>
+      <div class="modal-body">
+        <form #formEditar="ngForm" (ngSubmit)="actualizarCotizacion()">
+          <div class="mb-3">
+            <label class="form-label">Fecha</label>
+            <input type="date" class="form-control" [(ngModel)]="cotizacionEdit.fecha" name="fechaEditar" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Cliente</label>
+            <input type="text" class="form-control" [(ngModel)]="cotizacionEdit.cliente" name="clienteEditar"
+              [ngbTypeahead]="searchClientes" [resultFormatter]="nombreClienteFormatter" [inputFormatter]="nombreClienteFormatter"
+              (selectItem)="onSelectCliente($event, 'editar')" required />
+          </div>
+
+          <table class="table table-bordered text-center">
+            <thead class="table-light">
+              <tr>
+                <th>Material</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of cotizacionEdit.materiales; let i = index">
+                <td>
+                  <input type="text" class="form-control" [(ngModel)]="m.material" [name]="'matEdit' + i"
+                    [ngbTypeahead]="searchMateriales" [resultFormatter]="nombreMaterialFormatter" [inputFormatter]="nombreMaterialFormatter"
+                    (selectItem)="onSelectMaterial($event, i, 'editar')" required />
+                </td>
+                <td><input type="number" class="form-control" [(ngModel)]="m.cantidad" [name]="'cantEdit' + i" (ngModelChange)="calcularTotales(cotizacionEdit)" required></td>
+                <td><input type="number" class="form-control" [(ngModel)]="m.precioUnitario" [name]="'precioEdit' + i" (ngModelChange)="calcularTotales(cotizacionEdit)" required></td>
+                <td>{{ m.subtotal?.toFixed(2) || '0.00' }}</td>
+                <td><button type="button" class="btn btn-danger btn-sm" (click)="eliminarMaterial(cotizacionEdit, i)">X</button></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button type="button" class="btn btn-secondary mb-3" (click)="agregarMaterial(cotizacionEdit)">+ Agregar Material</button>
+
+          <div class="text-end">
+            <p><strong>Subtotal:</strong> ${{ cotizacionEdit.subTotal.toFixed(2) }}</p>
+            <p><strong>IVA (12%):</strong> ${{ cotizacionEdit.iva.toFixed(2) }}</p>
+            <h5><strong>Total:</strong> ${{ cotizacionEdit.total.toFixed(2) }}</h5>
+          </div>
+
+          <div class="d-flex justify-content-start gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="formEditar.invalid || cotizacionEdit.materiales.length === 0">Guardar</button>
+            <button type="button" class="btn btn-secondary" (click)="cerrarModal('editarCotModal')">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

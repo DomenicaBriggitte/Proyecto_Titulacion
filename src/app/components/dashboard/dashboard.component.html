@@ -1,2 +1,76 @@
-<app-sidebar></app-sidebar>
-<p>dashboard works!</p>
+  <app-sidebar></app-sidebar>
+<div class="content">
+<div class="dashboard-container dark-theme p-3">
+    <h2 >SEGUIMIENTO GENERAL</h2>
+
+    <!-- TARJETAS -->
+    <div class="row mb-4">
+      <div class="col-md-3" *ngFor="let card of cards">
+        <div class="card text-white mb-3" [ngClass]="card.color">
+          <div class="card-header text-center">{{ card.title }}</div>
+          <div class="card-body text-center">
+            <h5 class="card-title fs-3">{{ card.count }}</h5>
+            <p class="card-text">{{ card.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRÁFICOS BARRA Y PIE -->
+    <div class="row mb-4">
+      <div class="col-12 col-md-6 mb-3">
+        <div class="card bg-dark text-white p-3 shadow chart-container">
+          <h5 class="text-center">Cotizaciones por Mes</h5>
+          <ngx-charts-bar-vertical
+            autoResize="true"
+            [scheme]="colorScheme"
+            [results]="cotizacionesPorMes"
+            [gradient]="false"
+            [xAxis]="true"
+            [yAxis]="true"
+            [legend]="false"
+            [showXAxisLabel]="true"
+            [showYAxisLabel]="true"
+            xAxisLabel="Mes"
+            yAxisLabel="Cotizaciones">
+          </ngx-charts-bar-vertical>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 mb-3">
+        <div class="card bg-dark text-white p-3 shadow chart-container">
+          <h5 class="text-center">Distribución de Clientes</h5>
+          <ngx-charts-pie-chart
+            autoResize="true"
+            [scheme]="colorScheme"
+            [results]="clientesPorTipo"
+            [legend]="false"
+            [labels]="true"
+            [doughnut]="true">
+          </ngx-charts-pie-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO LÍNEA -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card bg-dark text-white p-3 shadow">
+          <h5 class="text-center">Ingresos Mensuales</h5>
+          <ngx-charts-line-chart
+            autoResize="true"
+            [scheme]="colorScheme"
+            [results]="ingresosMensuales"
+            [legend]="false"
+            [xAxis]="true"
+            [yAxis]="true"
+            [autoScale]="true">
+          </ngx-charts-line-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  

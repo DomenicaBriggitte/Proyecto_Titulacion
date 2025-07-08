@@ -19,7 +19,10 @@ import { MaterialesComponent } from './components/materiales/materiales.componen
 import { CotizacionComponent } from './components/cotizacion/cotizacion.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { HttpClientModule } from '@angular/common/http';  
-import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
   declarations: [
@@ -41,13 +44,14 @@ import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
   imports: [
     BrowserModule,
     AppRoutingModule,
+    BrowserAnimationsModule,  // debe estar aquí, no en declarations
     CommonModule,
-    FormsModule,
-    AppRoutingModule,
     FormsModule,
     NgxPaginationModule,
     HttpClientModule,
-    NgbTypeaheadModule
+    NgbTypeaheadModule,
+    NgxChartsModule,
+    NgbModule // ✅ IMPORTANTE: este módulo importa todos los componentes de ng-bootstrap
   ],
   providers: [],
   bootstrap: [AppComponent]
