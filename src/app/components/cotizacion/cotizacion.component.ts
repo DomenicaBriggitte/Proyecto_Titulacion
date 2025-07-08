@@ -1,259 +1,401 @@
-import { Component } from '@angular/core';
+// cotizacion.component.ts
+import { Component, OnInit } from '@angular/core';
 import * as bootstrap from 'bootstrap';
-import { ClienteService } from '../../services/cliente.service';
-import { MaterialesService } from 'src/app/services/materiales.service';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { ClienteService } from 'src/app/services/cliente.service';
+import { MaterialesService } from 'src/app/services/materiales.service';
+import { CotizacionService, Cotizacion } from 'src/app/services/cotizacion.service';
 
 @Component({
   selector: 'app-cotizacion',
   templateUrl: './cotizacion.component.html',
   styleUrls: ['./cotizacion.component.css']
 })
-export class CotizacionComponent {
+export class CotizacionComponent implements OnInit {
+  cotizaciones: Cotizacion[] = [];
+  cotizacionesFiltradas: Cotizacion[] = [];
+  cotizacionNuevo: any = this.resetearCotizacion();
+  cotizacionEdit: any = this.resetearCotizacion();
+  indiceEditando: number = -1;
+  deleteIndex: number | null = null;
+  searchQuery: string = '';
   clientes: any[] = [];
   materiales: any[] = [];
+  currentPage: number = 1;
+  itemsPerPage: number = 5;
+  itemsPerPageOptions: number[] = [5, 10, 15];
 
   constructor(
     private clienteService: ClienteService,
-    private materialesService: MaterialesService
-  ) {
-    this.clienteService.getClientes().subscribe((clientes: any[]) => {
-      this.clientes = clientes;
+    private materialesService: MaterialesService,
+    private cotizacionService: CotizacionService
+  ) {}
+
+  ngOnInit(): void {
+    this.cotizacionService.getCotizaciones().subscribe(data => {
+      this.cotizaciones = data;
+      this.cotizacionesFiltradas = [...data];
     });
-    this.materialesService.getMateriales().subscribe((materiales: any[]) => {
-      this.materiales = materiales;
-  });
-}
-
-  // Lista de cotizaciones
-  cotizaciones: any[] = [];
-
-  // Propiedad para la búsqueda
-  searchQuery: string = '';
-  filteredCotizaciones: any[] = [];
-
-  // Propiedad para una nueva cotización
-  nuevoCotizacion = {
-    numero: '',
-    cliente: '',
-    fecha: '',
-    materialesSeleccionados: [] as any[],
-    subTotal: 0,
-    iva: 0,
-    total: 0
-  };
-
-  // Filtrar las cotizaciones por número o cliente
-  filterCotizaciones() {
-    this.filteredCotizaciones = this.cotizaciones.filter(cotizacion =>
-      cotizacion.numero.includes(this.searchQuery) ||
-      cotizacion.cliente.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
+    this.clienteService.getClientes().subscribe(data => this.clientes = data);
+    this.materialesService.getMateriales().subscribe(data => this.materiales = data);
   }
 
-  //Obtener nombres para el listado
-  nombreFormatter = (cliente: any) => cliente && cliente.nombre ? cliente.nombre : cliente;
-  searchClientes = (text$: Observable<string>) =>
-  text$.pipe(
-    debounceTime(200),
-    distinctUntilChanged(),
-    map(term =>
-      term.length < 2 ? []
-        : this.clientes.filter(v => v.nombre.toLowerCase().includes(term.toLowerCase())).slice(0, 10)
-    )
-  );
-  onSelectCliente(event: any) {
-  this.nuevoCotizacion.cliente = event.item;
-  }
-
-  // Método para generar un número de cotización único
-  generarNumeroCotizacion(): string {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    // Buscar el mayor correlativo existente para el año y mes actual
-    let maxSecuencia = 0;
-    this.cotizaciones.forEach(c => {
-      if (c.numero) {
-        const match = c.numero.match(/^COT_(\d{4})(\d{2})(\d{6})$/);
-        if (match && match[1] === year.toString() && match[2] === month) {
-          const secuencia = parseInt(match[3], 10);
-          if (secuencia > maxSecuencia) {
-            maxSecuencia = secuencia;
-          }
-        }
-      }
-    });
-    const nuevaSecuencia = (maxSecuencia + 1).toString().padStart(6, '0');
-    return `COT_${year}${month}${nuevaSecuencia}`;
-  }
-
-  // Método para agregar una cotización
-  addCotizacion() {
-    this.nuevoCotizacion.numero = this.generarNumeroCotizacion();
-    this.nuevoCotizacion.materialesSeleccionados = [...this.materialesSeleccionados];
-    this.cotizaciones.push({ ...this.nuevoCotizacion });
-    this.filteredCotizaciones = [...this.cotizaciones];
-
-    const hoy = new Date();
-    const yyyy = hoy.getFullYear();
-    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
-    const dd = String(hoy.getDate()).padStart(2, '0');
-    const fechaActual = `${yyyy}-${mm}-${dd}`;
-    this.nuevoCotizacion = { numero: this.generarNumeroCotizacion(), cliente: '', fecha: fechaActual, materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
-    this.materialesSeleccionados = [
-      { nombre: '', codigo: '', cantidad: 1, precioUnitario: 0, subtotal: 0 }
-    ];
-
-
-    // Cerrar el modal de nueva cotización y luego mostrar el de éxito
-    const modalElement = document.getElementById('nuevoCotizacionModal');
-    if (modalElement) {
-      const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-      modal.hide();
-    // Esperar a que termine de cerrarse antes de mostrar el de éxito
-    modalElement.addEventListener('hidden.bs.modal', () => {
-      const successModalElement = document.getElementById('successModal');
-        if (successModalElement) {
-          const successModal = bootstrap.Modal.getInstance(successModalElement) || new bootstrap.Modal(successModalElement);
-          successModal.show();
-        }
-      }, { once: true });
-      
-      const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-          backdrop.remove(); // Eliminar capa oscura
-        }
-    }
-  }
-
-  // Método para eliminar una cotización
-  deleteCotizacion(cotizacion: any) {
-    const index = this.cotizaciones.findIndex(c => c.numero === cotizacion.numero);
-    if (index !== -1) {
-      this.cotizaciones.splice(index, 1);
-      this.filteredCotizaciones = [...this.cotizaciones];  // Actualizar la lista filtrada para mostrar los cambios
-    }
-    //recalcula numero de cotización -1
-    this.nuevoCotizacion = {
-      numero: this.generarNumeroCotizacion(),
-      cliente: '',
+  resetearCotizacion() {
+    return {
+      numeroCot: this.generarNumeroCotizacion(),
+      cliente: null,
       fecha: '',
-      materialesSeleccionados: [],
+      materiales: [],
       subTotal: 0,
       iva: 0,
       total: 0
     };
   }
 
-  // Método para ver una cotización
-  viewCotizacion(cotizacion: any) {
-    console.log(cotizacion);
-    // Mostrar detalles de la cotización
+  generarNumeroCotizacion(): string {
+    const fecha = new Date();
+    const anio = fecha.getFullYear();
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const random = Math.floor(Math.random() * 900000 + 100000);
+    return `COT_${anio}${mes}${dia}${random}`;
   }
 
-  // Método para editar una cotización
-  editCotizacion(cotizacion: any) {
-    this.nuevoCotizacion = { ...cotizacion };
-    const modalElement = document.getElementById('editCotizacionModal');
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
+  agregarMaterial(cot: any): void {
+    cot.materiales.push({ material: null, cantidad: 1, precioUnitario: 0, subtotal: 0 });
   }
 
-  // Método para actualizar la cotización
-  updateCotizacion() {
-    const index = this.cotizaciones.findIndex(c => c.numero === this.nuevoCotizacion.numero);
-    if (index !== -1) {
-      this.cotizaciones[index] = { ...this.nuevoCotizacion };
-      this.filteredCotizaciones = [...this.cotizaciones];  // Actualizar la lista filtrada para mostrar los cambios
-    }
-    this.nuevoCotizacion = { numero: '', cliente: '', fecha: '', materialesSeleccionados: [], subTotal: 0, iva:0, total: 0 };
-
-    const modalElement = document.getElementById('editCotizacionModal');
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.hide();
-    }
+  eliminarMaterial(cot: any, index: number): void {
+    cot.materiales.splice(index, 1);
+    this.calcularTotales(cot);
   }
 
-  // Método para seleccionar los materiales
-  seleccionarMaterial(material: any) {
-    this.nuevoCotizacion.materialesSeleccionados.push({
-      ...material,
-      cantidad: 1,
-      iva: material.costoSinIva * 0.15,  // Ejemplo: 12% IVA
-      total: material.costoSinIva * 1.15 // Precio con IVA
+  calcularTotales(cot: any): void {
+    cot.materiales.forEach((m: any) => {
+      m.subtotal = (m.cantidad || 0) * (m.precioUnitario || 0);
     });
-    this.calcularTotales();
+    cot.subTotal = cot.materiales.reduce((sum: number, m: any) => sum + (m.subtotal || 0), 0);
+    cot.iva = cot.subTotal * 0.12;
+    cot.total = cot.subTotal + cot.iva;
   }
 
-  // Método para calcular los totales
-  calcularTotales() {
-    const subtotal = this.materialesSeleccionados.reduce((sum, mat) => sum + (mat.subtotal || 0), 0);
-    this.nuevoCotizacion.subTotal = subtotal;
-    this.nuevoCotizacion.iva = +(subtotal * 0.12).toFixed(2);
-    this.nuevoCotizacion.total = +(subtotal + this.nuevoCotizacion.iva).toFixed(2);
+  convertirADecimal(valor: string): number {
+    if (typeof valor === 'string') {
+      return parseFloat(valor.replace(',', '.'));
+    }
+    return valor;
   }
 
+  nombreClienteFormatter = (c: any) => c?.nombre || c;
+  nombreMaterialFormatter = (m: any) => m?.nombre || m;
 
-  onMaterialChange(material: any, event: any): void {
-  if (!this.nuevoCotizacion.materialesSeleccionados) {
-    this.nuevoCotizacion.materialesSeleccionados = [];
+  searchClientes = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term =>
+        term.length < 2 ? [] :
+        this.clientes.filter(c => c.nombre.toLowerCase().includes(term.toLowerCase())).slice(0, 10)
+      )
+    );
+
+  searchMateriales = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term =>
+        term.length < 2 ? [] :
+        this.materiales.filter(m => m.nombre.toLowerCase().includes(term.toLowerCase())).slice(0, 10)
+      )
+    );
+
+  onSelectCliente(event: any, modo: 'nuevo' | 'editar') {
+    if (modo === 'nuevo') this.cotizacionNuevo.cliente = event.item;
+    else this.cotizacionEdit.cliente = event.item;
   }
-  if (event.target.checked) {
-    this.nuevoCotizacion.materialesSeleccionados.push(material);
-  } else {
-    this.nuevoCotizacion.materialesSeleccionados = this.nuevoCotizacion.materialesSeleccionados.filter((m: any) => m.codigo !== material.codigo);
+
+onSelectMaterial(event: any, index: number, modo: 'nuevo' | 'editar') {
+  const materialSeleccionado = event.item;
+  const target = modo === 'nuevo' ? this.cotizacionNuevo : this.cotizacionEdit;
+
+  target.materiales[index].material = materialSeleccionado;
+  target.materiales[index].precioUnitario = materialSeleccionado.costoSinIva; // ← aquí actualizamos el precio
+  target.materiales[index].subtotal = materialSeleccionado.costoSinIva * (target.materiales[index].cantidad || 1);
+
+  this.calcularTotales(target);
+}
+
+
+  guardarNuevaCotizacion(): void {
+    const nueva: Cotizacion = {
+      numeroCot: this.cotizacionNuevo.numeroCot,
+      clienteCedula: this.cotizacionNuevo.cliente.cedula,
+      fecha: this.cotizacionNuevo.fecha,
+      materiales: this.cotizacionNuevo.materiales.map((m: any) => ({
+        materialCodigo: m.material.codigo,
+        cantidad: m.cantidad,
+        precioUnitario: m.precioUnitario,
+        subtotal: m.subtotal
+      })),
+      subTotal: this.cotizacionNuevo.subTotal,
+      iva: this.cotizacionNuevo.iva,
+      total: this.cotizacionNuevo.total
+    };
+
+    this.cotizacionService.addCotizacion(nueva).subscribe(() => {
+      this.cotizacionService.getCotizaciones().subscribe(data => {
+        this.cotizaciones = data;
+        this.cotizacionesFiltradas = [...data];
+      });
+      this.cerrarModal('nuevoCotModal');
+      this.mostrarModal('successModal');
+      this.cotizacionNuevo = this.resetearCotizacion();
+    });
+  }
+
+abrirModalEditar(index: number): void {
+  const realIndex = (this.currentPage - 1) * this.itemsPerPage + index;
+  this.indiceEditando = realIndex;
+  const original = this.cotizacionesFiltradas[realIndex];
+
+  this.cotizacionEdit = {
+    numeroCot: original.numeroCot,
+    fecha: new Date(original.fecha).toISOString().split('T')[0],
+    cliente: this.clientes.find(c => c.cedula === original.clienteCedula),
+    materiales: original.materiales.map((m: any) => {
+      const matEncontrado = this.materiales.find(mat => mat.codigo === m.materialCodigo);
+      return {
+        material: matEncontrado || null,
+        cantidad: m.cantidad,
+        precioUnitario: m.precioUnitario,
+        subtotal: m.subtotal
+      };
+    }),
+    subTotal: original.subTotal,
+    iva: original.iva,
+    total: original.total
+  };
+
+  this.mostrarModal('editarCotModal');
+}
+
+  actualizarCotizacion(): void {
+  if (this.indiceEditando !== -1 && this.cotizacionEdit.cliente?.cedula) {
+    const actualizada: Cotizacion = {
+      numeroCot: this.cotizacionEdit.numeroCot,
+      clienteCedula: this.cotizacionEdit.cliente.cedula,
+      fecha: this.cotizacionEdit.fecha,
+      materiales: this.cotizacionEdit.materiales.map((m: any) => ({
+        materialCodigo: m.material.codigo,
+        cantidad: m.cantidad,
+        precioUnitario: m.precioUnitario,
+        subtotal: m.subtotal
+      })),
+      subTotal: this.cotizacionEdit.subTotal,
+      iva: this.cotizacionEdit.iva,
+      total: this.cotizacionEdit.total
+    };
+
+    const id = this.cotizaciones[this.indiceEditando].cotizacionId;
+    if (!id) return;
+
+    this.cotizacionService.updateCotizacion(id, actualizada).subscribe(() => {
+      this.cotizacionService.getCotizaciones().subscribe(data => {
+        this.cotizaciones = data;
+        this.cotizacionesFiltradas = [...data];
+      });
+      this.indiceEditando = -1;
+      this.cerrarModal('editarCotModal');
+      this.mostrarModal('successModal');
+    });
   }
 }
 
-  //Sección para Métodos de la Tabla de Cotización de Materiales
-    // Estructura de un material seleccionado
-    materialesSeleccionados = [
-      { nombre: '', codigo: '', cantidad: 1, precioUnitario: 0, subtotal: 0 }
-    ];
+  abrirModalNuevo(): void {
+    this.cotizacionNuevo = this.resetearCotizacion();
+    this.agregarMaterial(this.cotizacionNuevo);
+    this.mostrarModal('nuevoCotModal');
+  }
 
-    // Método para buscar materiales (ng-bootstrap typeahead)
-    searchMateriales = (text$: Observable<string>) =>
-      text$.pipe(
-        debounceTime(200),
-        distinctUntilChanged(),
-        map(term => term.length < 2 ? []
-          : this.materiales.filter(m => m.nombre.toLowerCase().includes(term.toLowerCase())).slice(0, 10))
+  mostrarModal(id: string): void {
+    const modalEl = document.getElementById(id);
+    if (modalEl) new bootstrap.Modal(modalEl).show();
+  }
+
+  cerrarModal(id: string): void {
+    const modalEl = document.getElementById(id);
+    if (modalEl) bootstrap.Modal.getInstance(modalEl)?.hide();
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) backdrop.remove();
+  }
+
+  obtenerNombreCliente(cedula: string): string {
+    const cliente = this.clientes.find(c => c.cedula === cedula);
+    return cliente ? cliente.nombre : cedula;
+  }
+
+  eliminarCotizacion(index: number): void {
+    this.deleteIndex = index;
+    this.mostrarModal('deleteConfirmationModal');
+  }
+
+  confirmDeleteCotizacion(): void {
+    if (this.deleteIndex !== null && this.deleteIndex > -1) {
+      const id = this.cotizaciones[this.deleteIndex].cotizacionId!;
+      this.cotizacionService.deleteCotizacion(id).subscribe(() => {
+        this.cotizaciones.splice(this.deleteIndex!, 1);
+        this.cotizacionesFiltradas = [...this.cotizaciones];
+        this.deleteIndex = null;
+        this.cerrarModal('deleteConfirmationModal');
+        this.mostrarModal('deleteModal');
+      });
+    }
+  }
+
+enviarPorWhatsapp(cot: Cotizacion): void {
+    const doc = new jsPDF();
+    const img = new Image();
+    img.src = 'assets/images/Logo/empresa.png';
+    doc.addImage(img, 'PNG', 10, 12, 40, 35);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('Patricio Rivera Rivera', 105, 20, { align: 'center' });
+    doc.setFontSize(11);
+    doc.text('Guayas / Guayaquil / Tarqui', 105, 26, { align: 'center' });
+    doc.text('Telf. 0999606125', 105, 32, { align: 'center' });
+    doc.text('correo: LILIANAZAMBRANO_7@HOTMAIL.COM', 105, 38, { align: 'center' });
+    doc.line(10, 45, 200, 45);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Cotización', 105, 52, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Número: ${cot.numeroCot}`, 10, 60);
+    doc.text(`Fecha: ${cot.fecha}`, 10, 68);
+    doc.text(`Cliente: ${this.obtenerNombreCliente(cot.clienteCedula)}`, 10, 76);
+
+    const data = (cot.materiales || []).map((item: any) => [
+      item.material?.nombre || item.materialCodigo,
+      item.cantidad,
+      `$${item.precioUnitario.toFixed(2)}`,
+      `$${item.subtotal.toFixed(2)}`
+    ]);
+
+    let finalY = 82;
+
+    if (data.length > 0) {
+      autoTable(doc, {
+        startY: finalY,
+        head: [['Material', 'Cantidad', 'Precio Unitario', 'Subtotal']],
+        body: data,
+        headStyles: {
+          fillColor: [255, 123, 0],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        },
+        didDrawPage: (data) => {
+          finalY = data.cursor?.y ?? finalY;
+        }
+      });
+    }
+
+    doc.text(`Subtotal: $${cot.subTotal.toFixed(2)}`, 140, finalY + 10);
+    doc.text(`IVA 12%: $${cot.iva.toFixed(2)}`, 140, finalY + 20);
+    doc.text(`Total: $${cot.total.toFixed(2)}`, 140, finalY + 30);
+
+    const pdfBlob = doc.output('blob');
+    const file = new File([pdfBlob], `Cotizacion_${cot.numeroCot}.pdf`, { type: 'application/pdf' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        title: 'Cotización',
+        text: `Revisa esta cotización: ${cot.numeroCot}`,
+        files: [file]
+      }).catch(err => console.log('No se pudo compartir:', err));
+    } else {
+      const mensaje = encodeURIComponent(`Hola, te comparto la cotización número ${cot.numeroCot} con total de $${cot.total.toFixed(2)}.`);
+      const url = `https://wa.me/?text=${mensaje}`;
+      window.open(url, '_blank');
+    }
+  }
+
+  descargarPDF(cot: Cotizacion): void {
+    const doc = new jsPDF();
+    const img = new Image();
+    img.src = 'assets/images/Logo/empresa.png';
+    doc.addImage(img, 'PNG', 10, 12, 40, 35);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('Patricio Rivera Rivera', 105, 20, { align: 'center' });
+    doc.setFontSize(11);
+    doc.text('Guayas / Guayaquil / Tarqui', 105, 26, { align: 'center' });
+    doc.text('Telf. 0999606125', 105, 32, { align: 'center' });
+    doc.text('correo: LILIANAZAMBRANO_7@HOTMAIL.COM', 105, 38, { align: 'center' });
+    doc.line(10, 45, 200, 45);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Cotización', 105, 52, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Número: ${cot.numeroCot}`, 10, 60);
+    doc.text(`Fecha: ${cot.fecha}`, 10, 68);
+    doc.text(`Cliente: ${this.obtenerNombreCliente(cot.clienteCedula)}`, 10, 76);
+
+    const data = (cot.materiales || []).map((item: any) => [
+      item.material?.nombre || item.materialCodigo,
+      item.cantidad,
+      `$${item.precioUnitario.toFixed(2)}`,
+      `$${item.subtotal.toFixed(2)}`
+    ]);
+
+    let finalY = 82;
+
+    if (data.length > 0) {
+      autoTable(doc, {
+        startY: finalY,
+        head: [['Material', 'Cantidad', 'Precio Unitario', 'Subtotal']],
+        body: data,
+        headStyles: {
+          fillColor: [255, 123, 0],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        },
+        didDrawPage: (data) => {
+          finalY = data.cursor?.y ?? finalY;
+        }
+      });
+    }
+
+    doc.text(`Subtotal: $${cot.subTotal.toFixed(2)}`, 140, finalY + 10);
+    doc.text(`IVA 12%: $${cot.iva.toFixed(2)}`, 140, finalY + 20);
+    doc.text(`Total: $${cot.total.toFixed(2)}`, 140, finalY + 30);
+
+    doc.save(`Cotizacion_${cot.numeroCot}.pdf`);
+  }
+
+
+
+  filtrarCotizaciones(): void {
+    const query = (this.searchQuery || '').toLowerCase();
+    this.cotizacionesFiltradas = this.cotizaciones.filter(c => {
+      const cliente = this.clientes.find(cl => cl.cedula === c.clienteCedula);
+      return (
+        c.numeroCot.toLowerCase().includes(query) ||
+        cliente?.nombre?.toLowerCase().includes(query)
       );
+    });
+  }
 
-    // Formatea el nombre del material en el autocomplete
-    materialNombreFormatter = (x: any) => x && x.nombre ? x.nombre : x;
+  get paginatedCotizaciones(): Cotizacion[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.cotizacionesFiltradas.slice(start, end);
+  }
 
-    // Cuando seleccionas un material del autocomplete
-    onSelectMaterial(event: any, idx: number) {
-      const mat = event.item;
-      this.materialesSeleccionados[idx].nombre = mat.nombre;
-      this.materialesSeleccionados[idx].codigo = mat.codigo;
-      this.materialesSeleccionados[idx].precioUnitario = mat.costoSinIva;
-      this.updateSubtotal(idx);
-    }
-
-    // Actualiza el subtotal al cambiar cantidad o material
-    updateSubtotal(idx: number) {
-      const item = this.materialesSeleccionados[idx];
-      const cantidad = Number(item.cantidad) > 0 ? Number(item.cantidad) : 1;
-      item.subtotal = cantidad * (item.precioUnitario || 0);
-      this.calcularTotales();
-    }
-
-    // Añadir una fila nueva
-    addFilaMaterial() {
-      this.materialesSeleccionados.push({ nombre: '', codigo: '', cantidad: 1, precioUnitario: 0, subtotal: 0 });
-    }
-
-    // Eliminar una fila de la tabla de materiales
-    removeMaterial(idx: number) {
-      this.materialesSeleccionados.splice(idx, 1);
-      this.calcularTotales();
-    }
-
+  get totalPages(): number {
+    return Math.ceil(this.cotizacionesFiltradas.length / this.itemsPerPage);
+  }
 }

@@ -9,6 +9,11 @@ import * as bootstrap from 'bootstrap';
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent {
+  isSidebarVisible: boolean = true;
+
+  toggleSidebar() {
+    this.isSidebarVisible = !this.isSidebarVisible;
+  }
   isVolquetasMenuOpen: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {

@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import * as bootstrap from 'bootstrap';
 import { MaterialesService } from '../../services/materiales.service';
 import { NgForm } from '@angular/forms';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-materiales',
@@ -37,6 +39,45 @@ export class MaterialesComponent {
       materiales.tipo.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
+ //Paginación
+  currentPage: number = 1;
+itemsPerPage: number = 5;
+itemsPerPageOptions: number[] = [5, 10, 15];
+
+get paginatedMateriales(): any[] {
+  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+  return this.filteredMateriales.slice(startIndex, startIndex + this.itemsPerPage);
+}
+
+get totalPages(): number {
+  return Math.ceil(this.filteredMateriales.length / this.itemsPerPage);
+}
+
+get visiblePages(): number[] {
+  const range = 1;
+  const start = Math.max(1, this.currentPage - range);
+  const end = Math.min(this.totalPages, this.currentPage + range);
+  return Array(end - start + 1).fill(0).map((_, i) => start + i);
+}
+
+
+
+
+exportarAExcel(): void {
+  const worksheet = XLSX.utils.json_to_sheet(this.filteredMateriales.map(mat => ({
+    Código: mat.codigo,
+    Nombre: mat.nombre,
+    'Costo sin IVA': mat.costoSinIva,
+    Tipo: mat.tipo
+  })));
+
+  const workbook = { Sheets: { 'Materiales': worksheet }, SheetNames: ['Materiales'] };
+  const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const data: Blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+  FileSaver.saveAs(data, 'materiales.xlsx');
+}
+
 
     validateCodigo(event: KeyboardEvent) {
     const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];

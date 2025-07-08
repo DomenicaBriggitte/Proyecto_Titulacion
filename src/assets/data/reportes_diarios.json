@@ -1,0 +1,185 @@
+[
+  {
+    "reporteDiario_Id": 38,
+    "fecha": "2025-07-05T00:00:00",
+    "clienteCedula": "0602127847001",
+    "volquetaId": 7,
+    "responsable": "huu",
+    "detalles": [
+      {
+        "detalleReporte_Id": 46,
+        "descripcion": "ng",
+        "observacion": "",
+        "total": 2,
+        "reporteDiario_Id": 38
+      },
+      {
+        "detalleReporte_Id": 47,
+        "descripcion": "ffff",
+        "observacion": "",
+        "total": 4,
+        "reporteDiario_Id": 38
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 39,
+    "fecha": "2025-08-01T00:00:00",
+    "clienteCedula": "0101900330001",
+    "volquetaId": 7,
+    "responsable": "eeeryk",
+    "detalles": [
+      {
+        "detalleReporte_Id": 48,
+        "descripcion": "arena",
+        "observacion": "",
+        "total": 3,
+        "reporteDiario_Id": 39
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 40,
+    "fecha": "2025-08-01T00:00:00",
+    "clienteCedula": "0101900330001",
+    "volquetaId": 7,
+    "responsable": "eeeryk",
+    "detalles": [
+      {
+        "detalleReporte_Id": 49,
+        "descripcion": "arena",
+        "observacion": "",
+        "total": 3,
+        "reporteDiario_Id": 40
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 50,
+    "fecha": "2025-07-09T00:00:00",
+    "clienteCedula": "0101900330001",
+    "volquetaId": 7,
+    "responsable": "aaaaaaaaaaaaaaaa",
+    "detalles": [
+      {
+        "detalleReporte_Id": 61,
+        "descripcion": "44444",
+        "observacion": "",
+        "total": 0.05,
+        "reporteDiario_Id": 50
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 51,
+    "fecha": "2025-07-18T00:00:00",
+    "clienteCedula": "0990617988001",
+    "volquetaId": 7,
+    "responsable": "riujy",
+    "detalles": [
+      {
+        "detalleReporte_Id": 62,
+        "descripcion": "com",
+        "observacion": "",
+        "total": 1.12,
+        "reporteDiario_Id": 51
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 52,
+    "fecha": "2025-07-09T00:00:00",
+    "clienteCedula": "0902821214001",
+    "volquetaId": 7,
+    "responsable": "sxc",
+    "detalles": [
+      {
+        "detalleReporte_Id": 63,
+        "descripcion": "weee",
+        "observacion": "",
+        "total": 0.01,
+        "reporteDiario_Id": 52
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 53,
+    "fecha": "2025-07-03T00:00:00",
+    "clienteCedula": "0101900330001",
+    "volquetaId": 9,
+    "responsable": "erc",
+    "detalles": [
+      {
+        "detalleReporte_Id": 64,
+        "descripcion": "e",
+        "observacion": "",
+        "total": 0.01,
+        "reporteDiario_Id": 53
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 54,
+    "fecha": "2025-07-07T00:00:00",
+    "clienteCedula": "1791807529001",
+    "volquetaId": 7,
+    "responsable": "aa",
+    "detalles": [
+      {
+        "detalleReporte_Id": 65,
+        "descripcion": "a",
+        "observacion": "",
+        "total": 0.01,
+        "reporteDiario_Id": 54
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 55,
+    "fecha": "2025-07-04T00:00:00",
+    "clienteCedula": "0802326660001",
+    "volquetaId": 7,
+    "responsable": "rety",
+    "detalles": [
+      {
+        "detalleReporte_Id": 66,
+        "descripcion": "sd",
+        "observacion": "",
+        "total": 444,
+        "reporteDiario_Id": 55
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 56,
+    "fecha": "2025-07-07T00:00:00",
+    "clienteCedula": "0190491250001",
+    "volquetaId": 2,
+    "responsable": "DomBri",
+    "detalles": [
+      {
+        "detalleReporte_Id": 67,
+        "descripcion": "Canasta",
+        "observacion": "na",
+        "total": 34,
+        "reporteDiario_Id": 56
+      }
+    ]
+  },
+  {
+    "reporteDiario_Id": 57,
+    "fecha": "2025-07-09T00:00:00",
+    "clienteCedula": "0101518660001",
+    "volquetaId": 2,
+    "responsable": "ermilo",
+    "detalles": [
+      {
+        "detalleReporte_Id": 68,
+        "descripcion": "sd",
+        "observacion": "",
+        "total": 45.9,
+        "reporteDiario_Id": 57
+      }
+    ]
+  }
+]

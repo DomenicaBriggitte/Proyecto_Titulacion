@@ -1,0 +1,159 @@
+
+.content {
+  margin-left: 250px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  height: 100%;
+}
+
+.text-center {
+  text-align: center;
+  font-weight: bold;
+}
+
+h2 {
+  color: #333;
+}
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  box-shadow: none;
+  transition: border-color 0.3s ease;
+  margin-left: auto;
+}
+
+.form-control:focus {
+  border-color: #f47c00;
+  box-shadow: 0 0 5px rgba(244, 124, 0, 0.5);
+}
+
+/* BOTONES */
+.btn-primary {
+  background-color: #f47c00;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px #00000033;
+}
+.btn-danger {
+  background-color: #ef2e41;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px #00000033;
+}
+.btn-success {
+  background-color: #f47c00;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px #00000033;
+}
+
+.btn-success-xls {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px #00000033;
+}
+/* Botón editar y Botones Si, No*/
+.btn-info, .btn.btn-si {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-info:hover, .btn.btn-si:hover {
+  background-color: #0056b3; 
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-info:active, .btn.btn-si:active {
+  background-color: #003d8b;
+}
+
+/* Botón de eliminar */
+.btn-danger, .btn.btn-no {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 8px #0000001a;
+}
+
+.btn-danger:hover, .btn.btn-no:hover {
+  background-color: #c82333; 
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger:active, .btn.btn-no:active {
+  background-color: #a71d2a; 
+}
+
+.table th, .table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table .thead-dark {
+  background-color: #343a40;
+  color: #ffffff;
+}
+
+.badge.bg-primary {
+  background-color: #f47c00 !important;
+  color: white;
+  font-weight: normal;
+  font-size: medium;
+}
+
+
+table th {
+  background-color: #ebe8e8b2;
+}
+.modal-header {
+  background-color: #f47c00;
+  color: #ffffff;
+}
+
+
+.btn i {
+  margin-right: 2px;
+  font-size: 20px;
+  vertical-align: middle;
+  transition: transform 0.3s ease;
+}
+
+.badge.badge-operativo {
+  background-color: #28a745 !important; /* verde */
+  color: white;
+  font-weight: normal;
+  font-size: medium;
+}
+
+.badge.badge-mantenimiento {
+  background-color: #f47c00 !important; /* naranja */
+  color: white;
+  font-weight: normal;
+  font-size: medium;
+}
+
+/*Visto y Animación*/
+.bi.bi-check-circle-fill{
+  width: 80px;
+  height: 80px;
+  color:#28a745
+}
+@keyframes rotateReverse {
+  0% {
+    transform: rotate(0deg); /* inicia */
+  }
+  100% {
+    transform: rotate(360deg); /* termina */
+  }
+}
+.animate-check {
+  animation: rotateReverse 0.3s ease-in-out forwards; /* duración */
+}
+

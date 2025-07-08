@@ -13,8 +13,8 @@ import { CotizacionComponent } from './components/cotizacion/cotizacion.componen
 
 const routes: Routes = [  
   { path: '', component: InicioComponent },
-  { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent },
+  { path: 'login', component: LoginComponent },
   { path: 'cliente', component: ClienteComponent },
   { path: 'pedido', component: PedidoComponent },
   { path: 'registro-volqueta', component: RegistroVolquetaComponent },
@@ -22,7 +22,7 @@ const routes: Routes = [
   { path: 'factura', component: FacturaComponent },
   { path: 'materiales', component: MaterialesComponent },
   { path: 'cotizacion', component: CotizacionComponent },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: 'dashboard', pathMatch: 'full' }
 ];
 
 @NgModule({

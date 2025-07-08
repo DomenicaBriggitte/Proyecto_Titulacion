@@ -25,4 +25,6 @@ export class ClienteService {
   deleteCliente(cedula: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${cedula}`);
   }
+
+  
 }
