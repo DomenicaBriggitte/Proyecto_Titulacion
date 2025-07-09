@@ -1,48 +1,48 @@
 [
   {
-    "id": 2,
+    "id": 1,
     "placa": "XYZ-5678",
     "tipo": "Mula",
     "capacidad": "5 m3",
     "estado": "En mantenimiento"
   },
   {
-    "id": 3,
+    "id": 2,
     "placa": "DEF-9876",
     "tipo": "Normal",
     "capacidad": "8 m3",
     "estado": "Operativo"
   },
   {
-    "id": 4,
+    "id": 3,
     "placa": "GHI-4321",
     "tipo": "Mula",
     "capacidad": "3 m3",
     "estado": "Operativo"
   },
   {
-    "id": 7,
+    "id": 4,
     "placa": "ABC-1233",
     "tipo": "Mula",
     "capacidad": "8 m3",
     "estado": "En mantenimiento"
   },
   {
-    "id": 9,
+    "id": 5,
     "placa": "ABC-1235",
     "tipo": "Normal",
     "capacidad": "10 m3",
     "estado": "Operativo"
   },
   {
-    "id": 11,
+    "id": 6,
     "placa": "XYZ-5670",
     "tipo": "Normal",
     "capacidad": "10 m3",
     "estado": "Operativo"
   },
   {
-    "id": 12,
+    "id": 7,
     "placa": "XYZ-5676",
     "tipo": "Normal",
     "capacidad": "10 m3",

@@ -1,19 +1,20 @@
-  <app-sidebar></app-sidebar>
+<app-sidebar></app-sidebar>
 <div class="content">
-<div class="dashboard-container dark-theme p-3">
-    <h2 >SEGUIMIENTO GENERAL</h2>
+  <div class="dashboard-container dark-theme p-3">
+    <h2>SEGUIMIENTO GENERAL</h2>
 
     <!-- TARJETAS -->
     <div class="row mb-4">
-      <div class="col-md-3" *ngFor="let card of cards">
-        <div class="card text-white mb-3" [ngClass]="card.color">
-          <div class="card-header text-center">{{ card.title }}</div>
-          <div class="card-body text-center">
-            <h5 class="card-title fs-3">{{ card.count }}</h5>
-            <p class="card-text">{{ card.description }}</p>
-          </div>
-        </div>
-      </div>
+<div class="col-md-3" *ngFor="let card of cards">
+  <div class="card text-white mb-3" [ngClass]="card.color" (click)="irA(card.route)" style="cursor: pointer;">
+    <div class="card-header text-center">{{ card.title }}</div>
+    <div class="card-body text-center">
+      <h5 class="card-title fs-3">{{ card.count }}</h5>
+      <p class="card-text">{{ card.description }}</p>
+    </div>
+  </div>
+</div>
+
     </div>
 
     <!-- GRÁFICOS BARRA Y PIE -->
@@ -32,7 +33,8 @@
             [showXAxisLabel]="true"
             [showYAxisLabel]="true"
             xAxisLabel="Mes"
-            yAxisLabel="Cotizaciones">
+            yAxisLabel="Cotizaciones"
+            class="full-chart">
           </ngx-charts-bar-vertical>
         </div>
       </div>
@@ -46,7 +48,8 @@
             [results]="clientesPorTipo"
             [legend]="false"
             [labels]="true"
-            [doughnut]="true">
+            [doughnut]="true"
+            class="full-chart">
           </ngx-charts-pie-chart>
         </div>
       </div>
@@ -55,7 +58,7 @@
     <!-- GRÁFICO LÍNEA -->
     <div class="row">
       <div class="col-md-12">
-        <div class="card bg-dark text-white p-3 shadow">
+        <div class="card bg-dark text-white p-3 shadow line-chart-container">
           <h5 class="text-center">Ingresos Mensuales</h5>
           <ngx-charts-line-chart
             autoResize="true"
@@ -64,13 +67,18 @@
             [legend]="false"
             [xAxis]="true"
             [yAxis]="true"
-            [autoScale]="true">
+            [showXAxisLabel]="true"
+            [showYAxisLabel]="true"
+            xAxisLabel="Mes"
+            yAxisLabel="Ingresos"
+            [autoScale]="true"
+            class="full-chart">
           </ngx-charts-line-chart>
         </div>
       </div>
     </div>
   </div>
-
 </div>
+
 
   

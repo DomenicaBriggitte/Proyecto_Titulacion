@@ -6,7 +6,7 @@ import { ReporteDiarioService } from 'src/app/services/reporte-diario.service';
 import { MaterialesService } from 'src/app/services/materiales.service';
 import { RegistroVolquetaService } from 'src/app/services/registro-volqueta.service';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -15,10 +15,10 @@ import { Color, ScaleType } from '@swimlane/ngx-charts';
 export class DashboardComponent implements OnInit {
   // Tarjetas principales
 cards = [
-  { title: 'Clientes', count: 129, color: 'bg-primary', description: 'Registrados' },
-  { title: 'Materiales', count: 56, color: 'bg-warning', description: 'Disponibles' },
-  { title: 'Cotizaciones', count: 1, color: 'bg-success', description: 'Emitidas' },
-  { title: 'Volquetas', count: 11, color: 'bg-danger', description: 'Registradas' }
+  { title: 'Clientes', count: 129, color: 'bg-primary', description: 'Registrados' ,route: '/cliente'},
+  { title: 'Materiales', count: 56, color: 'bg-warning', description: 'Disponibles' ,route: '/materiales' },
+  { title: 'Cotizaciones', count: 1, color: 'bg-success', description: 'Emitidas' ,route: '/cotizacion' },
+  { title: 'Volquetas', count: 11, color: 'bg-danger', description: 'Registradas' ,route: '/registro-volqueta' }
 ];
 
 
@@ -47,9 +47,16 @@ cards = [
     private cotizacionService: CotizacionService,
     private reporteService: ReporteDiarioService,
     private materialesService: MaterialesService,
-    private volquetaService: RegistroVolquetaService
+    private volquetaService: RegistroVolquetaService,
+    private router: Router 
   ) {}
-  
+
+
+  irA(ruta: string): void {
+  if (ruta) {
+    this.router.navigate([ruta]);
+  }
+}
 
   ngOnInit(): void {
     this.clienteService.getClientes().subscribe(clientes => {
@@ -65,25 +72,37 @@ cards = [
 
     
 
-    this.cotizacionService.getCotizaciones().subscribe(cotizaciones => {
-      this.cards[2].count = cotizaciones.length;
+ this.cotizacionService.getCotizaciones().subscribe(cotizaciones => {
+  this.cards[2].count = cotizaciones.length;
 
-      const resumenPorMes: any = {};
-      const resumenIngresos: any = {};
+  const resumenPorMes: any = {};
+  const resumenIngresos: any = {};
 
-      cotizaciones.forEach(cot => {
-        const fecha = new Date(cot.fecha);
-        const mes = fecha.toLocaleString('es-EC', { month: 'short' });
-        resumenPorMes[mes] = (resumenPorMes[mes] || 0) + 1;
-        resumenIngresos[mes] = (resumenIngresos[mes] || 0) + cot.total;
-      });
+  cotizaciones.forEach(cot => {
+    const fecha = new Date(cot.fecha);
 
-      this.cotizacionesPorMes = Object.entries(resumenPorMes).map(([name, value]) => ({ name, value }));
-      this.ingresosMensuales = [{
-        name: 'Ingresos',
-        series: Object.entries(resumenIngresos).map(([name, value]) => ({ name, value }))
-      }];
-    });
+    // ✅ Obtenemos mes abreviado sin punto final
+    const mes = fecha.toLocaleString('es-EC', { month: 'short' }).replace('.', '');
+
+    resumenPorMes[mes] = (resumenPorMes[mes] || 0) + 1;
+    resumenIngresos[mes] = (resumenIngresos[mes] || 0) + cot.total;
+  });
+
+  // ✅ Asignamos a los gráficos de forma dinámica
+  this.cotizacionesPorMes = Object.entries(resumenPorMes).map(([name, value]) => ({ name, value }));
+
+  this.ingresosMensuales = [
+  {
+    name: 'Ingresos',
+    series: Object.entries(resumenIngresos).map(([name, value]) => ({
+      name,
+      value: parseFloat((value as number).toFixed(2)) // ⬅️ Cast seguro
+    }))
+  }
+];
+
+});
+
 
     this.reporteService.getReportes().subscribe(reportes => {
       this.cards[3].count = reportes.length;
