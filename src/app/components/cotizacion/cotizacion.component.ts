@@ -255,7 +255,7 @@ abrirModalEditar(index: number): void {
     }
   }
 
-enviarPorWhatsapp(cot: Cotizacion): void {
+  enviarPorWhatsapp(cot: Cotizacion): void {
     const doc = new jsPDF();
     const img = new Image();
     img.src = 'assets/images/Logo/empresa.png';
@@ -276,20 +276,23 @@ enviarPorWhatsapp(cot: Cotizacion): void {
     doc.text(`Número: ${cot.numeroCot}`, 10, 60);
     doc.text(`Fecha: ${cot.fecha}`, 10, 68);
     doc.text(`Cliente: ${this.obtenerNombreCliente(cot.clienteCedula)}`, 10, 76);
-
-    const data = (cot.materiales || []).map((item: any) => [
-      item.material?.nombre || item.materialCodigo,
-      item.cantidad,
-      `$${item.precioUnitario.toFixed(2)}`,
-      `$${item.subtotal.toFixed(2)}`
-    ]);
+    const data = (cot.materiales || []).map((item: any) => {
+      const mat = this.materiales.find(m => m.codigo === item.materialCodigo);
+      return [
+        item.materialCodigo,
+        mat ? mat.nombre : '',
+        item.cantidad,
+        `$${item.precioUnitario.toFixed(2)}`,
+        `$${item.subtotal.toFixed(2)}`
+      ];
+    });
 
     let finalY = 82;
 
     if (data.length > 0) {
       autoTable(doc, {
         startY: finalY,
-        head: [['Material', 'Cantidad', 'Precio Unitario', 'Subtotal']],
+        head: [['Código', 'Material', 'Cantidad', 'Precio Unitario', 'Subtotal']],
         body: data,
         headStyles: {
           fillColor: [255, 123, 0],
@@ -343,20 +346,24 @@ enviarPorWhatsapp(cot: Cotizacion): void {
     doc.text(`Número: ${cot.numeroCot}`, 10, 60);
     doc.text(`Fecha: ${cot.fecha}`, 10, 68);
     doc.text(`Cliente: ${this.obtenerNombreCliente(cot.clienteCedula)}`, 10, 76);
-
-    const data = (cot.materiales || []).map((item: any) => [
-      item.material?.nombre || item.materialCodigo,
-      item.cantidad,
-      `$${item.precioUnitario.toFixed(2)}`,
-      `$${item.subtotal.toFixed(2)}`
-    ]);
+    const data = (cot.materiales || []).map((item: any) => {
+    // Nombre del material por el código
+    const mat = this.materiales.find(m => m.codigo === item.materialCodigo);
+      return [
+        item.materialCodigo,
+        mat ? mat.nombre : '', // material
+        item.cantidad,
+        `$${item.precioUnitario.toFixed(2)}`,
+        `$${item.subtotal.toFixed(2)}`
+      ];
+    });
 
     let finalY = 82;
 
     if (data.length > 0) {
       autoTable(doc, {
         startY: finalY,
-        head: [['Material', 'Cantidad', 'Precio Unitario', 'Subtotal']],
+        head: [['Código', 'Material', 'Cantidad', 'Precio Unitario', 'Subtotal']],
         body: data,
         headStyles: {
           fillColor: [255, 123, 0],
@@ -369,29 +376,33 @@ enviarPorWhatsapp(cot: Cotizacion): void {
       });
     }
 
-    // Actualiza el subtotal al cambiar cantidad o material
-    updateSubtotal(idx: number) {
-      const item = this.materialesSeleccionados[idx];
-      const cantidad = Number(item.cantidad) > 0 ? Number(item.cantidad) : 1;
-      item.subtotal = cantidad * (item.precioUnitario || 0);
-      this.calcularTotales();
-    }
+    doc.text(`Subtotal: $${cot.subTotal.toFixed(2)}`, 140, finalY + 10);
+    doc.text(`IVA 12%: $${cot.iva.toFixed(2)}`, 140, finalY + 20);
+    doc.text(`Total: $${cot.total.toFixed(2)}`, 140, finalY + 30);
 
-    // Añadir una fila nueva
-    addFilaMaterial() {
-      this.materialesSeleccionados.push({ nombre: '', codigo: '', cantidad: 1, precioUnitario: 0, subtotal: 0 });
-    }
+    doc.save(`Cotizacion_${cot.numeroCot}.pdf`);
+  }
 
-    // Eliminar una fila de la tabla de materiales
-    removeMaterial(idx: number) {
-      this.materialesSeleccionados.splice(idx, 1);
-      this.calcularTotales();
-    }
 
-    recargarMateriales() {
-      this.materialesService.getMateriales().subscribe((materiales: any[]) => {
-        this.materiales = materiales;
-      });
-    }
 
+  filtrarCotizaciones(): void {
+    const query = (this.searchQuery || '').toLowerCase();
+    this.cotizacionesFiltradas = this.cotizaciones.filter(c => {
+      const cliente = this.clientes.find(cl => cl.cedula === c.clienteCedula);
+      return (
+        c.numeroCot.toLowerCase().includes(query) ||
+        cliente?.nombre?.toLowerCase().includes(query)
+      );
+    });
+  }
+
+  get paginatedCotizaciones(): Cotizacion[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.cotizacionesFiltradas.slice(start, end);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.cotizacionesFiltradas.length / this.itemsPerPage);
+  }
 }

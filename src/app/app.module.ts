@@ -44,14 +44,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    BrowserAnimationsModule,  // debe estar aquí, no en declarations
+    BrowserAnimationsModule,
     CommonModule,
     FormsModule,
     NgxPaginationModule,
     HttpClientModule,
     NgbTypeaheadModule,
     NgxChartsModule,
-    NgbModule // ✅ IMPORTANTE: este módulo importa todos los componentes de ng-bootstrap
+    NgbModule 
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,3 +1,4 @@
+
 .content {
   margin-left: 250px;
   padding: 10px;
@@ -162,4 +163,3 @@ button[type="button"] {
 .animate-check {
   animation: rotateReverse 0.3s ease-in-out forwards; /* duración */
 }
-
