@@ -94,6 +94,7 @@
                   (keydown)="validateCedula($event)" 
                   #cedula="ngModel"
                    />
+                   <div *ngIf="errorClienteExistente" class="text-danger"> {{ mensajeError }} </div>
                    <div *ngIf="cedula.invalid && cedula.touched" class="text-danger">
                           <div *ngIf="cedula.errors?.['required']">Este campo es obligatorio.</div>
                           <div *ngIf="cedula.errors?.['pattern']">La cédula debe tener entre 10 y 13 dígitos numéricos</div>

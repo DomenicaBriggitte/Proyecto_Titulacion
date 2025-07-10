@@ -300,38 +300,49 @@ convertirADecimal(valor: string): number {
   }
 
   descargarPDF(reporteData: any): void {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text('Reporte Diario de Volqueta', 70, 15);
-    doc.setFontSize(12);
-    doc.text(`Fecha: ${reporteData.fecha}`, 10, 30);
-    doc.text(`Cliente: ${reporteData.clienteCedula}`, 10, 40);
-    doc.text(`Responsable: ${reporteData.responsable}`, 10, 50);
-    doc.text(`Volqueta ID: ${reporteData.volquetaId}`, 10, 60);
-    const data = (reporteData.detalles || []).map((item: any) => [
-      item.descripcion,
-      item.observacion || '',
-      `$${item.total.toFixed(2)}`
-    ]);
-    let finalY = 70;
-    if (data.length > 0) {
-      autoTable(doc, {
-        startY: finalY,
-        head: [['Descripción', 'Observación', 'Total ($)']],
-        body: data,
-        headStyles: {
-          fillColor: [255, 123, 0],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold'
-        },
-        didDrawPage: (data) => {
-          finalY = data.cursor?.y ?? finalY;
-        }
-      });
-    }
-    const total = this.calcularTotal(reporteData.detalles).toFixed(2);
-    doc.text(`Total Diario: $${total}`, 140, finalY + 10);
-    const nombreArchivo = `Reporte_${reporteData.fecha?.replace(/-/g, '') || 'sin_fecha'}.pdf`;
-    doc.save(nombreArchivo);
+  const doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.text('Reporte Diario de Volqueta', 70, 15);
+  doc.setFontSize(12);
+  
+  // Obtener el nombre del cliente
+  const clienteNombre = this.obtenerNombreCliente(reporteData.clienteCedula);
+  // Obtener la placa de la volqueta
+  const volquetaPlaca = this.obtenerPlaca(reporteData.volquetaId);
+  
+  doc.text(`Fecha: ${reporteData.fecha}`, 10, 30);
+  doc.text(`Cliente: ${clienteNombre}`, 10, 40);  // Mostrar nombre del cliente
+  doc.text(`Responsable: ${reporteData.responsable}`, 10, 50);
+  doc.text(`Volqueta: ${volquetaPlaca}`, 10, 60);  // Mostrar placa de la volqueta
+  
+  const data = (reporteData.detalles || []).map((item: any) => [
+    item.descripcion,
+    item.observacion || '',
+    `$${item.total.toFixed(2)}`
+  ]);
+  
+  let finalY = 70;
+  if (data.length > 0) {
+    autoTable(doc, {
+      startY: finalY,
+      head: [['Descripción', 'Observación', 'Total ($)']],
+      body: data,
+      headStyles: {
+        fillColor: [255, 123, 0],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold'
+      },
+      didDrawPage: (data) => {
+        finalY = data.cursor?.y ?? finalY;
+      }
+    });
   }
+
+  const total = this.calcularTotal(reporteData.detalles).toFixed(2);
+  doc.text(`Total Diario: $${total}`, 140, finalY + 10);
+  
+  const nombreArchivo = `Reporte_${reporteData.fecha?.replace(/-/g, '') || 'sin_fecha'}.pdf`;
+  doc.save(nombreArchivo);
+}
+
 }

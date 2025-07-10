@@ -31,7 +31,7 @@ export class LoginComponent {
         }
       }
 
-      this.router.navigate(['/cliente']);
+      this.router.navigate(['/dashboard']);
     } else {
         this.showError = true;
       }

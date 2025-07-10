@@ -89,10 +89,11 @@
                   maxlength="5"
                   required
                   #codigo="ngModel">
-            <div *ngIf="codigo.invalid && codigo.touched" class="text-danger">
-              <div *ngIf="codigo.errors?.['required']">Este campo es obligatorio.</div>
-            </div>
-          </div>
+                  <div *ngIf="errorMaterialExistente" class="text-danger">{{ mensajeError }} </div>
+                  <div *ngIf="codigo.invalid && codigo.touched" class="text-danger">
+                   <div *ngIf="codigo.errors?.['required']">Este campo es obligatorio.</div>
+               </div>
+               </div>
           <!-- Nombre-->
           <div class="mb-3">
               <label for="nombre" class="form-label">Nombre</label>

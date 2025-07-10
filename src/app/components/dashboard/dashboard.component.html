@@ -4,16 +4,16 @@
     <h2>SEGUIMIENTO GENERAL</h2>
 
     <!-- TARJETAS -->
-    <div class="row mb-4">
-<div class="col-md-3" *ngFor="let card of cards">
-  <div class="card text-white mb-3" [ngClass]="card.color" (click)="irA(card.route)" style="cursor: pointer;">
-    <div class="card-header text-center">{{ card.title }}</div>
-    <div class="card-body text-center">
-      <h5 class="card-title fs-3">{{ card.count }}</h5>
-      <p class="card-text">{{ card.description }}</p>
-    </div>
-  </div>
-</div>
+          <div class="row mb-4">
+      <div class="col-md-3" *ngFor="let card of cards">
+        <div class="card text-white mb-3" [ngClass]="card.color" (click)="irA(card.route)" style="cursor: pointer;">
+          <div class="card-header text-center">{{ card.title }}</div>
+          <div class="card-body text-center">
+            <h5 class="card-title fs-3">{{ card.count }}</h5>
+            <p class="card-text">{{ card.description }}</p>
+          </div>
+        </div>
+      </div>
 
     </div>
 
