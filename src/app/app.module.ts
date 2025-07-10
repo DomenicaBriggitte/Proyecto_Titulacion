@@ -22,6 +22,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgbModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HighlightPipe } from './highlight.pipe';
 
 
 @NgModule({
@@ -39,7 +40,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SidebarComponent,
     MaterialesComponent,
     CotizacionComponent,
-    DashboardComponent
+    DashboardComponent,
+    HighlightPipe
   ],
   imports: [
     BrowserModule,

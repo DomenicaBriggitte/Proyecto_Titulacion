@@ -50,22 +50,32 @@
       </thead>
       <tbody>
         <tr *ngFor="let p of paginatedPedidos">
-          <td>{{ p.numeroPedido }}</td>
+          <td [innerHTML]="p.numeroPedido | highlight:searchQuery"></td>
           <td>{{ p.fecha | date:'yyyy-MM-dd' }}</td>
-          <td>{{ getNombreCliente(p.clienteCedula) }}</td>
+          <td [innerHTML]="getNombreCliente(p.clienteCedula) | highlight:searchQuery"></td>
           <td>{{ getNumeroCotizacion(p.cotizacionId) }}</td>
-          <td><span class="badge bg-primary">{{ p.estadoEntrega }}</span></td>
-          <td><span titulo="Para cerrar el pedido, debe estar entregado y el pago cancelado" class="badge" [ngClass]="p.estadoPago === 'Cancelado' ? 'bg-success' : 'bg-warning'">{{ p.estadoPago }}</span></td>
-          <td>
-            <span class="badge"
-                  [ngClass]="{
-                    'bg-success': p.estadoPedido === 'Cerrado',
-                    'bg-warning': p.estadoPedido === 'Abierto'
-                  }">
-              <i *ngIf="p.estadoPedido === 'Cerrado'" class="bi bi-check-circle me-1" style="color: white;"></i>
-              <i *ngIf="p.estadoPedido === 'Abierto'" class="bi bi-hourglass-split text-warning fs-5"></i>
+          <td><span class="badge" [ngClass]="p.estadoEntrega === 'Entregado' ? 'bg-success' : 'bg-warning'">{{ p.estadoEntrega }}</span>
+          <td><span class="badge" [ngClass]="p.estadoPago === 'Cancelado' ? 'bg-success'  : 'bg-warning'">{{ p.estadoPago }}</span></td>
+          <td class="text-center">
+            <span class="badge" [ngClass]="{
+              'bg-success': p.estadoPedido === 'Cerrado',
+              'bg-warning': p.estadoPedido === 'Abierto'
+            }">
               {{ p.estadoPedido }}
             </span>
+
+            <!-- Ícono si está CERRADO -->
+            <i *ngIf="p.estadoPedido === 'Cerrado'" 
+              class="bi bi-check-circle-fill text-success ms-1" 
+              ngbTooltip="Pedido cerrado">
+            </i>
+
+            <!-- Ícono si está ABIERTO con color y mensaje según condición -->
+            <i *ngIf="p.estadoPedido === 'Abierto'" 
+              [ngClass]="getIconoColor(p)" 
+              [ngbTooltip]="getMensajeEstado(p)"
+              class="bi bi-info-circle-fill ms-1">
+            </i>
           </td>
           <td class="text-center">
             <div class="d-flex justify-content-center gap-2">
@@ -104,7 +114,7 @@
 
 <!-- Modal Nuevo Pedido -->
 <div class="modal fade" id="nuevoPedidoModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content p-3">
       <div class="modal-header">
         <h5 class="modal-title">Nuevo Pedido</h5>
@@ -112,55 +122,96 @@
       </div>
       <div class="modal-body">
         <form #form="ngForm" (ngSubmit)="guardarPedido()">
-          <div class="mb-3">
-            <label>Fecha</label>
-            <input type="date" class="form-control" [(ngModel)]="nuevoPedido.fecha" name="fecha" required>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label>Fecha</label>
+              <input type="date" class="form-control" [(ngModel)]="nuevoPedido.fecha" name="fecha" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Cotización</label>
+              <input type="text" class="form-control"
+                [(ngModel)]="cotizacionSeleccionada"
+                name="cotizacionInput"
+                [ngbTypeahead]="buscarCotizaciones"
+                [resultFormatter]="formatearCotizacion"
+                [inputFormatter]="formatearCotizacion"
+                (selectItem)="onSeleccionCotizacion($event)"
+                placeholder="Escriba el número de cotización"
+                required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Cliente</label>
+              <input type="text" class="form-control"
+                [(ngModel)]="clienteSeleccionado"
+                name="clienteInput"
+                [ngbTypeahead]="buscarClientes"
+                [resultFormatter]="formatearCliente"
+                [inputFormatter]="formatearCliente"
+                (selectItem)="onSeleccionCliente($event)"
+                placeholder="Escriba el nombre o cédula del cliente"
+                required />
+            </div>
+            <div class="col-md-6">
+              <label>Estado de Entrega</label>
+              <select class="form-control" [(ngModel)]="nuevoPedido.estadoEntrega" name="estadoEntrega" required>
+                <option value="Pendiente">Pendiente</option>
+                <option value="En Curso">En Curso</option>
+                <option value="Entregado">Entregado</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Estado de Pago</label>
+              <input class="form-control" [(ngModel)]="nuevoPedido.estadoPago" name="estadoPago" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Factura</label>
+              <select class="form-select" [(ngModel)]="nuevoPedido.facturaId" name="facturaId" (change)="actualizarEstadoPago('nuevo')">
+                <option value="">Sin factura</option>
+                <option *ngFor="let factura of facturas" [value]="factura.idFactura">FAC{{ factura.idFactura }}</option>
+              </select>
+            </div>
           </div>
-          
-          <div class="mb-3">
-            <label class="form-label">Cotización</label>
-            <select class="form-select" [(ngModel)]="nuevoPedido.cotizacionId" name="cotizacionId" (change)="onCotizacionSeleccionada('nuevo')">
-              <option value="" disabled selected>Seleccione una cotización</option>
-              <option *ngFor="let cot of cotizaciones" [value]="cot.cotizacionId">{{ cot.numeroCot }}</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Cliente</label>
-            <select class="form-select" [(ngModel)]="nuevoPedido.clienteCedula" name="clienteCedula">
-              <option value="" disabled>Seleccione un cliente</option>
-              <option *ngFor="let cliente of clientes" [value]="cliente.cedula">{{ cliente.nombre }}</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label>Estado de Entrega</label>
-            <select class="form-control" [(ngModel)]="nuevoPedido.estadoEntrega" name="estadoEntrega" required>
-              <option value="Pendiente">Pendiente</option>
-              <option value="En Curso">En Curso</option>
-              <option value="Entregado">Entregado</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Estado de Pago</label>
-            <input class="form-control" [(ngModel)]="nuevoPedido.estadoPago" name="estadoPago" readonly />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Factura</label>
-            <select class="form-select" [(ngModel)]="nuevoPedido.facturaId" name="facturaId" (change)="actualizarEstadoPago('nuevo')">
-              <option value="">Sin factura</option>
-              <option *ngFor="let factura of facturas" [value]="factura.idFactura">FAC{{ factura.idFactura }}</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label>Observaciones</label>
+          <div class="my-3">
+            <label class="form-label">Observaciones</label>
             <textarea class="form-control" [(ngModel)]="nuevoPedido.observaciones" name="observaciones"></textarea>
           </div>
 
-          <button type="submit" class="btn btn-success w-100" [disabled]="form.invalid">Guardar</button>
+          <div *ngIf="materialesCotizacion.length > 0">
+            <label class="form-label">Materiales de la Cotización</label>
+            <table class="table table-sm table-bordered text-center">
+              <thead class="table-light">
+                <tr>
+                  <th>Código</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unitario</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let m of materialesCotizacion">
+                  <td>{{ m.materialCodigo }}</td>
+                  <td>{{ m.cantidad }}</td>
+                  <td>{{ m.precioUnitario | currency }}</td>
+                  <td>{{ m.subtotal | currency }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="cotizacionSeleccionada" class="resumen-totales">
+          <div class="row mb-2">
+            <div class="col-6 label"><i class="bi bi-cash-coin"></i> Subtotal:</div>
+            <div class="col-6 valor">{{ cotizacionSeleccionada.subTotal | currency }}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6 label"><i class="bi bi-percent"></i><i class="bi bi-percent"></i> IVA:</div>
+            <div class="col-6 valor">{{ cotizacionSeleccionada.iva | currency }}</div>
+          </div>
+          <div class="row">
+            <div class="col-6 label total"><i class="bi bi-calculator-fill"></i> Total:</div>
+            <div class="col-6 valor total">{{ cotizacionSeleccionada.total | currency }}</div>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-success w-100 mt-3" [disabled]="form.invalid">Guardar</button>
         </form>
       </div>
     </div>
@@ -169,7 +220,7 @@
 
 <!-- Modal Editar Pedido -->
 <div class="modal fade" id="editarPedidoModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content p-3">
       <div class="modal-header">
         <h5 class="modal-title">Editar Pedido</h5>
@@ -177,77 +228,99 @@
       </div>
       <div class="modal-body">
         <form (ngSubmit)="actualizarPedido()">
-          <!-- Fecha -->
-          <div class="mb-3">
-            <label class="form-label">Fecha</label>
-            <input type="date" class="form-control" [(ngModel)]="pedidoEdit.fecha" name="fechaEdit" required />
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Fecha</label>
+              <input type="date" class="form-control" [(ngModel)]="pedidoEdit.fecha" name="fechaEdit" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Cotización</label>
+              <select class="form-select" [(ngModel)]="pedidoEdit.cotizacionId" name="cotizacionIdEdit" (change)="onCotizacionSeleccionada('editar')">
+                <option value="" disabled selected>Seleccione una cotización</option>
+                <option *ngFor="let cot of cotizaciones" [value]="cot.cotizacionId">{{ cot.numeroCot }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Cliente</label>
+              <select class="form-select" [(ngModel)]="pedidoEdit.clienteCedula" name="clienteCedulaEdit">
+                <option value="" disabled>Seleccione un cliente</option>
+                <option *ngFor="let cliente of clientes" [value]="cliente.cedula">{{ cliente.nombre }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Factura</label>
+              <select class="form-select" [(ngModel)]="pedidoEdit.facturaId" name="facturaIdEdit" (change)="actualizarEstadoPago('editar')">
+                <option value="">Sin factura</option>
+                <option *ngFor="let factura of facturas" [value]="factura.idFactura">FAC{{ factura.idFactura }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Estado de Entrega</label>
+              <select class="form-select" [(ngModel)]="pedidoEdit.estadoEntrega" name="estadoEntregaEdit" (change)="verificarEstadoPedido('editar')">
+                <option value="Pendiente">Pendiente</option>
+                <option value="En Curso">En Curso</option>
+                <option value="Entregado">Entregado</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Estado de Pago</label>
+              <input class="form-control" [(ngModel)]="pedidoEdit.estadoPago" name="estadoPagoEdit" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Estado del Pedido</label>
+              <select class="form-select" [(ngModel)]="pedidoEdit.estadoPedido" name="estadoPedidoEdit">
+                <option value="Abierto">Abierto</option>
+                <option value="Cerrado">Cerrado</option>
+              </select>
+            </div>
           </div>
 
-          <!-- Cotización -->
-          <div class="mb-3">
-            <label class="form-label">Cotización</label>
-            <select class="form-select" [(ngModel)]="pedidoEdit.cotizacionId" name="cotizacionIdEdit" (change)="onCotizacionSeleccionada('editar')">
-              <option value="" disabled selected>Seleccione una cotización</option>
-              <option *ngFor="let cot of cotizaciones" [value]="cot.cotizacionId">{{ cot.numeroCot }}</option>
-            </select>
-          </div>
-
-          <!-- Cliente -->
-          <div class="mb-3">
-            <label class="form-label">Cliente</label>
-            <select class="form-select" [(ngModel)]="pedidoEdit.clienteCedula" name="clienteCedulaEdit">
-              <option value="" disabled>Seleccione un cliente</option>
-              <option *ngFor="let cliente of clientes" [value]="cliente.cedula">{{ cliente.nombre }}</option>
-            </select>
-          </div>
-
-          <!-- Factura -->
-          <div class="mb-3">
-            <label class="form-label">Factura</label>
-            <select class="form-select" [(ngModel)]="pedidoEdit.facturaId" name="facturaIdEdit" (change)="actualizarEstadoPago('editar')">
-              <option value="">Sin factura</option>
-              <option *ngFor="let factura of facturas" [value]="factura.idFactura">FAC{{ factura.idFactura }}</option>
-            </select>
-          </div>
-
-          <!-- Estado de Entrega -->
-          <div class="mb-3">
-            <label class="form-label">Estado de Entrega</label>
-            <select class="form-select" [(ngModel)]="pedidoEdit.estadoEntrega" name="estadoEntregaEdit" (change)="verificarEstadoPedido('editar')"> 
-              <option value="Pendiente">Pendiente</option>
-              <option value="En Curso">En Curso</option>
-              <option value="Entregado">Entregado</option>
-            </select>
-          </div>
-
-          <!-- Estado de Pago (actualizado automáticamente si hay factura) -->
-          <div class="mb-3">
-            <label class="form-label">Estado de Pago</label>
-            <input class="form-control" [(ngModel)]="pedidoEdit.estadoPago" name="estadoPagoEdit" readonly />
-          </div>
-
-          <!-- Estado de Pedido -->
-          <div class="mb-3">
-            <label class="form-label">Estado del Pedido</label>
-            <select class="form-select" [(ngModel)]="pedidoEdit.estadoPedido" name="estadoPedidoEdit">
-              <option value="Abierto">Abierto</option>
-              <option value="Cerrado">Cerrado</option>
-            </select>
-          </div>
-
-          <!-- Observaciones -->
-          <div class="mb-3">
+          <div class="my-3">
             <label class="form-label">Observaciones</label>
             <textarea class="form-control" [(ngModel)]="pedidoEdit.observaciones" name="observacionesEdit" rows="2"></textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100">Actualizar</button>
+          <div *ngIf="materialesCotizacionEdit.length > 0">
+            <label class="form-label">Materiales de la Cotización</label>
+            <table class="table table-sm table-bordered text-center">
+              <thead class="table-light">
+                <tr>
+                  <th>Código</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unitario</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let m of materialesCotizacionEdit">
+                  <td>{{ m.materialCodigo }}</td>
+                  <td>{{ m.cantidad }}</td>
+                  <td>{{ m.precioUnitario | currency }}</td>
+                  <td>{{ m.subtotal | currency }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="cotizacionSeleccionadaEdit" class="resumen-totales">
+            <div class="row mb-2">
+              <div class="col-6 label"><i class="bi bi-cash-coin"></i> Subtotal:</div>
+              <div class="col-6 valor">{{ cotizacionSeleccionadaEdit.subTotal | currency }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-6 label"><i class="bi bi-percent"></i>IVA:</div>
+              <div class="col-6 valor">{{ cotizacionSeleccionadaEdit.iva | currency }}</div>
+            </div>
+            <div class="row">
+              <div class="col-6 label total"><i class="bi bi-calculator-fill"></i>Total:</div>
+              <div class="col-6 valor total">{{ cotizacionSeleccionadaEdit.total | currency }}</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-3">Actualizar</button>
         </form>
       </div>
     </div>
   </div>
 </div>
-
 
 <!-- Modal Confirmar Eliminación -->
 <div class="modal fade" id="confirmarEliminarPedidoModal" tabindex="-1">

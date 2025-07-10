@@ -105,7 +105,7 @@ h2 {
 }
 
 .badge.bg-warning {
-  background-color: #0b69cecb !important;
+  background-color: #f47c00 !important;
   color: white;
   font-weight: normal;
   font-size: medium;
@@ -243,4 +243,102 @@ button[type="button"].btn-secondary {
 
 .animate-check {
   animation: rotateReverse 0.3s ease-in-out forwards;
+}
+
+/*Modal Nuevo Pedido*/
+.modal-xl {
+  max-width: 1000px;
+}
+
+.modal-body {
+  background-color: #f8f9fa;
+}
+
+form label {
+  font-weight: 500;
+}
+
+form .form-control,
+form .form-select {
+  border-radius: 6px;
+}
+
+form textarea {
+  resize: vertical;
+}
+
+/* Tablas de materiales */
+.tabla-materiales th, .tabla-materiales td {
+  vertical-align: middle;
+  font-size: 0.875rem;
+  padding: 0.5rem;
+}
+.tabla-materiales th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+/* Totales */
+.tabla-totales {
+  margin-top: 1rem;
+}
+.tabla-totales th {
+  width: 50%;
+  background-color: #f8f9fa;
+}
+.tabla-totales td {
+  font-weight: bold;
+}
+
+/* Ajustes del modal */
+.modal-lg {
+  max-width: 850px;
+}
+.materiales-box {
+  background-color: #fdfdfd;
+  border: 1px solid #dee2e6;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.resumen-totales {
+  margin-top: 15px;
+  padding: 15px 25px;
+  background-color: #fff8f0;
+  border-left: 5px solid #f47c00;
+  border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+  font-size: 15px;
+  position: relative;
+  width: 50%;
+  padding-left: 25%;
+  margin-left: 50%;
+}
+
+.resumen-totales::before {
+  content: "\f155";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  top: -10px;
+  left: -20px;
+  font-size: 28px;
+  color: #f47c00;
+  width: 100%;
+}
+
+.resumen-totales .label {
+  font-weight: 500;
+  color: #444;
+}
+
+.resumen-totales .valor {
+  font-weight: bold;
+  text-align: right;
+}
+
+.resumen-totales .total {
+  font-size: 18px;
+  color: #f47c00;
 }

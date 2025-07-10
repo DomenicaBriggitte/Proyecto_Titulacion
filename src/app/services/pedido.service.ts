@@ -8,11 +8,14 @@ export interface Pedido {
   fecha: string;
   cotizacionId: string;
   clienteCedula: string;
-  estadoEntrega: 'Pendiente' | 'Entregado' | 'En Curso' | 'Cancelado';
+  estadoEntrega: 'Pendiente' | 'Entregado' | 'Parcial' | 'En Curso' | 'Cancelado';
   estadoPago: 'Pendiente' | 'Cancelado';
   estadoPedido: 'Abierto' | 'Cerrado';
   facturaId?: string | null;
   observaciones?: string;
+  subTotal?: number;
+  iva?: number;
+  total?: number;
 }
 
 @Injectable({

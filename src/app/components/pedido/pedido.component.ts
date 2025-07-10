@@ -4,6 +4,8 @@ import { PedidoService, Pedido } from 'src/app/services/pedido.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { CotizacionService } from 'src/app/services/cotizacion.service';
 import { FacturaService } from 'src/app/services/factura.service';
+import { Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-pedido',
@@ -26,6 +28,12 @@ export class PedidoComponent implements OnInit {
   pedidoEdit: Pedido = this.resetPedido();
   pedidoParaEliminar: Pedido | null = null;
 
+  cotizacionSeleccionada: any = null;
+  cotizacionSeleccionadaEdit: any = null;
+  clienteSeleccionado: any = null;
+  materialesCotizacion: any[] = [];
+  materialesCotizacionEdit: any[] = [];
+
   constructor(
     private pedidoService: PedidoService,
     private clienteService: ClienteService,
@@ -42,7 +50,6 @@ export class PedidoComponent implements OnInit {
       this.pedidos = data;
       this.pedidosFiltrados = [...data];
     });
-
     this.clienteService.getClientes().subscribe(data => this.clientes = data);
     this.cotizacionService.getCotizaciones().subscribe(data => this.cotizaciones = data);
     this.facturaService.getFacturas().subscribe(data => this.facturas = data);
@@ -73,35 +80,31 @@ export class PedidoComponent implements OnInit {
 
   abrirModalNuevo(): void {
     this.nuevoPedido = this.resetPedido();
+    this.cotizacionSeleccionada = null;
+    this.clienteSeleccionado = null;
+    this.materialesCotizacion = [];
     const modal = new bootstrap.Modal(document.getElementById('nuevoPedidoModal')!);
     modal.show();
-  } 
+  }
 
   abrirModalEditar(pedido: Pedido): void {
-    this.pedidoEdit = {
-      pedidoId: pedido.pedidoId,
-      numeroPedido: pedido.numeroPedido,
-      fecha: pedido.fecha.substring(0, 10),
-      cotizacionId: pedido.cotizacionId,
-      clienteCedula: pedido.clienteCedula,
-      estadoEntrega: pedido.estadoEntrega,
-      estadoPago: pedido.estadoPago,
-      estadoPedido: pedido.estadoPedido,
-      facturaId: pedido.facturaId ?? null,
-      observaciones: pedido.observaciones ?? ''
-    };
+    this.pedidoEdit = { ...pedido };
+    this.cotizacionSeleccionada = this.cotizaciones.find(c => c.cotizacionId === pedido.cotizacionId);
+    this.clienteSeleccionado = this.clientes.find(c => c.cedula === pedido.clienteCedula);
+    this.materialesCotizacionEdit = this.cotizacionSeleccionada?.materiales || [];
+    this.cotizacionSeleccionadaEdit = this.cotizaciones.find(c => c.cotizacionId === pedido.cotizacionId);
+    this.materialesCotizacionEdit = this.cotizacionSeleccionadaEdit?.materiales || [];
     const modal = new bootstrap.Modal(document.getElementById('editarPedidoModal')!);
     modal.show();
   }
 
   abrirModalEliminar(pedido: Pedido): void {
     this.pedidoParaEliminar = pedido;
-    const modal = new bootstrap.Modal(document.getElementById('confirmarEliminacionPedidoModal')!);
-    modal.show();
+    const modalEl = document.getElementById('confirmarEliminarPedidoModal');
+    if (modalEl) new bootstrap.Modal(modalEl).show();
   }
 
   guardarPedido(): void {
-    console.log(this.nuevoPedido); 
     this.pedidoService.addPedido(this.nuevoPedido).subscribe(() => {
       this.cargarDatos();
       bootstrap.Modal.getInstance(document.getElementById('nuevoPedidoModal')!)?.hide();
@@ -110,7 +113,7 @@ export class PedidoComponent implements OnInit {
   }
 
   actualizarPedido(): void {
-    if (this.pedidoEdit.pedidoId == null) return;
+    if (!this.pedidoEdit.pedidoId) return;
     this.pedidoService.updatePedido(this.pedidoEdit.pedidoId, this.pedidoEdit).subscribe(() => {
       this.cargarDatos();
       bootstrap.Modal.getInstance(document.getElementById('editarPedidoModal')!)?.hide();
@@ -142,7 +145,7 @@ export class PedidoComponent implements OnInit {
   }
 
   filterPedidos(): void {
-    const estado = this.filtroEstado; // puede ser 'Abierto', 'Cerrado' o ''
+    const estado = this.filtroEstado;
     const texto = this.searchQuery.toLowerCase();
 
     this.pedidosFiltrados = this.pedidos.filter(p => {
@@ -186,21 +189,6 @@ export class PedidoComponent implements OnInit {
     const factura = this.facturas.find(f => f.idFactura === id);
     return factura ? factura.numeroFactura : '';
   }
-  
-  onCotizacionSeleccionada(tipo: 'nuevo' | 'editar'): void {
-    const cotizacionId = tipo === 'nuevo' ? this.nuevoPedido.cotizacionId : this.pedidoEdit.cotizacionId;
-    const cotizacion = this.cotizaciones.find(c => c.cotizacionId === cotizacionId);
-
-    if (cotizacion) {
-      if (tipo === 'nuevo') {
-        this.nuevoPedido.clienteCedula = cotizacion.clienteCedula;
-      } else {
-        this.pedidoEdit.clienteCedula = cotizacion.clienteCedula;
-      }
-    }
-
-    this.verificarEstadoPedido(tipo);
-  }
 
   actualizarEstadoPago(tipo: 'nuevo' | 'editar'): void {
     const facturaId = tipo === 'nuevo' ? this.nuevoPedido.facturaId : this.pedidoEdit.facturaId;
@@ -242,4 +230,89 @@ export class PedidoComponent implements OnInit {
     this.currentPage = 1;
   }
 
+  getMensajeEstado(p: Pedido): string {
+    const entregado = p.estadoEntrega === 'Entregado';
+    const cancelado = p.estadoPago === 'Cancelado';
+
+    if (!entregado && !cancelado) {
+      return 'Pedido debe ser Entregado Factura debe ser Cancelada';
+    }
+    if (!entregado) {
+      return 'Pedido debe ser Entregado';
+    }
+    if (!cancelado) {
+      return 'Factura debe ser Cancelada';
+    }
+
+    return '';
+  }
+
+  getIconoColor(p: Pedido): string {
+    const entregado = p.estadoEntrega === 'Entregado';
+    const cancelado = p.estadoPago === 'Cancelado';
+
+    if (!entregado && !cancelado) {
+      return 'text-danger';
+    }
+    if (!entregado || !cancelado) {
+      return 'text-warning';
+    }
+    return 'text-secondary';
+  }
+
+  buscarCotizaciones = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term.length < 2 ? [] :
+        this.cotizaciones.filter(c =>
+          c.numeroCot.toLowerCase().includes(term.toLowerCase())
+        ).slice(0, 10))
+    );
+
+  formatearCotizacion = (c: any) => c.numeroCot || '';
+
+  onSeleccionCotizacion(event: any): void {
+    this.cotizacionSeleccionada = event.item;
+    this.nuevoPedido.cotizacionId = this.cotizacionSeleccionada.cotizacionId;
+
+    const cliente = this.clientes.find(c => c.cedula === this.cotizacionSeleccionada.clienteCedula);
+    if (cliente) {
+      this.clienteSeleccionado = cliente;
+      this.nuevoPedido.clienteCedula = cliente.cedula;
+    }
+
+    this.materialesCotizacion = this.cotizacionSeleccionada.materiales || [];
+  }
+
+  onCotizacionSeleccionada(tipo: 'nuevo' | 'editar'): void {
+  const cotizacionId = tipo === 'nuevo' ? this.nuevoPedido.cotizacionId : this.pedidoEdit.cotizacionId;
+  const cotizacion = this.cotizaciones.find(c => c.cotizacionId === cotizacionId);
+
+  if (cotizacion) {
+    if (tipo === 'nuevo') {
+      this.nuevoPedido.clienteCedula = cotizacion.clienteCedula;
+    } else {
+      this.pedidoEdit.clienteCedula = cotizacion.clienteCedula;
+    }
+  }
+}
+
+  buscarClientes = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term.length < 2 ? [] :
+        this.clientes.filter(c =>
+          c.nombre.toLowerCase().includes(term.toLowerCase()) ||
+          c.cedula.includes(term)
+        ).slice(0, 10))
+    );
+
+  formatearCliente = (c: any) => c?.nombre || '';
+
+  onSeleccionCliente(event: any): void {
+    this.clienteSeleccionado = event.item;
+    this.nuevoPedido.clienteCedula = this.clienteSeleccionado.cedula;
+  }
 }

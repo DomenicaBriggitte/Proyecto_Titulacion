@@ -31,7 +31,7 @@
         <tr *ngFor="let f of facturasFiltradas | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
           <td>{{ f.idFactura }}</td>
           <td>{{ f.fecha | date:'yyyy-MM-dd' }}</td>
-          <td>{{ f.cliente?.nombre }}</td>
+          <td [innerHTML]="f.cliente.nombre | highlight:searchQuery"></td>
           <td><span class="badge" [ngClass]="f.estadoPago === 'Cancelado' ? 'bg-success' : 'bg-warning'">{{ f.estadoPago }}</span></td>
           <td><a *ngIf="f.archivo" [href]="'https://localhost:7210/' + f.archivo" target="_blank">
             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-file-earmark-text-fill" viewBox="0 0 16 16">
