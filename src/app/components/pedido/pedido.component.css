@@ -330,14 +330,41 @@ form textarea {
 .resumen-totales .label {
   font-weight: 500;
   color: #444;
+  text-align: right;
+  width: 50%;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .resumen-totales .valor {
   font-weight: bold;
-  text-align: right;
+  color: #f47c00;
+  text-align: left;
+  width: auto;  
 }
+
 
 .resumen-totales .total {
   font-size: 18px;
   color: #f47c00;
+  font-weight: bold;
+  text-align: right;
+}
+.resumen-totales .row .col-6 {
+  display: flex;
+  align-items: center;  
+  justify-content: flex-start;  
+  margin-bottom: 0;  
+ margin-right: 2px;
+}
+
+.resumen-totales .row .col-6 i {
+  margin-right: 4px;  
+}
+.resumen-totales .row .col-6 span {
+  margin-left: 0;  
+}
+.resumen-totales .label, .resumen-totales .valor {
+   margin: 0;  
+  padding: 0; 
 }

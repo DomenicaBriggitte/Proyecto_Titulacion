@@ -15,6 +15,8 @@ clientes: any[] = [];
 filteredClientes: any[] = [];
 searchQuery: string = '';
 currentPage: number = 1;
+ mensajeError: string = ''; 
+errorClienteExistente: boolean = false; // Variable para activar el mensaje de error
 
 ngOnInit() {
   this.clienteService.getClientes().subscribe(data => {
@@ -162,21 +164,23 @@ validateEmail(event: KeyboardEvent) {
   }
 }
 
-errorClienteExistente: boolean = false;
+
 
 // Agregar nuevo cliente
 addClient(form: NgForm) {
   if (form.invalid) return;
+
   this.clienteService.addCliente(this.nuevoCliente).subscribe({
     next: () => {
       // Vuelve a cargar la lista desde la API
       this.clienteService.getClientes().subscribe((clientes: any[]) => {
-        this.clientes = clientes;
+        this.clientes.unshift(this.nuevoCliente); 
         this.filteredClientes = [...this.clientes];
-        this.currentPage = 1
+        this.currentPage = 1; // Asegurarse de que la paginación empiece desde la primera página
       });
+
       this.nuevoCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
-      
+
       // Cierra el modal y muestra éxito
       const nuevoClienteModalElement = document.getElementById('nuevoClienteModal');
       if (nuevoClienteModalElement) {
@@ -194,10 +198,18 @@ addClient(form: NgForm) {
       }
     },
     error: (err) => {
-      alert('Error al agregar cliente: ' + (err.error?.message || err.message));
+      if (err.status === 409) {
+        // Si el error es un 409, significa que el cliente ya está registrado
+        this.errorClienteExistente = true;
+        this.mensajeError = err.error.message || "Este cliente ya está registrado.";
+      } else {
+        // Para otros errores
+        alert('Error al agregar cliente: ' + (err.error?.message || err.message));
+      }
     }
   });
 }
+
   
 
 // Función para editar un cliente
@@ -223,12 +235,14 @@ updateCliente() {
         this.filteredClientes = [...this.clientes];
         this.currentPage = 1
       }
-    // Cerrar el modal de editar material
-    const editMaterialesModalElement = document.getElementById('editMaterialesModal');
-    if (editMaterialesModalElement) {
-      const modal = new bootstrap.Modal(editMaterialesModalElement);
-      modal.hide();
-    }
+ 
+      // Cierra el modal de edición después de guardar
+      const editClientModalElement = document.getElementById('editClientModal');
+      if (editClientModalElement) {
+        const modal = bootstrap.Modal.getInstance(editClientModalElement);
+        modal?.hide(); // Cierra el modal de edición
+      }
+
 
     // Mostrar el modal de éxito
     const successModalElement = document.getElementById('successModal');

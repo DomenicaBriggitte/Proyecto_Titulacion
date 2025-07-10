@@ -12,6 +12,8 @@ import * as FileSaver from 'file-saver';
 })
 export class MaterialesComponent {
   materiales: any[] = [];
+   mensajeError: string = '';  
+  errorMaterialExistente: boolean = false;  
     
   ngOnInit() {
     this.materialesService.getMateriales().subscribe(data => {
@@ -112,39 +114,45 @@ exportarAExcel(): void {
     return /^\d+(\.\d{1,2})?$/.test(value);
   }
 
-  addMateriales(form: NgForm) {
-    if (form.invalid || !this.isValidCurrency(String(this.nuevoMateriales.costoSinIva))) {
-      return;
-    }
-    this.materialesService.addMaterial(this.nuevoMateriales).subscribe({
-      next: () => {
-        this.materialesService.getMateriales().subscribe((materiales: any[]) => {
-          this.materiales = materiales;
-          this.filteredMateriales = [...this.materiales];
-        });
-        this.nuevoMateriales = { codigo: '', nombre: '', costoSinIva: 0, tipo: '' };
+addMateriales(form: NgForm) {
+  if (form.invalid) return;
 
-    const modalEl = document.getElementById('nuevoMaterialesModal');
+  this.materialesService.addMaterial(this.nuevoMateriales).subscribe({
+    next: () => {
+      this.materialesService.getMateriales().subscribe((materiales: any[]) => {
+        this.materiales = materiales;
+        this.filteredMateriales = [...this.materiales];
+      });
+      this.nuevoMateriales = { codigo: '', nombre: '', costoSinIva: 0, tipo: '' };
+
+      const modalEl = document.getElementById('nuevoMaterialesModal');
       if (modalEl) {
         const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
         modal.hide();
       }
 
-    const successModalEl = document.getElementById('successModal');
-    if (successModalEl) {
-      const successModal = new bootstrap.Modal(successModalEl);
-      successModal.show();
-      setTimeout(() => {
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) backdrop.remove();
-      }, 300);
-    }
+      const successModalEl = document.getElementById('successModal');
+      if (successModalEl) {
+        const successModal = new bootstrap.Modal(successModalEl);
+        successModal.show();
+        setTimeout(() => {
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
+        }, 300);
+      }
     },
     error: (err) => {
-      alert('Error al agregar el material: ' + (err.error?.message || err.message));
+      if (err.status === 409) {
+        // Si el error es un 409, significa que el material ya existe
+        this.mensajeError = err.error.message || "Este material ya está registrado.";
+        this.errorMaterialExistente = true;
+      } else {
+        alert('Error al agregar material: ' + (err.error?.message || err.message));
+      }
     }
   });
 }
+
 
   // Editar material
   editMateriales(materiales: any) {
@@ -156,40 +164,42 @@ exportarAExcel(): void {
     }
   }
 
-  updateMateriales() {
-    this.materialesService.updateMaterial(this.selectedMateriales).subscribe({
+updateMateriales() {
+  this.materialesService.updateMaterial(this.selectedMateriales).subscribe({
     next: () => {
+      // Actualiza la lista de materiales después de la actualización
       this.materialesService.getMateriales().subscribe((materiales: any[]) => {
         this.materiales = materiales;
         this.filteredMateriales = [...this.materiales];
       });
 
-    // Cerrar el modal de editar material
-    const editMaterialesModalElement = document.getElementById('editMaterialesModal');
-    if (editMaterialesModalElement) {
-      const modal = new bootstrap.Modal(editMaterialesModalElement);
-      modal.hide();
-    }
+      // Cerrar el modal de edición
+      const editMaterialesModalElement = document.getElementById('editMaterialesModal');
+      if (editMaterialesModalElement) {
+        const modal = bootstrap.Modal.getInstance(editMaterialesModalElement);
+        modal?.hide(); // Cierra el modal
+      }
 
-    // Mostrar el modal de éxito
-    const successModalElement = document.getElementById('successModal');
-    if (successModalElement) {
-      const successModal = new bootstrap.Modal(successModalElement);
-      successModal.show(); // Mostrar el modal de éxito
-      successModal.hide();
-    }
+      // Mostrar el modal de éxito
+      const successModalElement = document.getElementById('successModal');
+      if (successModalElement) {
+        const successModal = new bootstrap.Modal(successModalElement);
+        successModal.show(); // Muestra el modal de éxito
+        successModal.hide();
+      }
 
-    // Asegurarse de que el backdrop se elimine al cerrar el modal
-    const backdrop = document.querySelector('.modal-backdrop');
-    if (backdrop) {
-      backdrop.remove();
-    }
-  },
+      // Asegurarse de que el backdrop se elimine al cerrar el modal
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
+    },
     error: (err) => {
       alert('Error al actualizar materiales: ' + (err.error?.message || err.message));
     }
   });
 }
+
 
 materialParaEliminar: any = null;  // Nueva implementación: para guardar el material temporalmente
 deleteMateriales(materiales: any) {

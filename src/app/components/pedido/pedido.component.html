@@ -198,12 +198,12 @@
             </table>
           </div>
           <div *ngIf="cotizacionSeleccionada" class="resumen-totales">
-          <div class="row mb-2">
+          <div class="row">
             <div class="col-6 label"><i class="bi bi-cash-coin"></i> Subtotal:</div>
             <div class="col-6 valor">{{ cotizacionSeleccionada.subTotal | currency }}</div>
           </div>
-          <div class="row mb-2">
-            <div class="col-6 label"><i class="bi bi-percent"></i><i class="bi bi-percent"></i> IVA:</div>
+          <div class="row">
+            <div class="col-6 label"><i class="bi bi-percent"></i>IVA:</div>
             <div class="col-6 valor">{{ cotizacionSeleccionada.iva | currency }}</div>
           </div>
           <div class="row">
@@ -302,11 +302,11 @@
             </table>
           </div>
           <div *ngIf="cotizacionSeleccionadaEdit" class="resumen-totales">
-            <div class="row mb-2">
+            <div class="row">
               <div class="col-6 label"><i class="bi bi-cash-coin"></i> Subtotal:</div>
               <div class="col-6 valor">{{ cotizacionSeleccionadaEdit.subTotal | currency }}</div>
             </div>
-            <div class="row mb-2">
+            <div class="row">
               <div class="col-6 label"><i class="bi bi-percent"></i>IVA:</div>
               <div class="col-6 valor">{{ cotizacionSeleccionadaEdit.iva | currency }}</div>
             </div>
