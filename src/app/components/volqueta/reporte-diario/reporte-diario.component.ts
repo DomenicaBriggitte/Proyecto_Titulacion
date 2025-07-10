@@ -122,7 +122,7 @@ export class ReporteDiarioComponent implements OnInit {
   }
 
   agregarItem(reporte: any): void {
-    reporte.detalles.push({ descripcion: '', total: 0 });
+    reporte.detalles.push({ descripcion: '', total: '' });
   }
 
   eliminarItem(reporte: any, index: number): void {
@@ -159,7 +159,7 @@ export class ReporteDiarioComponent implements OnInit {
 
   abrirModalNuevo(): void {
     this.reporteNuevo = this.resetearReporte();
-    this.reporteNuevo.detalles = [{ descripcion: '', total: 0 }];
+    this.reporteNuevo.detalles = [{ descripcion: '', total: '' }];
     this.mostrarModal('nuevoReporteModal');
   }
 
@@ -232,10 +232,10 @@ actualizarReporte(): void {
     }
   }
 convertirADecimal(valor: string): number {
-  if (typeof valor === 'string') {
-    return parseFloat(valor.replace(',', '.'));
-  }
-  return valor;
+  const limpio = valor?.toString().replace(',', '.').trim();
+
+  const numero = parseFloat(limpio);
+  return isNaN(numero) ? 0 : numero;
 }
 
   filtrarReportes(): void {
@@ -253,8 +253,7 @@ convertirADecimal(valor: string): number {
   }
 
   currentPage: number = 1;
-  itemsPerPage: number = 5;
-  itemsPerPageOptions: number[] = [5, 10, 15];
+  itemsPerPage: number = 10;
   
 
   get paginatedReportes(): ReporteDiario[] {
@@ -266,7 +265,27 @@ convertirADecimal(valor: string): number {
   get totalPages(): number {
     return Math.ceil(this.reportesFiltrados.length / this.itemsPerPage);
   }
-  
+  get visiblePages(): number[] {
+  const total = this.totalPages;
+  const current = this.currentPage;
+
+  let start = current - 1;
+  let end = current + 1;
+
+  if (start < 1) {
+    start = 1;
+    end = Math.min(2, total);
+  } else if (end > total) {
+    end = total;
+    start = Math.max(1, total - 1);
+  }
+
+  const pages: number[] = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+}
 
   mostrarModal(id: string): void {
     const modalEl = document.getElementById(id);

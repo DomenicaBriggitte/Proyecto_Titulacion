@@ -1,41 +1,45 @@
+/* CONTENEDOR GENERAL */
 .dashboard-container {
   overflow-y: auto;
   max-height: 100vh;
   padding: 1rem;
- 
 }
+
+/* CONTENIDO PRINCIPAL */
 .content {
   margin-left: 250px;
   padding: 10px;
   background-color: #f8f9fa;
   height: 100%;
 }
+
+/* TARJETAS */
 .card {
   border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 10px #00000065;
+  padding: 0.75rem 1rem;
+  min-height: 130px;
+  overflow: visible;
 }
-
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px #0000004d;
+  cursor: pointer;
+}
 .card .card-header,
 .card .card-title,
 .card .card-text {
   color: white;
 }
-
-.dark-theme text {
-  fill: #ffffff !important;
+.card .card-title {
+  font-size: 1.5rem;
+}
+.card .card-text {
+  font-size: 0.9rem;
 }
 
-.dark-theme .tooltip {
-  color: black !important;
-}
-
-.text-white {
-  color: #ffffff !important;
-}
-
-.shadow {
-  box-shadow: 0 4px 12px #00000047;
-}
-
+/* TÍTULO PRINCIPAL */
 h2 {
   font-size: 30px;
   font-weight: bold;
@@ -43,7 +47,65 @@ h2 {
   text-align: center;
   padding-bottom: 30px;
 }
+.card h5 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: white;
+  text-align: center;
+}
 
+/* GRÁFICOS: CONTENEDORES */
+.chart-container {
+  min-height: 420px;
+  padding: 1rem 1rem 3.5rem 1rem; /* más espacio inferior */
+  overflow: hidden;
+}
+.line-chart-container {
+  min-height: 430px;
+  padding: 2rem 2rem 4rem 2rem;
+  overflow: hidden;
+}
+
+/* TAMAÑOS Y CORRECCIÓN DE RECORTES */
+::ng-deep .full-chart {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+}
+
+/* ESTILOS DE ETIQUETAS Y EJE */
+::ng-deep .ngx-charts text.axis-label,
+::ng-deep .ngx-charts .tick text {
+  fill: white !important;
+  font-weight: 500;
+  font-size: 13px;
+}
+::ng-deep .ngx-charts text.pie-label {
+  fill: white !important;
+  font-size: 14px;
+  font-weight: 600;
+}
+::ng-deep .ngx-charts .legend-label-text {
+  fill: white !important;
+  font-size: 14px;
+}
+::ng-deep .ngx-charts .x.axis,
+::ng-deep .ngx-charts .y.axis {
+  overflow: visible !important;
+}
+
+/* TEMA OSCURO GLOBAL PARA TEXTOS */
+.dark-theme text {
+  fill: #ffffff !important;
+}
+.dark-theme .tooltip {
+  color: black !important;
+}
+.text-white {
+  color: #ffffff !important;
+}
+
+/* GENERAL RESET */
 html, body {
   height: 100%;
   margin: 0;
@@ -53,60 +115,8 @@ html, body {
   overflow: hidden;
 }
 
-.dashboard-container {
-  overflow-y: auto;
-}
-.chart-container {
-  min-height: 400px; /* O el alto que desees */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-::ng-deep .ngx-charts text.axis-label {
-  fill: white !important;      /* Color de las etiquetas del eje X e Y */
-  font-weight: bold;
-}
-
-::ng-deep .ngx-charts .tick text {
-  fill: white !important;      /* Color de los números del eje */
-}
-
-/* Ejes y etiquetas del gráfico de barras */
-::ng-deep .ngx-charts text.axis-label .ng-reflect-label {
-  fill: white !important;         /* “Mes”, “Cotizaciones” */
-  font-size: 16px;
-  font-weight: bold;
-}
-
-::ng-deep .ngx-charts .tick text {
-  fill: white !important;         /* Números de los ejes */
-}
-
-/* Etiquetas dentro del gráfico de pastel */
-::ng-deep .ngx-charts text.pie-label {
-  fill: white !important;         /* “Jurídica”, “Natural” en el doughnut */
-  font-size: 14px;
-}
-
-/* Leyenda del gráfico de pastel */
-::ng-deep .ngx-charts .legend-label-text {
-  fill: white !important;         /* “Legend”, “Jurídica”, “Natural” */
-  font-size: 14px;
-}
-
-/* Números de los ejes */
-::ng-deep .ngx-charts .tick text {
-  fill: white !important;
-  font-size: 13px;
-}
-.card {
-  border-radius: 12px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 10px #00000065; /* sombra base */
-}
-
-.card:hover {
-  transform: scale(1.05); /* efecto de zoom */
-  box-shadow: 0 10px 25px #0000004d; /* sombra más intensa al hacer hover */
-  cursor: pointer;
+/* Asegura mínimo tamaño en pantallas pequeñas */
+.row .col-md-6,
+.row .col-md-12 {
+  min-width: 320px;
 }

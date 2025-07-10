@@ -25,8 +25,7 @@ export class CotizacionComponent implements OnInit {
   clientes: any[] = [];
   materiales: any[] = [];
   currentPage: number = 1;
-  itemsPerPage: number = 5;
-  itemsPerPageOptions: number[] = [5, 10, 15];
+  itemsPerPage: number = 10;
 
   constructor(
     private clienteService: ClienteService,
@@ -42,6 +41,27 @@ export class CotizacionComponent implements OnInit {
     this.clienteService.getClientes().subscribe(data => this.clientes = data);
     this.materialesService.getMateriales().subscribe(data => this.materiales = data);
   }
+get visiblePages(): number[] {
+  const total = this.totalPages;
+  const current = this.currentPage;
+
+  let start = current - 1;
+  let end = current + 1;
+
+  if (start < 1) {
+    start = 1;
+    end = Math.min(2, total);
+  } else if (end > total) {
+    end = total;
+    start = Math.max(1, total - 1);
+  }
+
+  const pages: number[] = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+}
 
   resetearCotizacion() {
     return {
@@ -54,6 +74,7 @@ export class CotizacionComponent implements OnInit {
       total: 0
     };
   }
+  
 
   generarNumeroCotizacion(): string {
     const fecha = new Date();
@@ -63,6 +84,10 @@ export class CotizacionComponent implements OnInit {
     const random = Math.floor(Math.random() * 900000 + 100000);
     return `COT_${anio}${mes}${dia}${random}`;
   }
+  tieneMaterialesInvalidos(cot: any): boolean {
+  return cot.materiales.some((m: any) => !m.material || !m.material.codigo);
+}
+
 
   agregarMaterial(cot: any): void {
     cot.materiales.push({ material: null, cantidad: 1, precioUnitario: 0, subtotal: 0 });
@@ -236,6 +261,10 @@ abrirModalEditar(index: number): void {
     const cliente = this.clientes.find(c => c.cedula === cedula);
     return cliente ? cliente.nombre : cedula;
   }
+  esClienteValido(cliente: any): boolean {
+  return cliente && typeof cliente === 'object' && 'cedula' in cliente;
+}
+
 
   eliminarCotizacion(index: number): void {
     this.deleteIndex = index;

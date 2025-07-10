@@ -89,15 +89,47 @@ agregarVolqueta(form: NgForm): void {
     this.mostrarModal('deleteConfirmationModal');
   }
 
-  confirmDeleteVolqueta(): void {
-    if (this.deleteVolquetaObj) {
-      this.volquetaService.delete(this.deleteVolquetaObj.id!).subscribe(() => {
+confirmDeleteVolqueta(): void {
+  if (this.deleteVolquetaObj) {
+    this.volquetaService.delete(this.deleteVolquetaObj.id!).subscribe({
+      next: () => {
         this.getVolquetas();
         this.closeModal('deleteConfirmationModal');
         this.mostrarModal('deleteModal');
-      });
-    }
+      },
+      error: (error) => {
+        this.closeModal('deleteConfirmationModal'); // Se cierra primero
+
+        // Espera un poco antes de mostrar el modal de error para evitar conflicto de modales
+        setTimeout(() => {
+          const mensaje = error?.error || "No se pudo eliminar la volqueta.";
+          this.mostrarAlertaModal("No se puede eliminar", mensaje);
+        }, 300); // ligero retardo para garantizar el cierre anterior
+      }
+    });
   }
+}
+
+mostrarAlertaModal(titulo: string, mensaje: string): void {
+  const modalEl = document.getElementById('alertModal');
+  if (modalEl) {
+    // Cambiar el contenido dinámicamente
+    const titleEl = modalEl.querySelector('#alertModalTitle');
+    const messageEl = modalEl.querySelector('#alertModalMessage');
+
+    if (titleEl) titleEl.textContent = titulo;
+    if (messageEl) messageEl.textContent = mensaje;
+
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  } else {
+    console.warn('No se encontró el modal de alerta en el DOM.');
+  }
+}
+
+
+
 
   filtrarVolquetas(): void {
     const query = this.searchQuery.toLowerCase();
@@ -117,8 +149,7 @@ agregarVolqueta(form: NgForm): void {
   XLSX.writeFile(workbook, 'volquetas.xlsx');
 }
 // Pagianción
-pageSizeOptions = [5, 10, 15]; 
-pageSize = 5;                 
+pageSize = 10;              
 currentPage = 1;               
 
 get paginatedVolquetas() {
@@ -140,6 +171,27 @@ cambiarPageSize(nuevoTamaño: number) {
   this.currentPage = 1; // reinicia a la página 1
 }
 
+get visiblePages(): number[] {
+  const total = this.totalPages;
+  const current = this.currentPage;
+
+  let start = current - 1;
+  let end = current + 1;
+
+  if (start < 1) {
+    start = 1;
+    end = Math.min(2, total);
+  } else if (end > total) {
+    end = total;
+    start = Math.max(1, total - 1);
+  }
+
+  const pages: number[] = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+}
 
 mostrarModal(id: string): void {
   const modalEl = document.getElementById(id);
@@ -148,6 +200,12 @@ mostrarModal(id: string): void {
     modal.show();
   }
 }
+abrirNuevoModal(): void {
+  this.nuevaVolqueta = { placa: '', tipo: '', capacidad: '', estado: '' };
+  this.mensajeError = '';
+  this.mostrarModal('nuevoVolquetaModal');
+}
+
 
 closeModal(id: string): void {
   const modalEl = document.getElementById(id);

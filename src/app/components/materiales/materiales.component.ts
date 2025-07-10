@@ -40,13 +40,13 @@ export class MaterialesComponent {
     );
   }
  //Paginación
-  currentPage: number = 1;
-itemsPerPage: number = 5;
-itemsPerPageOptions: number[] = [5, 10, 15];
+currentPage: number = 1;
+itemsPerPage: number = 10;
 
 get paginatedMateriales(): any[] {
   const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-  return this.filteredMateriales.slice(startIndex, startIndex + this.itemsPerPage);
+  const endIndex = startIndex + this.itemsPerPage;
+  return this.filteredMateriales.slice(startIndex, endIndex);
 }
 
 get totalPages(): number {
@@ -54,12 +54,26 @@ get totalPages(): number {
 }
 
 get visiblePages(): number[] {
-  const range = 1;
-  const start = Math.max(1, this.currentPage - range);
-  const end = Math.min(this.totalPages, this.currentPage + range);
-  return Array(end - start + 1).fill(0).map((_, i) => start + i);
-}
+  const total = this.totalPages;
+  const current = this.currentPage;
 
+  let start = current - 1;
+  let end = current + 1;
+
+  if (start < 1) {
+    start = 1;
+    end = Math.min(2, total);
+  } else if (end > total) {
+    end = total;
+    start = Math.max(1, total - 1);
+  }
+
+  const pages: number[] = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+}
 
 
 

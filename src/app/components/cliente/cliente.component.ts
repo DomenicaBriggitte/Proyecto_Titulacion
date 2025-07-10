@@ -11,20 +11,21 @@ import * as FileSaver from 'file-saver';
   styleUrls: ['./cliente.component.css']
 })
 export class ClienteComponent {
-  clientes: any[] = [];
+clientes: any[] = [];
+filteredClientes: any[] = [];
+searchQuery: string = '';
+currentPage: number = 1;
+
 ngOnInit() {
   this.clienteService.getClientes().subscribe(data => {
     this.clientes = data;
-    this.filteredClientes = [...this.clientes]; // Esto es importante para paginar
+    this.filteredClientes = [...this.clientes]; 
+    this.currentPage = 1// Esto es importante para paginar
   });
 }
 
-  constructor(private clienteService: ClienteService) {
-    this.clienteService.getClientes().subscribe((clientes: any[]) => {
-      this.clientes = clientes;
-      this.filteredClientes = [...this.clientes];
-    });
-  }
+constructor(private clienteService: ClienteService) {}
+
   abs(value: number): number {
   return Math.abs(value);
 }
@@ -33,20 +34,18 @@ ngOnInit() {
   nuevoCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
   selectedCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
 
-  filteredClientes = [...this.clientes];  // Inicializar la lista filtrada con todos los clientes
-  searchQuery: string = '';  // Propiedad para almacenar lo que el usuario escribe en el campo de búsqueda
 
-  filterClientes() {
-    // Filtrar los clientes por cédula o nombre
-    this.filteredClientes = this.clientes.filter(cliente => 
-      cliente.cedula.includes(this.searchQuery) || 
-      cliente.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
-  }
+filterClientes() {
+  this.filteredClientes = this.clientes.filter(cliente => 
+    cliente.cedula.includes(this.searchQuery) || 
+    cliente.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
+  );
+  this.currentPage = 1; // importante para evitar mostrar más registros de los que debe
+}
+
+
   // Paginación
-currentPage: number = 1;
-itemsPerPage: number = 5;
-itemsPerPageOptions = [5, 10, 15];
+itemsPerPage: number = 10;
 
 get totalPages(): number {
   return Math.ceil(this.filteredClientes.length / this.itemsPerPage);
@@ -54,17 +53,21 @@ get totalPages(): number {
 
 get paginatedClientes(): any[] {
   const start = (this.currentPage - 1) * this.itemsPerPage;
-  return this.filteredClientes.slice(start, start + this.itemsPerPage);
+  const end = start + this.itemsPerPage;
+  return this.filteredClientes.slice(start, end);
 }
+
+
+
 
 // Para mostrar solo 3 botones de página
 get paginationRange(): number[] {
   const total = this.totalPages;
   let start = Math.max(1, this.currentPage - 1);
-  let end = Math.min(total, start + 2);
+  let end = Math.min(total, start + 1); 
 
-  if (end - start < 2) {
-    start = Math.max(1, end - 2);
+  if (end - start < 1) {
+    start = Math.max(1, end - 1);
   }
 
   const range: number[] = [];
@@ -73,6 +76,12 @@ get paginationRange(): number[] {
   }
   return range;
 }
+
+// Función para cambiar de página
+onItemsPerPageChange(): void {
+  this.currentPage = 1;
+}
+
 exportarExcel() {
   const worksheet = XLSX.utils.json_to_sheet(this.filteredClientes);
   const workbook = {
@@ -164,6 +173,7 @@ addClient(form: NgForm) {
       this.clienteService.getClientes().subscribe((clientes: any[]) => {
         this.clientes = clientes;
         this.filteredClientes = [...this.clientes];
+        this.currentPage = 1
       });
       this.nuevoCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
       
@@ -211,6 +221,7 @@ updateCliente() {
       if (index !== -1) {
         this.clientes[index] = { ...this.selectedCliente };
         this.filteredClientes = [...this.clientes];
+        this.currentPage = 1
       }
     // Cerrar el modal de editar material
     const editMaterialesModalElement = document.getElementById('editMaterialesModal');
@@ -263,6 +274,7 @@ confirmDelete() {
       if (index !== -1) {
         this.clientes.splice(index, 1);
         this.filteredClientes = [...this.clientes];
+        this.currentPage = 1
       }
       this.clienteParaEliminar = null;
       // Cierra el modal de confirmación
