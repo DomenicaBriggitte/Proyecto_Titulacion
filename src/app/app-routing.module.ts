@@ -10,19 +10,20 @@ import { ReporteDiarioComponent } from './components/volqueta/reporte-diario/rep
 import { FacturaComponent } from './components/factura/factura.component';
 import { MaterialesComponent } from './components/materiales/materiales.component'; 
 import { CotizacionComponent } from './components/cotizacion/cotizacion.component';
+import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [  
   { path: '', component: InicioComponent },
-  { path: 'dashboard', component: DashboardComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'cliente', component: ClienteComponent },
-  { path: 'pedido', component: PedidoComponent },
-  { path: 'registro-volqueta', component: RegistroVolquetaComponent },
-  { path: 'reporte-diario', component: ReporteDiarioComponent },
-  { path: 'factura', component: FacturaComponent },
-  { path: 'materiales', component: MaterialesComponent },
-  { path: 'cotizacion', component: CotizacionComponent },
-  { path: '**', redirectTo: 'dashboard', pathMatch: 'full' }
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { path: 'cliente', component: ClienteComponent, canActivate: [AuthGuard] },
+  { path: 'pedido', component: PedidoComponent, canActivate: [AuthGuard] },
+  { path: 'registro-volqueta', component: RegistroVolquetaComponent, canActivate: [AuthGuard] },
+  { path: 'reporte-diario', component: ReporteDiarioComponent, canActivate: [AuthGuard] },
+  { path: 'factura', component: FacturaComponent, canActivate: [AuthGuard] },
+  { path: 'materiales', component: MaterialesComponent, canActivate: [AuthGuard] },
+  { path: 'cotizacion', component: CotizacionComponent, canActivate: [AuthGuard] },
+  { path: '**', redirectTo: 'login', pathMatch: 'full' }
 ];
 
 @NgModule({

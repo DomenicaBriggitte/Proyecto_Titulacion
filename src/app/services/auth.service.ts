@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7083/api/auth'; // Ajusta tu puerto
+  private apiUrl = 'https://localhost:7210/api/auth'; // Ajusta tu puerto
   private isAuthenticated = false;
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -16,20 +16,25 @@ export class AuthService {
     const body = { nombreUsuario, contraseña };
     return this.http.post<any>(`${this.apiUrl}/login`, body).pipe(
       tap({
-        next: () => this.isAuthenticated = true,
-        error: () => this.isAuthenticated = false
-      }),
-      // Retornamos true o false basado en si la respuesta fue exitosa
-      tap(() => {}, () => false)
+        next: () => {
+          this.isAuthenticated = true;
+          localStorage.setItem('isLoggedIn', 'true');
+        },
+        error: () => {
+          this.isAuthenticated = false;
+          localStorage.removeItem('isLoggedIn');
+        }
+      })
     );
   }
 
   isLoggedIn(): boolean {
-    return this.isAuthenticated;
+    return this.isAuthenticated || localStorage.getItem('isLoggedIn') === 'true';
   }
 
   logout(): void {
     this.isAuthenticated = false;
+    localStorage.removeItem('isLoggedIn');
     this.router.navigate(['/login']);
   }
 }
