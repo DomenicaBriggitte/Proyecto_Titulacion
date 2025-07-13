@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../auth.service';
+import { AuthService } from '../../services/auth.service';
 import * as bootstrap from 'bootstrap';
 
 @Component({
@@ -41,20 +41,19 @@ export class SidebarComponent {
 
   // Función de cierre de sesión
   logout() {
-    this.authService.logout();  // Cerrar sesión utilizando el servicio de autenticación
+    this.authService.logout();  
     this.router.navigate(['/']); // Redirigir al usuario a la página principal
 
     // Cerrar el modal de confirmación de cierre de sesión
     const deleteModalElement = document.getElementById('logoutModal');
     if (deleteModalElement) {
       const logoutModal = new bootstrap.Modal(deleteModalElement);
-      logoutModal.hide();  // Cerrar el modal
+      logoutModal.hide(); 
     }
 
-    // Eliminar la capa oscura (backdrop)
     const backdrop = document.querySelector('.modal-backdrop');
     if (backdrop) {
-      backdrop.remove(); // Eliminar capa oscura
+      backdrop.remove();
     }
   }
 }

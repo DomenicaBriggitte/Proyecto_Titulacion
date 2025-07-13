@@ -20,20 +20,23 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    const isValid = this.authService.login(this.user, this.password);
-
-    if (isValid) {
-      const modalElement = document.getElementById('loginModal');
-      if(modalElement) {
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        if (modal) {
-          modal.hide();
+    this.authService.login(this.user, this.password).subscribe({
+      next: (success) => {
+        if (success !== false) {
+          const modalElement = document.getElementById('loginModal');
+          if (modalElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) modal.hide();
+          }
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.showError = true;
         }
-      }
-
-      this.router.navigate(['/dashboard']);
-    } else {
+      },
+      error: (err) => {
         this.showError = true;
+        console.error('Error en login:', err);
       }
+    });
   }
 }

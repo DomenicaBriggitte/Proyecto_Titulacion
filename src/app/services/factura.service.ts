@@ -17,10 +17,10 @@ export class FacturaService {
   }
 
   updateFactura(id: number, formData: FormData): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, formData); // ✅ backticks
+    return this.http.put<any>(`${this.apiUrl}/${id}`, formData);
   }
 
   deleteFactura(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`); // ✅ backticks
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 }
