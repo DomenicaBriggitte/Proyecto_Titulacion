@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import * as bootstrap from 'bootstrap';
-import { FacturaService } from 'src/app/services/factura.service';
+import { FacturaService, Factura } from 'src/app/services/factura.service';
+import { PedidoService, Pedido } from 'src/app/services/pedido.service';
 import { ClienteService } from 'src/app/services/cliente.service';
+import { Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-factura',
@@ -9,143 +12,272 @@ import { ClienteService } from 'src/app/services/cliente.service';
   styleUrls: ['./factura.component.css']
 })
 export class FacturaComponent implements OnInit {
-  facturas: any[] = [];
+  facturas: Factura[] = [];
+  facturasFiltradas: Factura[] = [];
+  pedidos: Pedido[] = [];
   clientes: any[] = [];
-  searchQuery = '';
-  facturasFiltradas: any[] = [];
-  itemsPerPage = 5;
-  currentPage = 1;
+  filtroEstado: string = '';
+  searchQuery: string = '';
+  currentPage: number = 1;
+  itemsPerPage: number = 5;
+  itemsPerPageOptions: number[] = [5, 10, 15];
 
-  nuevaFactura = {
-    fecha: '',
-    clienteCedula: '',
-    estadoPago: 'Pendiente',
-    archivo: null
-  };
+  nuevoFactura: Factura = this.resetFactura();
+  facturaEdit: Factura = this.resetFactura();
+  facturaParaEliminar: Factura | null = null;
 
-  facturaEdit = {
-    idFactura: 0,
-    fecha: '',
-    clienteCedula: '',
-    estadoPago: '',
-    archivo: null,
-    archivoUrl: '',
-    archivoNombre: ''
-  };
+  pedidoSeleccionado: Pedido | null = null;
+  pedidoSeleccionadoEdit: Pedido | null = null;
+  clienteSeleccionado: any | null = null;
+  selectedFile: File | null = null;
+  selectedFileEdit: File | null = null;
 
-  facturaParaEliminar: any = null;
-
-  constructor(private facturaService: FacturaService, private clienteService: ClienteService) {}
+  constructor(
+    private facturaService: FacturaService,
+    private pedidoService: PedidoService,
+    private clienteService: ClienteService
+  ) {}
 
   ngOnInit(): void {
     this.cargarDatos();
   }
 
-  cargarDatos() {
+  cargarDatos(): void {
     this.facturaService.getFacturas().subscribe(data => {
       this.facturas = data;
-      this.facturasFiltradas = [...this.facturas];
+      this.facturasFiltradas = [...data];
     });
-    this.clienteService.getClientes().subscribe(data => {
-      this.clientes = data;
-    });
+    this.pedidoService.getPedidos().subscribe(data => this.pedidos = data);
+    this.clienteService.getClientes().subscribe(data => this.clientes = data);
   }
 
-  filterFacturas() {
-    const q = this.searchQuery.toLowerCase();
-    this.facturasFiltradas = this.facturas.filter(f =>
-      f.cliente?.nombre?.toLowerCase().includes(q) ||
-      f.estadoPago.toLowerCase().includes(q)
-    );
+  resetFactura(): Factura {
+    return {
+      numeroFactura: this.generarNumeroFacturaTemporal(), 
+      fecha: new Date().toISOString().substring(0, 10),
+      pedidoId: 0, 
+      clienteCedula: '',
+      estadoPago: 'Pendiente',
+      archivo: null,
+      observaciones: ''
+    };
   }
 
-  onFileSelected(event: any, tipo: 'nuevo' | 'editar') {
-    const archivo = event.target.files[0];
-    if (tipo === 'nuevo') {
-      this.nuevaFactura.archivo = archivo;
-    } else {
-      this.facturaEdit.archivo = archivo;
-    }
+  generarNumeroFacturaTemporal(): string {
+    const fecha = new Date();
+    const yyyy = fecha.getFullYear();
+    const mm = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const dd = fecha.getDate().toString().padStart(2, '0');
+    const random = Math.floor(1000 + Math.random() * 9000);
+    return `FAC${yyyy}${mm}${dd}${random}`;
   }
 
-  abrirModalNuevo() {
+  abrirModalNuevo(): void {
+    this.nuevoFactura = this.resetFactura();
+    this.pedidoSeleccionado = null;
+    this.clienteSeleccionado = null;
+    this.selectedFile = null;
     const modal = new bootstrap.Modal(document.getElementById('nuevoFacturaModal')!);
     modal.show();
   }
 
-  abrirModalEditar(factura: any) {
-    this.facturaEdit = {
-      idFactura: factura.idFactura,
-      fecha: factura.fecha?.substring(0, 10),
-      clienteCedula: factura.clienteCedula,
-      estadoPago: factura.estadoPago,
-      archivo: null,
-      archivoUrl: factura.archivo,
-      archivoNombre: factura.archivo ? factura.archivo.split('/').pop() : null      
-    };
-    this.facturaEdit.archivoUrl = factura.archivo;
-    this.facturaEdit.archivoNombre = factura.archivo?.split('/').pop(); // nombre del archivo
+  abrirModalEditar(factura: Factura): void {
+    this.facturaEdit = { ...factura };
+    if (this.facturaEdit.fecha) {
+      this.facturaEdit.fecha = new Date(this.facturaEdit.fecha).toISOString().substring(0, 10);
+    }
+
+    this.pedidoSeleccionadoEdit = this.pedidos.find(p => p.pedidoId === factura.pedidoId) || null;
+    this.clienteSeleccionado = this.clientes.find(c => c.cedula === factura.clienteCedula) || null;
+    this.selectedFileEdit = null;
     const modal = new bootstrap.Modal(document.getElementById('editarFacturaModal')!);
     modal.show();
   }
 
-  abrirModalEliminar(factura: any) {
+  abrirModalEliminar(factura: Factura): void {
     this.facturaParaEliminar = factura;
-    const modal = new bootstrap.Modal(document.getElementById('confirmarEliminacionFacturaModal')!);
-    modal.show();
+    const modalEl = document.getElementById('confirmarEliminarFacturaModal');
+    if (modalEl) new bootstrap.Modal(modalEl).show();
   }
 
-  guardarFactura() {
-    const formData = new FormData();
-    formData.append('fecha', this.nuevaFactura.fecha);
-    formData.append('clienteCedula', this.nuevaFactura.clienteCedula);
-    formData.append('estadoPago', this.nuevaFactura.estadoPago);
-    if (this.nuevaFactura.archivo) {
-      formData.append('archivo', this.nuevaFactura.archivo);
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.nuevoFactura.archivo = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onFileSelectedEdit(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.selectedFileEdit = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.facturaEdit.archivo = e.target.result; 
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  guardarFactura(): void {
+    if (!this.nuevoFactura.pedidoId) {
+      console.error('Debe seleccionar un pedido para la factura.');
+      return;
     }
 
-    this.facturaService.addFactura(formData).subscribe(() => {
+    this.facturaService.addFactura(this.nuevoFactura).subscribe(() => {
       this.cargarDatos();
-      this.nuevaFactura = { fecha: '', clienteCedula: '', estadoPago: 'Pendiente', archivo: null };
       bootstrap.Modal.getInstance(document.getElementById('nuevoFacturaModal')!)?.hide();
-      const success = new bootstrap.Modal(document.getElementById('facturaGuardadaModal')!);
-      success.show();
+      new bootstrap.Modal(document.getElementById('facturaGuardadaModal')!).show();
+    }, error => {
+      console.error('Error al guardar la factura:', error);
     });
   }
 
-  actualizarFactura() {
-    const formData = new FormData();
-    formData.append('idFactura', this.facturaEdit.idFactura.toString());
-    formData.append('fecha', this.facturaEdit.fecha);
-    formData.append('clienteCedula', this.facturaEdit.clienteCedula);
-    formData.append('estadoPago', this.facturaEdit.estadoPago);
-    if (this.facturaEdit.archivo) {
-      formData.append('archivo', this.facturaEdit.archivo);
-    }
+  actualizarFactura(): void {
+    if (!this.facturaEdit.idFactura) return;
 
-    this.facturaService.updateFactura(this.facturaEdit.idFactura, formData).subscribe(() => {
+    this.facturaService.updateFactura(this.facturaEdit.idFactura, this.facturaEdit).subscribe(() => {
       this.cargarDatos();
       bootstrap.Modal.getInstance(document.getElementById('editarFacturaModal')!)?.hide();
-      const success = new bootstrap.Modal(document.getElementById('facturaGuardadaModal')!);
-      success.show();
+      new bootstrap.Modal(document.getElementById('facturaGuardadaModal')!).show();
+    }, error => {
+      console.error('Error al actualizar la factura:', error);
     });
   }
 
-  confirmarEliminarFactura() {
+  eliminarFactura(factura: Factura): void {
+    this.facturaParaEliminar = factura;
+    const modalEl = document.getElementById('confirmarEliminarFacturaModal');
+    if (modalEl) new bootstrap.Modal(modalEl).show();
+  }
+
+  confirmarEliminarFactura(): void {
+    if (!this.facturaParaEliminar?.idFactura) return;
+
     this.facturaService.deleteFactura(this.facturaParaEliminar.idFactura).subscribe(() => {
-      this.facturas = this.facturas.filter(f => f.idFactura !== this.facturaParaEliminar.idFactura);
-      this.facturasFiltradas = [...this.facturas];
-      bootstrap.Modal.getInstance(document.getElementById('confirmarEliminacionFacturaModal')!)?.hide();
-      const modal = new bootstrap.Modal(document.getElementById('facturaEliminadaModal')!);
-      modal.show();
+      this.cargarDatos();
+      this.facturaParaEliminar = null;
+
+      const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmarEliminarFacturaModal')!);
+      confirmModal?.hide();
+
+      setTimeout(() => {
+        const modal = new bootstrap.Modal(document.getElementById('facturaEliminadaModal')!);
+        modal.show();
+      }, 300);
+    }, error => {
+      console.error('Error al eliminar la factura:', error);
     });
   }
 
-  exportarAExcel() {
-    alert('Funcionalidad de exportación aún no implementada. Puedes usar XLSX o ngx-export-as');
+  filterFacturas(): void {
+    const estado = this.filtroEstado;
+    const texto = this.searchQuery.toLowerCase();
+
+    this.facturasFiltradas = this.facturas.filter(f => {
+      const coincideEstado = estado ? f.estadoPago === estado : true;
+      const cliente = this.clientes.find(c => c.cedula === f.clienteCedula);
+      const pedido = this.pedidos.find(p => p.pedidoId === f.pedidoId);
+
+      const coincideBusqueda =
+        f.numeroFactura.toLowerCase().includes(texto) ||
+        cliente?.nombre?.toLowerCase().includes(texto) ||
+        pedido?.numeroPedido?.toLowerCase().includes(texto);
+
+      return coincideEstado && coincideBusqueda;
+    });
+
+    this.currentPage = 1;
   }
 
-  cambiarPagina(page: number) {
-    this.currentPage = page;
-  }
+  get paginatedFacturas(): Factura[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.facturasFiltradas.slice(start, start + this.itemsPerPage);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.facturasFiltradas.length / this.itemsPerPage);
+  }
+
+  cambiarPagina(page: number): void {
+    this.currentPage = page;
+  }
+
+  getNombreCliente(cedula: string): string {
+    const cliente = this.clientes.find(c => c.cedula === cedula);
+    return cliente ? cliente.nombre : '';
+  }
+
+  getNumeroPedido(pedidoId: number): string {
+    const pedido = this.pedidos.find(p => p.pedidoId === pedidoId);
+    return pedido ? pedido.numeroPedido : '';
+  }
+
+  get facturasPagadas(): Factura[] {
+    return this.facturas.filter(f => f.estadoPago === 'Cancelado');
+  }
+
+  get facturasPendientes(): Factura[] {
+    return this.facturas.filter(f => f.estadoPago === 'Pendiente');
+  }
+
+  filtrarPorEstado(estado: string): void {
+    this.filtroEstado = estado;
+    this.filterFacturas();
+    this.currentPage = 1;
+  }
+
+  buscarPedidos = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term.length < 2 ? [] :
+        this.pedidos.filter(p =>
+          p.numeroPedido.toLowerCase().includes(term.toLowerCase()) ||
+          this.getNombreCliente(p.clienteCedula).toLowerCase().includes(term.toLowerCase())
+        ).slice(0, 10))
+    );
+
+  formatearPedido = (p: Pedido) => p.numeroPedido || '';
+
+  onSeleccionPedido(event: any, type: 'nuevo' | 'editar'): void {
+    const selectedPedido: Pedido = event.item;
+    const targetFactura = type === 'nuevo' ? this.nuevoFactura : this.facturaEdit;
+    const targetPedidoSeleccionado = type === 'nuevo' ? 'pedidoSeleccionado' : 'pedidoSeleccionadoEdit';
+
+    this[targetPedidoSeleccionado] = selectedPedido;
+    targetFactura.pedidoId = selectedPedido.pedidoId!;
+    targetFactura.clienteCedula = selectedPedido.clienteCedula;
+
+    if (selectedPedido.fecha) {
+      targetFactura.fecha = new Date(selectedPedido.fecha).toISOString().substring(0, 10);
+    } else {
+      targetFactura.fecha = new Date().toISOString().substring(0, 10);
+    }
+
+    targetFactura.estadoPago = selectedPedido.estadoPago;
+
+    this.clienteSeleccionado = this.clientes.find(c => c.cedula === selectedPedido.clienteCedula) || null;
+  }
+
+  getFileName(base64String: string | null | undefined): string {
+    if (!base64String) return 'No archivo';
+    return base64String.split(';')[0].split(':')[1] || 'archivo_adjunto';
+  }
+
+  openFile(base64String: string | null | undefined): void {
+    if (base64String) {
+      const link = document.createElement('a');
+      link.href = base64String;
+      link.target = '_blank';
+      link.download = 'archivo_adjunto';
+      link.click();
+    }
+  }
 }
