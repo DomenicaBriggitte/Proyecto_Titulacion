@@ -147,7 +147,8 @@ exportarExcel() {
   
 validateEmail(event: KeyboardEvent) {
   const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-  const regex = /^[a-zA-Z0-9._%+-@.]*$/; // Solo caracteres válidos
+  // Expresión regular para correo electrónico válido
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; 
 
   // Bloquear espacio
   if (event.key === ' ') {
@@ -159,34 +160,42 @@ validateEmail(event: KeyboardEvent) {
     return; // Permitir teclas de control
   }
 
-  if (!regex.test(event.key)) {
-    event.preventDefault(); // Bloquear teclas inválidas
+  // Verificar si el correo cumple con la expresión regular
+  if (!regex.test(this.nuevoCliente.correo)) {
+    event.preventDefault(); // Bloquear teclas no permitidas
   }
 }
 
 
 
 // Agregar nuevo cliente
+// Función para agregar un nuevo cliente
 addClient(form: NgForm) {
-  if (form.invalid) return;
+  if (form.invalid) {
+    return;  // Si el formulario no es válido, no se envía
+  }
 
+  // Agregar cliente si el formulario es válido
   this.clienteService.addCliente(this.nuevoCliente).subscribe({
     next: () => {
-      // Vuelve a cargar la lista desde la API
+      // Recargar la lista de clientes después de agregar el nuevo cliente
       this.clienteService.getClientes().subscribe((clientes: any[]) => {
         this.clientes.unshift(this.nuevoCliente); 
-        this.filteredClientes = [...this.clientes];
-        this.currentPage = 1; // Asegurarse de que la paginación empiece desde la primera página
+        this.filteredClientes = [...this.clientes];  // Actualizar los clientes filtrados
+        this.currentPage = 1;  // Reiniciar la paginación
       });
 
+      // Limpiar el formulario después de agregar
       this.nuevoCliente = { cedula: '', nombre: '', tipo: '', telefono: '', correo: '' };
 
-      // Cierra el modal y muestra éxito
+      // Cerrar el modal
       const nuevoClienteModalElement = document.getElementById('nuevoClienteModal');
       if (nuevoClienteModalElement) {
         const modal = bootstrap.Modal.getInstance(nuevoClienteModalElement) || new bootstrap.Modal(nuevoClienteModalElement);
         modal.hide();
       }
+
+      // Mostrar el modal de éxito
       const successModalElement = document.getElementById('successModal');
       if (successModalElement) {
         const successModal = new bootstrap.Modal(successModalElement);
@@ -199,18 +208,14 @@ addClient(form: NgForm) {
     },
     error: (err) => {
       if (err.status === 409) {
-        // Si el error es un 409, significa que el cliente ya está registrado
         this.errorClienteExistente = true;
         this.mensajeError = err.error.message || "Este cliente ya está registrado.";
       } else {
-        // Para otros errores
         alert('Error al agregar cliente: ' + (err.error?.message || err.message));
       }
     }
   });
 }
-
-  
 
 // Función para editar un cliente
 editCliente(cliente: any) {

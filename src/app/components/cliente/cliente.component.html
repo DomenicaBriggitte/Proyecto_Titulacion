@@ -68,9 +68,6 @@
   </ul>
 </nav>
 
-
-
-
 <!-- Modal Nuevo cliente -->
 <div class="modal fade" id="nuevoClienteModal" tabindex="-1" aria-labelledby="nuevoClienteModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -136,24 +133,25 @@
                 <div *ngIf="telefono.errors?.['maxlength']">Teléfono debe tener 10 dígitos</div>
               </div>
             </div>
-           <!-- Correo Electronico-->
-          <div class="mb-3">
-              <label for="correo" class="form-label">Correo</label>
-                <input 
-                  type="email" 
-                  class="form-control" 
-                  id="correo" 
-                  [(ngModel)]="nuevoCliente.correo" 
-                  name="correo" 
-                  required
-                  maxlength="50"
-                  (keydown)="validateEmail($event)" 
-                  #correo="ngModel"
-                />
-              <div *ngIf="correo.invalid && correo.touched" class="text-danger">
-                <div *ngIf="correo.errors?.['required']">Este campo es obligatorio.</div>
-              </div>
-            </div>
+<div class="mb-3">
+  <label for="correo" class="form-label">Correo</label>
+  <input 
+    type="email" 
+    class="form-control" 
+    id="correo" 
+    [(ngModel)]="nuevoCliente.correo" 
+    name="correo" 
+    required
+    maxlength="50"
+    pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" 
+    #correo="ngModel"
+  />
+  <div *ngIf="correo.invalid && correo.touched" class="text-danger">
+    <div *ngIf="correo.errors?.['required']">Este campo es obligatorio.</div>
+    <div *ngIf="correo.errors?.['pattern']">El correo debe tener un formato válido (ej. alguien123@ejemplo.com).</div>
+  </div>
+</div>
+
            <!-- Juridica o natural-->
           <div class="mb-3">
             <label for="tipo" class="form-label">Tipo</label>
@@ -163,11 +161,7 @@
               <option value="Jurídica">Jurídica</option>
             </select>
           </div>
-          <button type="submit" 
-          class="btn btn-success w-100"
-          [disabled]="!nuevoClienteForm.valid">
-          Guardar
-        </button>
+            <button type="submit" class="btn btn-success w-100" [disabled]="!nuevoClienteForm.valid">  < Guardar</button>
         </form>
       </div>
     </div>
@@ -242,7 +236,7 @@
           </div>
 
           <!-- Correo Electrónico -->
-          <div class="mb-3">
+           <div class="mb-3">
             <label for="correo" class="form-label">Correo</label>
             <input type="email" 
                    class="form-control" 
@@ -251,10 +245,11 @@
                    name="correo" 
                    required 
                    maxlength="50"
-                   (keydown)="validateEmail($event)"
+                   pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" 
                    #correo="ngModel" />
             <div *ngIf="correo.invalid && correo.touched" class="text-danger">
               <div *ngIf="correo.errors?.['required']">Este campo es obligatorio.</div>
+              <div *ngIf="correo.errors?.['pattern']">El correo debe tener un formato válido (ej. alguien123@ejemplo.com).</div>
             </div>
           </div>
 

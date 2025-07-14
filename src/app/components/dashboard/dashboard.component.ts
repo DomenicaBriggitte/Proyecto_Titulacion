@@ -1,4 +1,3 @@
-// dashboard.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { CotizacionService } from 'src/app/services/cotizacion.service';
@@ -7,6 +6,7 @@ import { MaterialesService } from 'src/app/services/materiales.service';
 import { RegistroVolquetaService } from 'src/app/services/registro-volqueta.service';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
 import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -14,13 +14,12 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
   // Tarjetas principales
-cards = [
-  { title: 'Clientes', count: 129, color: 'bg-primary', description: 'Registrados' ,route: '/cliente'},
-  { title: 'Materiales', count: 56, color: 'bg-warning', description: 'Disponibles' ,route: '/materiales' },
-  { title: 'Cotizaciones', count: 1, color: 'bg-success', description: 'Emitidas' ,route: '/cotizacion' },
-  { title: 'Volquetas', count: 11, color: 'bg-danger', description: 'Registradas' ,route: '/registro-volqueta' }
-];
-
+  cards = [
+    { title: 'Clientes', count: 129, color: 'bg-primary', description: 'Registrados', route: '/cliente' },
+    { title: 'Materiales', count: 56, color: 'bg-warning', description: 'Disponibles', route: '/materiales' },
+    { title: 'Cotizaciones', count: 1, color: 'bg-success', description: 'Emitidas', route: '/cotizacion' },
+    { title: 'Volquetas', count: 11, color: 'bg-danger', description: 'Registradas', route: '/registro-volqueta' }
+  ];
 
   // Gráfico de barras: Cotizaciones por mes
   cotizacionesPorMes: any[] = [];
@@ -51,14 +50,14 @@ cards = [
     private router: Router 
   ) {}
 
-
   irA(ruta: string): void {
-  if (ruta) {
-    this.router.navigate([ruta]);
+    if (ruta) {
+      this.router.navigate([ruta]);
+    }
   }
-}
 
   ngOnInit(): void {
+    // Obtener todos los clientes
     this.clienteService.getClientes().subscribe(clientes => {
       const naturales = clientes.filter(c => c.tipo === 'Natural').length;
       const juridicos = clientes.filter(c => c.tipo === 'Jurídica').length;
@@ -70,52 +69,48 @@ cards = [
       ];
     });
 
-    
+    // Obtener las cotizaciones
+    this.cotizacionService.getCotizaciones().subscribe(cotizaciones => {
+      this.cards[2].count = cotizaciones.length;
 
- this.cotizacionService.getCotizaciones().subscribe(cotizaciones => {
-  this.cards[2].count = cotizaciones.length;
+      const resumenPorMes: any = {};
+      const resumenIngresos: any = {};
 
-  const resumenPorMes: any = {};
-  const resumenIngresos: any = {};
+      cotizaciones.forEach(cot => {
+        const fecha = new Date(cot.fecha);
+        const mes = fecha.toLocaleString('es-EC', { month: 'short' }).replace('.', '');
+        resumenPorMes[mes] = (resumenPorMes[mes] || 0) + 1;
+        resumenIngresos[mes] = (resumenIngresos[mes] || 0) + cot.total;
+      });
 
-  cotizaciones.forEach(cot => {
-    const fecha = new Date(cot.fecha);
+      this.cotizacionesPorMes = Object.entries(resumenPorMes).map(([name, value]) => ({ name, value }));
+      this.ingresosMensuales = [
+        {
+          name: 'Ingresos',
+          series: Object.entries(resumenIngresos).map(([name, value]) => ({
+            name,
+            value: parseFloat((value as number).toFixed(2))
+          }))
+        }
+      ];
+    });
 
-    // ✅ Obtenemos mes abreviado sin punto final
-    const mes = fecha.toLocaleString('es-EC', { month: 'short' }).replace('.', '');
-
-    resumenPorMes[mes] = (resumenPorMes[mes] || 0) + 1;
-    resumenIngresos[mes] = (resumenIngresos[mes] || 0) + cot.total;
-  });
-
-  // ✅ Asignamos a los gráficos de forma dinámica
-  this.cotizacionesPorMes = Object.entries(resumenPorMes).map(([name, value]) => ({ name, value }));
-
-  this.ingresosMensuales = [
-  {
-    name: 'Ingresos',
-    series: Object.entries(resumenIngresos).map(([name, value]) => ({
-      name,
-      value: parseFloat((value as number).toFixed(2)) // ⬅️ Cast seguro
-    }))
-  }
-];
-
-});
-
-
+    // Obtener reportes
     this.reporteService.getReportes().subscribe(reportes => {
       this.cards[3].count = reportes.length;
     });
 
+    // Obtener materiales
     this.materialesService.getMateriales().subscribe(materiales => {
       this.cards[1].count = materiales.length;
       this.materialesTop = materiales.sort((a, b) => b.costoSinIva - a.costoSinIva).slice(0, 5);
     });
 
+    // Suscripción a los cambios de volquetas
     this.volquetaService.getAll().subscribe(volquetas => {
       this.volquetaStats.operativo = volquetas.filter(v => v.estado === 'Operativo').length;
       this.volquetaStats.mantenimiento = volquetas.filter(v => v.estado === 'En mantenimiento').length;
+      this.cards[3].count = volquetas.length; // Actualiza el contador de volquetas
     });
   }
 }
