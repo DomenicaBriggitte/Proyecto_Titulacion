@@ -1,4 +1,3 @@
-// cotizacion.component.ts
 import { Component, OnInit } from '@angular/core';
 import * as bootstrap from 'bootstrap';
 import jsPDF from 'jspdf';
@@ -147,7 +146,7 @@ onSelectMaterial(event: any, index: number, modo: 'nuevo' | 'editar') {
   const target = modo === 'nuevo' ? this.cotizacionNuevo : this.cotizacionEdit;
 
   target.materiales[index].material = materialSeleccionado;
-  target.materiales[index].precioUnitario = materialSeleccionado.costoSinIva; // ← aquí actualizamos el precio
+  target.materiales[index].precioUnitario = materialSeleccionado.costoSinIva;
   target.materiales[index].subtotal = materialSeleccionado.costoSinIva * (target.materiales[index].cantidad || 1);
 
   this.calcularTotales(target);
@@ -376,11 +375,10 @@ abrirModalEditar(index: number): void {
     doc.text(`Fecha: ${cot.fecha}`, 10, 68);
     doc.text(`Cliente: ${this.obtenerNombreCliente(cot.clienteCedula)}`, 10, 76);
     const data = (cot.materiales || []).map((item: any) => {
-    // Nombre del material por el código
     const mat = this.materiales.find(m => m.codigo === item.materialCodigo);
       return [
         item.materialCodigo,
-        mat ? mat.nombre : '', // material
+        mat ? mat.nombre : '',
         item.cantidad,
         `$${item.precioUnitario.toFixed(2)}`,
         `$${item.subtotal.toFixed(2)}`

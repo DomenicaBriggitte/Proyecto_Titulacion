@@ -19,7 +19,7 @@ export class FacturaComponent implements OnInit {
   filtroEstado: string = '';
   searchQuery: string = '';
   currentPage: number = 1;
-  itemsPerPage: number = 5;
+  itemsPerPage: number = 10;
   itemsPerPageOptions: number[] = [5, 10, 15];
 
   nuevoFactura: Factura = this.resetFactura();

@@ -65,14 +65,14 @@
             </span>
 
             <!-- Ícono si está CERRADO -->
-            <i *ngIf="p.estadoPedido === 'Cerrado'" 
-              class="bi bi-check-circle-fill text-success ms-1" 
+            <i *ngIf="p.estadoPedido === 'Cerrado'"
+              class="bi bi-check-circle-fill text-success ms-1"
               ngbTooltip="Pedido cerrado">
             </i>
 
             <!-- Ícono si está ABIERTO con color y mensaje según condición -->
-            <i *ngIf="p.estadoPedido === 'Abierto'" 
-              [ngClass]="getIconoColor(p)" 
+            <i *ngIf="p.estadoPedido === 'Abierto'"
+              [ngClass]="getIconoColor(p)"
               [ngbTooltip]="getMensajeEstado(p)"
               class="bi bi-info-circle-fill ms-1">
             </i>
@@ -166,8 +166,8 @@
             <div class="col-md-6">
               <label class="form-label">Factura</label>
               <select class="form-select" [(ngModel)]="nuevoPedido.facturaId" name="facturaId" (change)="actualizarEstadoPago('nuevo')">
-                <option value="">Sin factura</option>
-                <option *ngFor="let factura of facturas" [value]="factura.idFactura">FAC{{ factura.idFactura }}</option>
+                <option [ngValue]="null">Sin factura</option> <!-- Usar [ngValue]="null" para el valor nulo -->
+                <option *ngFor="let factura of facturas" [ngValue]="factura.idFactura">FAC{{ factura.idFactura }}</option>
               </select>
             </div>
           </div>
@@ -250,8 +250,8 @@
             <div class="col-md-6">
               <label class="form-label">Factura</label>
               <select class="form-select" [(ngModel)]="pedidoEdit.facturaId" name="facturaIdEdit" (change)="actualizarEstadoPago('editar')">
-                <option value="">Sin factura</option>
-                <option *ngFor="let factura of facturas" [value]="factura.idFactura">FAC{{ factura.idFactura }}</option>
+                <option [ngValue]="null">Sin factura</option> <!-- Usar [ngValue]="null" para el valor nulo -->
+                <option *ngFor="let factura of facturas" [ngValue]="factura.idFactura">FAC{{ factura.idFactura }}</option>
               </select>
             </div>
             <div class="col-md-6">
@@ -342,7 +342,33 @@
 </div>
 
 
-<!-- Modal Pedido Guardado -->
+<!-- Modal Factura Creada (Anteriormente pedidoGuardadoModal) -->
+<div class="modal fade" id="facturaCreadaModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-body text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-check-circle-fill animate-check" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </svg>
+        <h4 class="mt-3">¡Factura Creada con Éxito!</h4>
+        <div *ngIf="facturaCreada" class="text-start mt-4 p-3 border rounded bg-light">
+          <p><strong>Número de Factura:</strong> {{ facturaCreada.numeroFactura }}</p>
+          <p><strong>Fecha:</strong> {{ facturaCreada.fecha | date:'yyyy-MM-dd' }}</p>
+          <p><strong>Cliente:</strong> {{ getNombreCliente(facturaCreada.clienteCedula) }}</p>
+          <p><strong>Estado de Pago:</strong>
+            <span class="badge" [ngClass]="facturaCreada.estadoPago === 'Cancelado' ? 'bg-success' : 'bg-warning'">
+              {{ facturaCreada.estadoPago }}
+            </span>
+          </p>
+          <p *ngIf="facturaCreada.observaciones"><strong>Observaciones:</strong> {{ facturaCreada.observaciones }}</p>
+        </div>
+        <button type="button" class="btn btn-primary mt-3" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pedido Guardado (Mantener por si acaso, aunque ahora se usará facturaCreadaModal) -->
 <div class="modal fade" id="pedidoGuardadoModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content p-3">
@@ -372,4 +398,3 @@
     </div>
   </div>
 </div>
-
