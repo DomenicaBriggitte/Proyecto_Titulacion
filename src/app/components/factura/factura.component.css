@@ -27,7 +27,67 @@ h2 {
   box-shadow: 0 0 5px rgba(244, 124, 0, 0.5);
 }
 
-.table th, .table td {
+.resumen-estados {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.card-resumen {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 150px;
+  height: 80px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease-in-out;
+  gap: 12px;
+}
+
+.card-resumen:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+.card-resumen .texto {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.card-resumen .titulo {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.card-resumen .cantidad {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.card-resumen i {
+  font-size: 1.5rem;
+  padding: 0.8rem;
+}
+
+.card-resumen.activo {
+  border-color: #f47c00;
+  background-color: #fff4e5;
+}
+
+.table th,
+.table td {
   text-align: center;
   vertical-align: middle;
 }
@@ -45,7 +105,7 @@ h2 {
 }
 
 .badge.bg-warning {
-  background-color: #0b69cecb !important;
+  background-color: #f47c00 !important;
   color: white;
   font-weight: normal;
   font-size: medium;
@@ -53,6 +113,13 @@ h2 {
 
 .badge.bg-success {
   background-color: #28a745 !important;
+  color: white;
+  font-weight: normal;
+  font-size: medium;
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d !important;
   color: white;
   font-weight: normal;
   font-size: medium;
@@ -73,12 +140,13 @@ table th {
   font-size: larger;
 }
 
-button[type="submit"] {
+button[type="submit"],
+button[type="button"].btn-primary {
   background-color: #ff7f00;
   color: #ffffff;
 }
 
-button[type="button"] {
+button[type="button"].btn-secondary {
   background-color: #dcdcdc;
   color: #000000;
 }
@@ -87,6 +155,7 @@ button[type="button"] {
   justify-content: center;
 }
 
+/* BOTONES */
 .btn {
   margin: 5px;
   border-radius: 8px;
@@ -108,42 +177,47 @@ button[type="button"] {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.btn-info, .btn.btn-si {
+.btn-info,
+.btn.btn-si {
   background-color: #007bff;
   color: white;
   border: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.btn-info:hover, .btn.btn-si:hover {
+.btn-info:hover,
+.btn.btn-si:hover {
   background-color: #0056b3;
-  color: white;
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.btn-info:active, .btn.btn-si:active {
+.btn-info:active,
+.btn.btn-si:active {
   background-color: #003d8b;
 }
 
-.btn-danger, .btn.btn-no {
+.btn-danger,
+.btn.btn-no {
   background-color: #dc3545;
   color: white;
   border: none;
   box-shadow: 0 4px 8px #0000001a;
 }
 
-.btn-danger:hover, .btn.btn-no:hover {
+.btn-danger:hover,
+.btn.btn-no:hover {
   background-color: #c82333;
-  color: white;
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.btn-danger:active, .btn.btn-no:active {
+.btn-danger:active,
+.btn.btn-no:active {
   background-color: #a71d2a;
 }
 
+/* Íconos */
 .btn i {
   margin-right: 2px;
   font-size: 20px;
@@ -151,28 +225,11 @@ button[type="button"] {
   transition: transform 0.3s ease;
 }
 
+/* Ícono de éxito */
 .bi.bi-check-circle-fill {
   width: 80px;
   height: 80px;
   color: #28a745;
-}
-
-.bi.bi-file-earmark-text-fill{
-  width: 30px;
-  height: 30px;
-  color: #f47c00;
-  border: none;
-  box-shadow: 0 1px 3px #00000009;
-}
-
-.bi.bi-file-earmark-text-fill:hover{
-  color: #db7004;
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-.bi.bi-file-earmark-text-fill:active{
-  color: #bf6e1d;
 }
 
 @keyframes rotateReverse {
@@ -185,5 +242,129 @@ button[type="button"] {
 }
 
 .animate-check {
-  animation: rotateReverse 0.3s ease-in-out forwards;
+  animation: rotateReverse 0.3s ease-in-out forwards;
+}
+
+/*Modal Nuevo Pedido*/
+.modal-xl {
+  max-width: 1000px;
+}
+
+.modal-body {
+  background-color: #f8f9fa;
+}
+
+form label {
+  font-weight: 500;
+}
+
+form .form-control,
+form .form-select {
+  border-radius: 6px;
+}
+
+form textarea {
+  resize: vertical;
+}
+
+/* Tablas de materiales */
+.tabla-materiales th, .tabla-materiales td {
+  vertical-align: middle;
+  font-size: 0.875rem;
+  padding: 0.5rem;
+}
+.tabla-materiales th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+/* Totales */
+.tabla-totales {
+  margin-top: 1rem;
+}
+.tabla-totales th {
+  width: 50%;
+  background-color: #f8f9fa;
+}
+.tabla-totales td {
+  font-weight: bold;
+}
+
+/* Ajustes del modal */
+.modal-lg {
+  max-width: 850px;
+}
+.materiales-box {
+  background-color: #fdfdfd;
+  border: 1px solid #dee2e6;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.resumen-totales {
+  margin-top: 15px;
+  padding: 15px 25px;
+  background-color: #fff8f0;
+  border-left: 5px solid #f47c00;
+  border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+  font-size: 15px;
+  position: relative;
+  width: 50%;
+  padding-left: 10%;
+  margin-left: 50%;
+}
+
+.resumen-totales::before {
+  content: "\f155";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  top: 0px;
+  left: 8px;
+  font-size: 28px;
+  color: #f47c00;
+}
+
+.resumen-totales .label {
+  font-weight: 500;
+  color: #444;
+  text-align: right;
+  width: 50%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.resumen-totales .valor {
+  font-weight: bold;
+  color: #f47c00;
+  text-align: left;
+  width: auto;  
+}
+
+
+.resumen-totales .total {
+  font-size: 18px;
+  color: #f47c00;
+  font-weight: bold;
+  text-align: right;
+}
+.resumen-totales .row .col-6 {
+  display: flex;
+  align-items: center;  
+  justify-content: flex-start;  
+  margin-bottom: 0;  
+  margin-right: 2px;
+}
+
+.resumen-totales .row .col-6 i {
+  margin-right: 4px;  
+}
+.resumen-totales .row .col-6 span {
+  margin-left: 0;  
+}
+.resumen-totales .label, .resumen-totales .valor {
+    margin: 0;  
+  padding: 0; 
 }

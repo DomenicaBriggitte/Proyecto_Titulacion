@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7210/api/auth'; // Ajusta tu puerto
+  private apiUrl = 'https://localhost:7210/api/auth';
   private isAuthenticated = false;
 
   constructor(private http: HttpClient, private router: Router) {}

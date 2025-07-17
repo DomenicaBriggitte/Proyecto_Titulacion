@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as bootstrap from 'bootstrap';
-import { PedidoService, Pedido } from 'src/app/services/pedido.service';
+import { PedidoService, Pedido, Cliente, Factura } from 'src/app/services/pedido.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { CotizacionService } from 'src/app/services/cotizacion.service';
 import { FacturaService } from 'src/app/services/factura.service';
@@ -15,24 +15,26 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 export class PedidoComponent implements OnInit {
   pedidos: Pedido[] = [];
   pedidosFiltrados: Pedido[] = [];
-  clientes: any[] = [];
-  cotizaciones: any[] = [];
-  facturas: any[] = [];
+  clientes: Cliente[] = [];
+  cotizaciones: any [] = [];
+  facturas: Factura[] = [];
   filtroEstado: string = '';
   searchQuery: string = '';
   currentPage: number = 1;
-  itemsPerPage: number = 5;
+  itemsPerPage: number = 10;
   itemsPerPageOptions: number[] = [5, 10, 15];
 
   nuevoPedido: Pedido = this.resetPedido();
   pedidoEdit: Pedido = this.resetPedido();
   pedidoParaEliminar: Pedido | null = null;
 
-  cotizacionSeleccionada: any = null;
-  cotizacionSeleccionadaEdit: any = null;
-  clienteSeleccionado: any = null;
+  cotizacionSeleccionada: any | null = null;
+  cotizacionSeleccionadaEdit: any | null = null;
+  clienteSeleccionado: Cliente | null = null;
   materialesCotizacion: any[] = [];
   materialesCotizacionEdit: any[] = [];
+
+  facturaCreada: Factura | null = null;
 
   constructor(
     private pedidoService: PedidoService,
@@ -58,8 +60,8 @@ export class PedidoComponent implements OnInit {
   resetPedido(): Pedido {
     return {
       numeroPedido: this.generarNumeroPedido(),
-      fecha: '',
-      cotizacionId: '',
+      fecha: new Date().toISOString().substring(0, 10),
+      cotizacionId: 0, 
       clienteCedula: '',
       estadoEntrega: 'Pendiente',
       estadoPago: 'Pendiente',
@@ -83,16 +85,21 @@ export class PedidoComponent implements OnInit {
     this.cotizacionSeleccionada = null;
     this.clienteSeleccionado = null;
     this.materialesCotizacion = [];
+    this.facturaCreada = null;
     const modal = new bootstrap.Modal(document.getElementById('nuevoPedidoModal')!);
     modal.show();
   }
 
   abrirModalEditar(pedido: Pedido): void {
     this.pedidoEdit = { ...pedido };
-    this.cotizacionSeleccionada = this.cotizaciones.find(c => c.cotizacionId === pedido.cotizacionId);
-    this.clienteSeleccionado = this.clientes.find(c => c.cedula === pedido.clienteCedula);
+    if (this.pedidoEdit.fecha) {
+        this.pedidoEdit.fecha = new Date(this.pedidoEdit.fecha).toISOString().substring(0, 10);
+    }
+
+    this.cotizacionSeleccionada = this.cotizaciones.find(c => c.cotizacionId === pedido.cotizacionId) || null;
+    this.clienteSeleccionado = this.clientes.find(c => c.cedula === pedido.clienteCedula) || null;
     this.materialesCotizacionEdit = this.cotizacionSeleccionada?.materiales || [];
-    this.cotizacionSeleccionadaEdit = this.cotizaciones.find(c => c.cotizacionId === pedido.cotizacionId);
+    this.cotizacionSeleccionadaEdit = this.cotizaciones.find(c => c.cotizacionId === pedido.cotizacionId) || null;
     this.materialesCotizacionEdit = this.cotizacionSeleccionadaEdit?.materiales || [];
     const modal = new bootstrap.Modal(document.getElementById('editarPedidoModal')!);
     modal.show();
@@ -105,11 +112,31 @@ export class PedidoComponent implements OnInit {
   }
 
   guardarPedido(): void {
-    this.pedidoService.addPedido(this.nuevoPedido).subscribe(() => {
-      this.cargarDatos();
-      bootstrap.Modal.getInstance(document.getElementById('nuevoPedidoModal')!)?.hide();
-      new bootstrap.Modal(document.getElementById('pedidoGuardadoModal')!).show();
-    });
+    this.pedidoService.addPedido(this.nuevoPedido).subscribe(
+      (data: Pedido) => {
+        this.cargarDatos();
+
+        bootstrap.Modal.getInstance(document.getElementById('nuevoPedidoModal')!)?.hide();
+
+        if (data.facturaId) {
+          this.facturaService.getFacturaById(data.facturaId).subscribe(
+            (facturaData: Factura) => {
+              this.facturaCreada = facturaData;
+              new bootstrap.Modal(document.getElementById('facturaCreadaModal')!).show();
+            },
+            error => {
+              console.error('Error al obtener los detalles de la factura:', error);
+              new bootstrap.Modal(document.getElementById('pedidoGuardadoModal')!).show();
+            }
+          );
+        } else {
+          new bootstrap.Modal(document.getElementById('pedidoGuardadoModal')!).show();
+        }
+      },
+      error => {
+        console.error('Error al guardar el pedido:', error);
+      }
+    );
   }
 
   actualizarPedido(): void {
@@ -179,12 +206,12 @@ export class PedidoComponent implements OnInit {
     return cliente ? cliente.nombre : '';
   }
 
-  getNumeroCotizacion(id: string): string {
-    const cot = this.cotizaciones.find(c => c.cotizacionId == id);
+  getNumeroCotizacion(id: number): string {
+    const cot = this.cotizaciones.find(c => c.cotizacionId === id);
     return cot ? cot.numeroCot : '';
   }
 
-  getNumeroFactura(id: string | null): string {
+  getNumeroFactura(id: number | null | undefined): string {
     if (!id) return '';
     const factura = this.facturas.find(f => f.idFactura === id);
     return factura ? factura.numeroFactura : '';
@@ -192,7 +219,7 @@ export class PedidoComponent implements OnInit {
 
   actualizarEstadoPago(tipo: 'nuevo' | 'editar'): void {
     const facturaId = tipo === 'nuevo' ? this.nuevoPedido.facturaId : this.pedidoEdit.facturaId;
-    const factura = this.facturas.find(f => f.idFactura == facturaId);
+    const factura = this.facturas.find(f => f.idFactura === facturaId);
     const estado = factura?.estadoPago || 'Pendiente';
 
     if (tipo === 'nuevo') {
@@ -272,31 +299,31 @@ export class PedidoComponent implements OnInit {
 
   formatearCotizacion = (c: any) => c.numeroCot || '';
 
-  onSeleccionCotizacion(event: any): void {
+  onSeleccionCotizacion(event: { item: any }): void {
     this.cotizacionSeleccionada = event.item;
     this.nuevoPedido.cotizacionId = this.cotizacionSeleccionada.cotizacionId;
 
-    const cliente = this.clientes.find(c => c.cedula === this.cotizacionSeleccionada.clienteCedula);
+    const cliente = this.clientes.find(c => c.cedula === this.cotizacionSeleccionada?.clienteCedula); 
     if (cliente) {
       this.clienteSeleccionado = cliente;
       this.nuevoPedido.clienteCedula = cliente.cedula;
     }
 
-    this.materialesCotizacion = this.cotizacionSeleccionada.materiales || [];
+    this.materialesCotizacion = this.cotizacionSeleccionada?.materiales || [];
   }
 
   onCotizacionSeleccionada(tipo: 'nuevo' | 'editar'): void {
-  const cotizacionId = tipo === 'nuevo' ? this.nuevoPedido.cotizacionId : this.pedidoEdit.cotizacionId;
-  const cotizacion = this.cotizaciones.find(c => c.cotizacionId === cotizacionId);
+    const cotizacionId = tipo === 'nuevo' ? this.nuevoPedido.cotizacionId : this.pedidoEdit.cotizacionId;
+    const cotizacion = this.cotizaciones.find(c => c.cotizacionId === cotizacionId);
 
-  if (cotizacion) {
-    if (tipo === 'nuevo') {
-      this.nuevoPedido.clienteCedula = cotizacion.clienteCedula;
-    } else {
-      this.pedidoEdit.clienteCedula = cotizacion.clienteCedula;
+    if (cotizacion) {
+      if (tipo === 'nuevo') {
+        this.nuevoPedido.clienteCedula = cotizacion.clienteCedula;
+      } else {
+        this.pedidoEdit.clienteCedula = cotizacion.clienteCedula;
+      }
     }
   }
-}
 
   buscarClientes = (text$: Observable<string>) =>
     text$.pipe(
@@ -308,11 +335,20 @@ export class PedidoComponent implements OnInit {
           c.cedula.includes(term)
         ).slice(0, 10))
     );
+  formatearCliente = (c: Cliente) => c?.nombre || ''; 
 
-  formatearCliente = (c: any) => c?.nombre || '';
-
-  onSeleccionCliente(event: any): void {
+  onSeleccionCliente(event: { item: Cliente }): void { 
     this.clienteSeleccionado = event.item;
     this.nuevoPedido.clienteCedula = this.clienteSeleccionado.cedula;
+  }
+
+  openFile(base64String: string | null | undefined): void {
+    if (base64String) {
+      const link = document.createElement('a');
+      link.href = base64String;
+      link.target = '_blank';
+      link.download = 'archivo_adjunto';
+      link.click();
+    }
   }
 }

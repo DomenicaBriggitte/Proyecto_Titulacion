@@ -2,25 +2,44 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+export interface Factura {
+  idFactura?: number;
+  numeroFactura: string;
+  pedidoId: number;
+  fecha: string;
+  clienteCedula: string;
+  estadoPago: 'Pendiente' | 'Cancelado';
+  archivo?: string | null;
+  observaciones?: string;
+  pedido?: { numeroPedido: string };
+  cliente?: { nombre: string; cedula: string };
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class FacturaService {
-  private apiUrl = 'https://localhost:7210/api/Factura';
+  private apiUrl = 'https://localhost:7210/api/Facturas';
 
   constructor(private http: HttpClient) {}
 
-  getFacturas(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  getFacturas(): Observable<Factura[]> {
+    return this.http.get<Factura[]>(this.apiUrl);
   }
 
-  addFactura(formData: FormData): Observable<any> {
-    return this.http.post<any>(this.apiUrl, formData);
+  getFacturaById(id: number): Observable<Factura> {
+    return this.http.get<Factura>(`${this.apiUrl}/${id}`);
   }
 
-  updateFactura(id: number, formData: FormData): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, formData);
+  addFactura(factura: Factura): Observable<any> {
+    return this.http.post(this.apiUrl, factura);
+  }
+
+  updateFactura(id: number, factura: Factura): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, factura);
   }
 
   deleteFactura(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }
