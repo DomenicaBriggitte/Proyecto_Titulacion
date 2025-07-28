@@ -153,6 +153,13 @@
               <label>Fecha</label>
               <input type="date" class="form-control" [(ngModel)]="nuevoPedido.fecha" name="fecha" required>
             </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Volqueta</label>
+              <select class="form-select" [(ngModel)]="nuevoPedido.volquetaId" name="volquetaId" (change)="actualizarEstadoEntrega('nuevo')">
+                <option *ngFor="let volqueta of volquetas" [value]="volqueta.id">{{ volqueta.placa }}</option>
+              </select>
+            </div>
                         
             <div class="col-md-6">
               <label>Estado de Entrega</label>
@@ -251,21 +258,31 @@
                 <option *ngFor="let cliente of clientes" [value]="cliente.cedula">{{ cliente.nombre }}</option>
               </select>
             </div>
+
             <div class="col-md-6">
-              <label class="form-label">Factura</label>
-              <select class="form-select" [(ngModel)]="pedidoEdit.facturaId" name="facturaIdEdit" (change)="actualizarEstadoPago('editar')">
-                <option [ngValue]="null">Sin factura</option> <!-- Usar [ngValue]="null" para el valor nulo -->
-                <option *ngFor="let factura of facturas" [ngValue]="factura.idFactura">FAC{{ factura.idFactura }}</option>
+              <label class="form-label">Volqueta</label>
+              <select class="form-select" [(ngModel)]="pedidoEdit.volquetaId" name="volquetaId" (change)="actualizarEstadoEntrega('editar')">
+                <option *ngFor="let volqueta of volquetas" [value]="volqueta.id">{{ volqueta.placa }}</option>
               </select>
             </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Factura</label>
+              <select class="form-select" [(ngModel)]="pedidoEdit.facturaId" name="facturaIdEdit" (change)="actualizarEstadoPago('editar')" disabled>
+                <option [ngValue]="null">Sin factura</option> <!-- Usar [ngValue]="null" para el valor nulo -->
+                <option *ngFor="let factura of facturas" [ngValue]="factura.idFactura">FAC{{ factura.numeroFactura }}</option>
+              </select>
+            </div>
+            
             <div class="col-md-6">
               <label class="form-label">Estado de Entrega</label>
-              <select class="form-select" [(ngModel)]="pedidoEdit.estadoEntrega" name="estadoEntregaEdit" (change)="verificarEstadoPedido('editar')">
+              <select class="form-control" [(ngModel)]="pedidoEdit.estadoEntrega" name="estadoEntregaEdit" (change)="verificarEstadoPedido('editar')" required>
                 <option value="Pendiente">Pendiente</option>
                 <option value="En Curso">En Curso</option>
                 <option value="Entregado">Entregado</option>
               </select>
             </div>
+            
             <div class="col-md-6">
               <label class="form-label">Estado de Pago</label>
               <input class="form-control" [(ngModel)]="pedidoEdit.estadoPago" name="estadoPagoEdit" readonly />

@@ -33,6 +33,7 @@ export interface Pedido {
   estadoEntrega: 'Pendiente' | 'Entregado' | 'Parcial' | 'En Curso' | 'Cancelado';
   estadoPago: 'Pendiente' | 'Cancelado';
   estadoPedido: 'Abierto' | 'Cerrado';
+  volquetaId?: number | null;
   facturaId?: number | null;
   observaciones?: string;
   subTotal?: number;
