@@ -124,10 +124,6 @@
         <form #form="ngForm" (ngSubmit)="guardarPedido()">
           <div class="row g-3">
             <div class="col-md-6">
-              <label>Fecha</label>
-              <input type="date" class="form-control" [(ngModel)]="nuevoPedido.fecha" name="fecha" required>
-            </div>
-            <div class="col-md-6">
               <label class="form-label">Cotización</label>
               <input type="text" class="form-control"
                 [(ngModel)]="cotizacionSeleccionada"
@@ -139,6 +135,7 @@
                 placeholder="Escriba el número de cotización"
                 required />
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Cliente</label>
               <input type="text" class="form-control"
@@ -151,6 +148,19 @@
                 placeholder="Escriba el nombre o cédula del cliente"
                 required />
             </div>
+
+            <div class="col-md-6">
+              <label>Fecha</label>
+              <input type="date" class="form-control" [(ngModel)]="nuevoPedido.fecha" name="fecha" required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Volqueta</label>
+              <select class="form-select" [(ngModel)]="nuevoPedido.volquetaId" name="volquetaId" (change)="actualizarEstadoEntrega('nuevo')">
+                <option *ngFor="let volqueta of volquetas" [value]="volqueta.id">{{ volqueta.placa }}</option>
+              </select>
+            </div>
+                        
             <div class="col-md-6">
               <label>Estado de Entrega</label>
               <select class="form-control" [(ngModel)]="nuevoPedido.estadoEntrega" name="estadoEntrega" required>
@@ -159,17 +169,18 @@
                 <option value="Entregado">Entregado</option>
               </select>
             </div>
+            
             <div class="col-md-6">
               <label class="form-label">Estado de Pago</label>
               <input class="form-control" [(ngModel)]="nuevoPedido.estadoPago" name="estadoPago" readonly />
             </div>
-            <div class="col-md-6">
+            <!--<div class="col-md-6">
               <label class="form-label">Factura</label>
-              <select class="form-select" [(ngModel)]="nuevoPedido.facturaId" name="facturaId" (change)="actualizarEstadoPago('nuevo')">
-                <option [ngValue]="null">Sin factura</option> <!-- Usar [ngValue]="null" para el valor nulo -->
+              <select class="form-select" [(ngModel)]="nuevoPedido.facturaId" name="facturaId" (change)="actualizarEstadoPago('nuevo')" readonly>
+                <option [ngValue]="null">Sin factura</option> -- Usar [ngValue]="null" para el valor nulo --
                 <option *ngFor="let factura of facturas" [ngValue]="factura.idFactura">FAC{{ factura.idFactura }}</option>
               </select>
-            </div>
+            </div> -->
           </div>
           <div class="my-3">
             <label class="form-label">Observaciones</label>
@@ -247,21 +258,31 @@
                 <option *ngFor="let cliente of clientes" [value]="cliente.cedula">{{ cliente.nombre }}</option>
               </select>
             </div>
+
             <div class="col-md-6">
-              <label class="form-label">Factura</label>
-              <select class="form-select" [(ngModel)]="pedidoEdit.facturaId" name="facturaIdEdit" (change)="actualizarEstadoPago('editar')">
-                <option [ngValue]="null">Sin factura</option> <!-- Usar [ngValue]="null" para el valor nulo -->
-                <option *ngFor="let factura of facturas" [ngValue]="factura.idFactura">FAC{{ factura.idFactura }}</option>
+              <label class="form-label">Volqueta</label>
+              <select class="form-select" [(ngModel)]="pedidoEdit.volquetaId" name="volquetaId" (change)="actualizarEstadoEntrega('editar')">
+                <option *ngFor="let volqueta of volquetas" [value]="volqueta.id">{{ volqueta.placa }}</option>
               </select>
             </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Factura</label>
+              <select class="form-select" [(ngModel)]="pedidoEdit.facturaId" name="facturaIdEdit" (change)="actualizarEstadoPago('editar')" disabled>
+                <option [ngValue]="null">Sin factura</option> <!-- Usar [ngValue]="null" para el valor nulo -->
+                <option *ngFor="let factura of facturas" [ngValue]="factura.idFactura">FAC{{ factura.numeroFactura }}</option>
+              </select>
+            </div>
+            
             <div class="col-md-6">
               <label class="form-label">Estado de Entrega</label>
-              <select class="form-select" [(ngModel)]="pedidoEdit.estadoEntrega" name="estadoEntregaEdit" (change)="verificarEstadoPedido('editar')">
+              <select class="form-control" [(ngModel)]="pedidoEdit.estadoEntrega" name="estadoEntregaEdit" (change)="verificarEstadoPedido('editar')" required>
                 <option value="Pendiente">Pendiente</option>
                 <option value="En Curso">En Curso</option>
                 <option value="Entregado">Entregado</option>
               </select>
             </div>
+            
             <div class="col-md-6">
               <label class="form-label">Estado de Pago</label>
               <input class="form-control" [(ngModel)]="pedidoEdit.estadoPago" name="estadoPagoEdit" readonly />
@@ -342,7 +363,7 @@
 </div>
 
 
-<!-- Modal Factura Creada (Anteriormente pedidoGuardadoModal) -->
+<!-- Modal Factura Creada -->
 <div class="modal fade" id="facturaCreadaModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content p-3">
@@ -368,7 +389,7 @@
   </div>
 </div>
 
-<!-- Modal Pedido Guardado (Mantener por si acaso, aunque ahora se usará facturaCreadaModal) -->
+<!-- Modal Pedido Guardado -->
 <div class="modal fade" id="pedidoGuardadoModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content p-3">

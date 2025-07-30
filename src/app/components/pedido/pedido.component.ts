@@ -6,6 +6,7 @@ import { CotizacionService } from 'src/app/services/cotizacion.service';
 import { FacturaService } from 'src/app/services/factura.service';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { RegistroVolquetaService } from 'src/app/services/registro-volqueta.service';
 
 @Component({
   selector: 'app-pedido',
@@ -17,6 +18,7 @@ export class PedidoComponent implements OnInit {
   pedidosFiltrados: Pedido[] = [];
   clientes: Cliente[] = [];
   cotizaciones: any [] = [];
+  volquetas: any[] = [];
   facturas: Factura[] = [];
   filtroEstado: string = '';
   searchQuery: string = '';
@@ -40,7 +42,8 @@ export class PedidoComponent implements OnInit {
     private pedidoService: PedidoService,
     private clienteService: ClienteService,
     private cotizacionService: CotizacionService,
-    private facturaService: FacturaService
+    private facturaService: FacturaService,
+    private volquetaService: RegistroVolquetaService
   ) {}
 
   ngOnInit(): void {
@@ -55,6 +58,9 @@ export class PedidoComponent implements OnInit {
     this.clienteService.getClientes().subscribe(data => this.clientes = data);
     this.cotizacionService.getCotizaciones().subscribe(data => this.cotizaciones = data);
     this.facturaService.getFacturas().subscribe(data => this.facturas = data);
+    this.volquetaService.getAll().subscribe(volquetas => {
+      this.volquetas = volquetas;
+    });
   }
 
   resetPedido(): Pedido {
@@ -240,6 +246,22 @@ export class PedidoComponent implements OnInit {
       pedido.estadoPedido = 'Cerrado';
     } else {
       pedido.estadoPedido = 'Abierto';
+    }
+  }
+
+  actualizarEstadoEntrega(tipo: 'nuevo' | 'editar'): void {
+    if (tipo === 'nuevo') {
+      if (this.nuevoPedido.volquetaId) {
+        this.nuevoPedido.estadoEntrega = 'En Curso';
+      } else {
+        this.nuevoPedido.estadoEntrega = 'Pendiente';
+      }
+    } else {
+      if (this.pedidoEdit.volquetaId) {
+        this.pedidoEdit.estadoEntrega = 'En Curso';
+      } else {
+        this.pedidoEdit.estadoEntrega = 'Pendiente';
+      }
     }
   }
 
