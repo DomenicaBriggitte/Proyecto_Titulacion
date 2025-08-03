@@ -27,6 +27,65 @@ h2 {
   box-shadow: 0 0 5px rgba(244, 124, 0, 0.5);
 }
 
+/*Filtro Cartillas Tipos*/
+.resumen-tipos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.card-resumen {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 150px;
+  height: 80px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease-in-out;
+  gap: 12px;
+}
+
+.card-resumen:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+.card-resumen .texto {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.card-resumen .titulo {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.card-resumen .cantidad {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.card-resumen i {
+  font-size: 1.5rem;
+  padding: 0.8rem;
+}
+
+.card-resumen.activo {
+  border-color: #f47c00;
+  background-color: #fff4e5;
+}
 
 .table th, .table td {
   text-align: center;

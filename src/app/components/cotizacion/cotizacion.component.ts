@@ -124,7 +124,7 @@ export class CotizacionComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       map(term =>
-        term.length < 2 ? [] :
+        term.length < 1 ? [] :
         this.clientes.filter(c => c.nombre.toLowerCase().includes(term.toLowerCase())).slice(0, 10)
       )
     );
@@ -134,7 +134,7 @@ export class CotizacionComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       map(term =>
-        term.length < 2 ? [] :
+        term.length < 1 ? [] :
         this.materiales.filter(m => m.nombre.toLowerCase().includes(term.toLowerCase())).slice(0, 10)
       )
     );

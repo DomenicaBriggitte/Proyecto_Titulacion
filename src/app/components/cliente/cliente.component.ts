@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import * as bootstrap from 'bootstrap';
-import { ClienteService } from '../../services/cliente.service';
+import { ClienteService, Cliente } from '../../services/cliente.service';
 import { NgForm } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
@@ -11,8 +11,9 @@ import * as FileSaver from 'file-saver';
   styleUrls: ['./cliente.component.css']
 })
 export class ClienteComponent {
-clientes: any[] = [];
+clientes: Cliente[] = [];
 filteredClientes: any[] = [];
+filtroTipo: string = '';
 searchQuery: string = '';
 currentPage: number = 1;
  mensajeError: string = ''; 
@@ -38,13 +39,17 @@ constructor(private clienteService: ClienteService) {}
 
 
 filterClientes() {
-  this.filteredClientes = this.clientes.filter(cliente => 
+  const tipo = this.filtroTipo;
+  this.filteredClientes = this.clientes.filter(cliente => {
+    const coincideTipo = tipo ? cliente.tipo === tipo : true;
+    const coincideBusqueda = 
     cliente.cedula.includes(this.searchQuery) || 
-    cliente.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
-  );
+    cliente.nombre.toLowerCase().includes(this.searchQuery.toLowerCase());
+
+    return coincideTipo && coincideBusqueda;
+});
   this.currentPage = 1; // importante para evitar mostrar más registros de los que debe
 }
-
 
   // Paginación
 itemsPerPage: number = 10;
@@ -58,9 +63,6 @@ get paginatedClientes(): any[] {
   const end = start + this.itemsPerPage;
   return this.filteredClientes.slice(start, end);
 }
-
-
-
 
 // Para mostrar solo 3 botones de página
 get paginationRange(): number[] {
@@ -164,8 +166,6 @@ validateEmail(event: KeyboardEvent) {
   }
 }
 
-
-
 // Agregar nuevo cliente
 addClient(form: NgForm) {
   if (form.invalid) return;
@@ -262,6 +262,20 @@ updateCliente() {
       alert('Error al actualizar cliente: ' + (err.error?.message || err.message));
     }
   });
+}
+
+get clientesNaturales(): Cliente[] {
+  return this.clientes.filter(c => c.tipo === 'Natural');
+}
+
+get clientesJuridicos(): Cliente[] {
+  return this.clientes.filter(c => c.tipo === 'Jurídica');
+}
+
+filtrarPorTipo(tipo: string): void{
+  this.filtroTipo = tipo;
+  this.filterClientes();
+  this.currentPage = 1;
 }
 
 clienteParaEliminar: any = null;

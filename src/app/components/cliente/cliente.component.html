@@ -4,6 +4,32 @@
   <div class="container mt-5">
     <h2 class="text-center mb-4">Gestión de Clientes</h2>
 
+    <div class="mb-4 d-flex justify-content-center flex-wrap gap-3 resumen-tipos">
+      <div class="card-resumen" [class.activo]="filtroTipo === 'Natural'" (click)="filtrarPorTipo('Natural')">
+        <i class="bi bi-check-circle text-success fs-5"></i>
+        <div class="texto">
+          <div class="titulo">Naturales</div>
+          <div class="cantidad">{{ clientesNaturales.length }}</div>
+        </div>
+      </div>
+
+      <div class="card-resumen" [class.activo]="filtroTipo === 'Abierto'" (click)="filtrarPorTipo('Jurídica')">
+        <i class="bi bi-hourglass-split text-warning fs-5"></i>
+        <div class="texto">
+          <div class="titulo">Jurídicos</div>
+          <div class="cantidad">{{ clientesJuridicos.length }}</div>
+        </div>
+      </div>
+
+      <div class="card-resumen" [class.activo]="!filtroTipo" (click)="filtrarPorTipo('')">
+        <i class="bi bi-list-ul text-secondary fs-5"></i>
+        <div class="texto">
+          <div class="titulo">Todos</div>
+          <div class="cantidad">{{ clientes.length }}</div>
+        </div>
+      </div>
+    </div>
+    
     <div class="d-flex mb-3">
       <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoClienteModal">+ Nuevo Cliente</button>
       <button class="btn btn-success" (click)="exportarExcel()">XLS</button>

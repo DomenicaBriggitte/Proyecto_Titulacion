@@ -2,9 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface Cliente {
+  cedula: string;
+  nombre: string;
+  tipo: string;
+  telefono: string;
+  correo: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
+
 export class ClienteService {
   private apiUrl = 'https://localhost:7210/api/Cliente';
 
