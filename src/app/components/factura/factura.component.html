@@ -31,7 +31,7 @@
     </div>
 
     <div class="d-flex mb-3 justify-content-between align-items-center">
-      <button class="btn btn-primary" (click)="abrirModalNuevo()">+ Nueva Factura</button>
+      <!--<button class="btn btn-primary" (click)="abrirModalNuevo()">+ Nueva Factura</button>-->
       <input type="text" class="form-control w-25" placeholder="Buscar Factura..." [(ngModel)]="searchQuery" (ngModelChange)="filterFacturas()">
     </div>
 
@@ -102,62 +102,106 @@
 </div>
 
 <!-- Modal Nueva Factura -->
-<div class="modal fade" id="nuevoFacturaModal" tabindex="-1">
+<div class="modal fade" id="editarFacturaModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content p-3">
       <div class="modal-header">
-        <h5 class="modal-title">Nueva Factura</h5>
+        <h5 class="modal-title">Editar Factura</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form #form="ngForm" (ngSubmit)="guardarFactura()">
+        <form (ngSubmit)="actualizarFactura()">
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Número de Factura</label>
-              <input type="text" class="form-control" [(ngModel)]="nuevoFactura.numeroFactura" name="numeroFactura" readonly required>
+              <input type="text" class="form-control" [(ngModel)]="facturaEdit.numeroFactura" name="numeroFacturaEdit" readonly required>
             </div>
             <div class="col-md-6">
               <label class="form-label">Fecha</label>
-              <input type="date" class="form-control" [(ngModel)]="nuevoFactura.fecha" name="fecha" required>
+              <input type="date" class="form-control" [(ngModel)]="facturaEdit.fecha" name="fechaEdit" readonly>
             </div>
             <div class="col-md-6">
               <label class="form-label">Pedido Asociado</label>
               <input type="text" class="form-control"
-                [(ngModel)]="pedidoSeleccionado"
-                name="pedidoInput"
-                [ngbTypeahead]="buscarPedidos"
-                [resultFormatter]="formatearPedido"
-                [inputFormatter]="formatearPedido"
-                (selectItem)="onSeleccionPedido($event, 'nuevo')"
-                placeholder="Escriba el número de pedido"
-                required />
+                [ngModel]="pedidoSeleccionadoEdit?.numeroPedido || ''"
+                name="pedidoInputEdit"
+                readonly
+                placeholder="Se auto-completará al seleccionar un pedido" />
             </div>
             <div class="col-md-6">
               <label class="form-label">Cliente</label>
               <input type="text" class="form-control"
                 [ngModel]="clienteSeleccionado?.nombre || ''"
-                name="clienteInput"
+                name="clienteInputEdit"
                 readonly
                 placeholder="Se auto-completará al seleccionar un pedido" />
             </div>
             <div class="col-md-6">
               <label class="form-label">Estado de Pago</label>
-              <select class="form-select" [(ngModel)]="nuevoFactura.estadoPago" name="estadoPago" required>
-                <option value="Pendiente">Pendiente</option>
-                <option value="Cancelado">Cancelado</option>
-              </select>
+              <!-- El estado de pago ahora se actualiza automáticamente por el cálculo de pagos -->
+              <input type="text" class="form-control" [(ngModel)]="facturaEdit.estadoPago" name="estadoPagoEdit" readonly>
             </div>
             <div class="col-md-6">
               <label class="form-label">Adjuntar Archivo (PDF/Imagen)</label>
-              <input type="file" class="form-control" (change)="onFileSelected($event)" accept=".pdf,image/*">
-              <small *ngIf="selectedFile" class="text-muted">Archivo seleccionado: {{ selectedFile.name }}</small>
+              <input type="file" class="form-control" (change)="onFileSelectedEdit($event)" accept=".pdf,image/*">
+              <small *ngIf="selectedFileEdit" class="text-muted">Archivo seleccionado: {{ selectedFileEdit.name }}</small>
+              <small *ngIf="!selectedFileEdit && facturaEdit.archivo" class="text-muted">Archivo actual: {{ getFileName(facturaEdit.archivo) }}</small>
             </div>
           </div>
           <div class="my-3">
             <label class="form-label">Observaciones</label>
-            <textarea class="form-control" [(ngModel)]="nuevoFactura.observaciones" name="observaciones" rows="2"></textarea>
+            <textarea class="form-control" [(ngModel)]="facturaEdit.observaciones" name="observacionesEdit" rows="2"></textarea>
           </div>
-          <button type="submit" class="btn btn-success w-100 mt-3" [disabled]="form.invalid || !nuevoFactura.pedidoId">Guardar</button>
+
+          <!-- --- SECCIÓN DE PAGOS --- -->
+          <hr class="my-4">
+          <h5>Pagos Realizados</h5>
+          <table class="table table-bordered table-sm mt-3">
+            <thead class="table-light">
+              <tr>
+                <th>Monto</th>
+                <th>Fecha</th>
+                <th>Comprobante</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let pago of pagosFacturaEdit; let i = index">
+                <td>
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="pago.monto" [name]="'montoPago' + i" (ngModelChange)="calcularResumenPagos()" required>
+                </td>
+                <td>
+                  <input type="date" class="form-control form-control-sm" [(ngModel)]="pago.fechaPago" [name]="'fechaPago' + i" required>
+                </td>
+                <td>
+                  <input type="file" class="form-control form-control-sm" (change)="onComprobanteSelected($event, i)" accept="image/*">
+                  <small *ngIf="pago.comprobante" class="text-muted">
+                    <button type="button" class="btn btn-link btn-sm p-0" (click)="openComprobante(pago.comprobante)">Ver comprobante</button>
+                  </small>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-danger btn-sm" (click)="eliminarPago(i)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" class="btn btn-secondary btn-sm mb-3" (click)="agregarPago()">+ Agregar Pago</button>
+
+          <div class="row mt-3">
+            <div class="col-md-6 offset-md-6">
+              <div class="card bg-light p-3">
+                <p class="mb-1"><strong>Total de la Factura:</strong> <span class="float-end">${{ totalFactura | number:'1.2-2' }}</span></p>
+                <p class="mb-1"><strong>Total Pagado:</strong> <span class="float-end text-success">${{ totalPagado | number:'1.2-2' }}</span></p>
+                <hr class="my-2">
+                <h5 class="mb-0"><strong>Falta por Pagar:</strong> <span class="float-end text-danger">${{ saldoPendiente | number:'1.2-2' }}</span></h5>
+              </div>
+            </div>
+          </div>
+          <!-- --- FIN SECCIÓN PAGOS --- -->
+
+          <button type="submit" class="btn btn-primary w-100 mt-3">Actualizar</button>
         </form>
       </div>
     </div>
@@ -177,11 +221,11 @@
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Número de Factura</label>
-              <input type="text" class="form-control" [(ngModel)]="facturaEdit.numeroFactura" name="numeroFacturaEdit" readonly required>
+              <input type="text" class="form-control" [(ngModel)]="facturaEdit.numeroFactura" name="numeroFacturaEdit" readonly>
             </div>
             <div class="col-md-6">
               <label class="form-label">Fecha</label>
-              <input type="date" class="form-control" [(ngModel)]="facturaEdit.fecha" name="fechaEdit" required>
+              <input type="date" class="form-control" [(ngModel)]="facturaEdit.fecha" name="fechaEdit" readonly>
             </div>
             <div class="col-md-6">
               <label class="form-label">Pedido Asociado</label>

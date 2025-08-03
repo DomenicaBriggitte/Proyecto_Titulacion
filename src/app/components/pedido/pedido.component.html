@@ -151,7 +151,7 @@
 
             <div class="col-md-6">
               <label>Fecha</label>
-              <input type="date" class="form-control" [(ngModel)]="nuevoPedido.fecha" name="fecha" required>
+              <input type="date" class="form-control" [(ngModel)]="nuevoPedido.fecha" name="fecha" [min]="todayDate" [max]="todayDate" required>
             </div>
 
             <div class="col-md-6">
@@ -242,7 +242,7 @@
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Fecha</label>
-              <input type="date" class="form-control" [(ngModel)]="pedidoEdit.fecha" name="fechaEdit" required />
+              <input type="date" class="form-control" [(ngModel)]="pedidoEdit.fecha" name="fechaEdit" readonly />
             </div>
             <div class="col-md-6">
               <label class="form-label">Cotización</label>

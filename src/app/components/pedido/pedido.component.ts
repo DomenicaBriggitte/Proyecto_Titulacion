@@ -24,7 +24,8 @@ export class PedidoComponent implements OnInit {
   searchQuery: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 10;
-  itemsPerPageOptions: number[] = [5, 10, 15];
+  itemsPerPageOptions: number[] = [10, 15, 20];
+  todayDate: string = ''; 
 
   nuevoPedido: Pedido = this.resetPedido();
   pedidoEdit: Pedido = this.resetPedido();
@@ -51,6 +52,7 @@ export class PedidoComponent implements OnInit {
   }
 
   cargarDatos(): void {
+    this.todayDate = new Date().toISOString().substring(0, 10); // Obtener fecha actual
     this.pedidoService.getPedidos().subscribe(data => {
       this.pedidos = data;
       this.pedidosFiltrados = [...data];
@@ -66,7 +68,7 @@ export class PedidoComponent implements OnInit {
   resetPedido(): Pedido {
     return {
       numeroPedido: this.generarNumeroPedido(),
-      fecha: new Date().toISOString().substring(0, 10),
+      fecha: this.todayDate,
       cotizacionId: 0, 
       clienteCedula: '',
       estadoEntrega: 'Pendiente',

@@ -26,6 +26,9 @@ export class CotizacionComponent implements OnInit {
   currentPage: number = 1;
   itemsPerPage: number = 10;
 
+  //Propiedad para almacenar la fecha actual en formato YYYY-MM-DD
+  todayDate: string = '';    
+
   constructor(
     private clienteService: ClienteService,
     private materialesService: MaterialesService,
@@ -33,6 +36,7 @@ export class CotizacionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.todayDate = new Date().toISOString().split('T')[0]; //obtener fecha actual
     this.cotizacionService.getCotizaciones().subscribe(data => {
       this.cotizaciones = data;
       this.cotizacionesFiltradas = [...data];
@@ -40,40 +44,40 @@ export class CotizacionComponent implements OnInit {
     this.clienteService.getClientes().subscribe(data => this.clientes = data);
     this.materialesService.getMateriales().subscribe(data => this.materiales = data);
   }
-get visiblePages(): number[] {
-  const total = this.totalPages;
-  const current = this.currentPage;
 
-  let start = current - 1;
-  let end = current + 1;
+  get visiblePages(): number[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
 
-  if (start < 1) {
-    start = 1;
-    end = Math.min(2, total);
-  } else if (end > total) {
-    end = total;
-    start = Math.max(1, total - 1);
+    let start = current - 1;
+    let end = current + 1;
+
+    if (start < 1) {
+      start = 1;
+      end = Math.min(2, total);
+    } else if (end > total) {
+      end = total;
+      start = Math.max(1, total - 1);
+    }
+
+    const pages: number[] = [];
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
   }
-
-  const pages: number[] = [];
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
-  return pages;
-}
 
   resetearCotizacion() {
     return {
       numeroCot: this.generarNumeroCotizacion(),
       cliente: null,
-      fecha: '',
+      fecha: this.todayDate,
       materiales: [],
       subTotal: 0,
       iva: 0,
       total: 0
     };
   }
-  
 
   generarNumeroCotizacion(): string {
     const fecha = new Date();
@@ -86,7 +90,6 @@ get visiblePages(): number[] {
   tieneMaterialesInvalidos(cot: any): boolean {
   return cot.materiales.some((m: any) => !m.material || !m.material.codigo);
 }
-
 
   agregarMaterial(cot: any): void {
     cot.materiales.push({ material: null, cantidad: 1, precioUnitario: 0, subtotal: 0 });
@@ -264,7 +267,6 @@ abrirModalEditar(index: number): void {
   return cliente && typeof cliente === 'object' && 'cedula' in cliente;
 }
 
-
   eliminarCotizacion(index: number): void {
     this.deleteIndex = index;
     this.mostrarModal('deleteConfirmationModal');
@@ -409,8 +411,6 @@ abrirModalEditar(index: number): void {
 
     doc.save(`Cotizacion_${cot.numeroCot}.pdf`);
   }
-
-
 
   filtrarCotizaciones(): void {
     const query = (this.searchQuery || '').toLowerCase();

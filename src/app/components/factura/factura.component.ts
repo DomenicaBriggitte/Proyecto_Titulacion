@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as bootstrap from 'bootstrap';
-import { FacturaService, Factura } from 'src/app/services/factura.service';
+import { FacturaService, Factura, Pago } from 'src/app/services/factura.service';
 import { PedidoService, Pedido } from 'src/app/services/pedido.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { Observable } from 'rxjs';
@@ -32,6 +32,12 @@ export class FacturaComponent implements OnInit {
   selectedFile: File | null = null;
   selectedFileEdit: File | null = null;
 
+  // --- PAGOS PARCIALES ---
+  pagosFacturaEdit: Pago[] = [];
+  totalFactura: number = 0;
+  totalPagado: number = 0;
+  saldoPendiente: number = 0;
+
   constructor(
     private facturaService: FacturaService,
     private pedidoService: PedidoService,
@@ -59,7 +65,8 @@ export class FacturaComponent implements OnInit {
       clienteCedula: '',
       estadoPago: 'Pendiente',
       archivo: null,
-      observaciones: ''
+      observaciones: '',
+      pagos: []
     };
   }
 
@@ -82,16 +89,31 @@ export class FacturaComponent implements OnInit {
   }
 
   abrirModalEditar(factura: Factura): void {
-    this.facturaEdit = { ...factura };
-    if (this.facturaEdit.fecha) {
-      this.facturaEdit.fecha = new Date(this.facturaEdit.fecha).toISOString().substring(0, 10);
-    }
+    this.facturaService.getFacturaById(factura.idFactura!).subscribe(
+      (fullFactura: Factura) => {
+        this.facturaEdit = { ...fullFactura };
 
-    this.pedidoSeleccionadoEdit = this.pedidos.find(p => p.pedidoId === factura.pedidoId) || null;
-    this.clienteSeleccionado = this.clientes.find(c => c.cedula === factura.clienteCedula) || null;
-    this.selectedFileEdit = null;
-    const modal = new bootstrap.Modal(document.getElementById('editarFacturaModal')!);
-    modal.show();
+        if (this.facturaEdit.fecha) {
+          this.facturaEdit.fecha = new Date(this.facturaEdit.fecha).toISOString().substring(0, 10);
+        }
+
+        this.pagosFacturaEdit = fullFactura.pagos ? [...fullFactura.pagos] : [];
+        this.totalFactura = fullFactura.pedido?.cotizacion?.total || 0;
+
+        this.calcularResumenPagos();
+
+        this.pedidoSeleccionadoEdit = this.pedidos.find(p => p.pedidoId === fullFactura.pedidoId) || null;
+        this.clienteSeleccionado = this.clientes.find(c => c.cedula === fullFactura.clienteCedula) || null;
+        this.selectedFileEdit = null;
+
+        const modal = new bootstrap.Modal(document.getElementById('editarFacturaModal')!);
+        modal.show();
+      },
+      error => {
+        console.error('Error al cargar detalles de la factura:', error);
+        // Manejar el error, mostrar un mensaje al usuario
+      }
+    );
   }
 
   abrirModalEliminar(factura: Factura): void {
@@ -124,6 +146,55 @@ export class FacturaComponent implements OnInit {
     }
   }
 
+  // --- MÉTODOS PARA GESTIÓN DE PAGOS ---
+  agregarPago(): void {
+    this.pagosFacturaEdit.push({
+      facturaId: this.facturaEdit.idFactura!,
+      monto: 0,
+      fechaPago: new Date().toISOString().substring(0, 10), // Fecha actual
+      comprobante: null
+    });
+    this.calcularResumenPagos();
+  }
+
+  eliminarPago(index: number): void {
+    this.pagosFacturaEdit.splice(index, 1);
+    this.calcularResumenPagos();
+  }
+
+  onComprobanteSelected(event: any, index: number): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.pagosFacturaEdit[index].comprobante = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  calcularResumenPagos(): void {
+    this.totalPagado = this.pagosFacturaEdit.reduce((sum, pago) => sum + (pago.monto || 0), 0);
+    this.saldoPendiente = this.totalFactura - this.totalPagado;
+
+    if (this.saldoPendiente <= 0 && this.totalFactura > 0) {
+      this.facturaEdit.estadoPago = 'Cancelado';
+    } else {
+      this.facturaEdit.estadoPago = 'Pendiente';
+    }
+  }
+
+  openComprobante(base64String: string | null | undefined): void {
+    if (base64String) {
+      const link = document.createElement('a');
+      link.href = base64String;
+      link.target = '_blank';
+      link.download = 'comprobante_pago';
+      link.click();
+    }
+  }
+  // --- FIN MÉTODOS PARA GESTIÓN DE PAGOS ---
+
   guardarFactura(): void {
     if (!this.nuevoFactura.pedidoId) {
       console.error('Debe seleccionar un pedido para la factura.');
@@ -141,6 +212,8 @@ export class FacturaComponent implements OnInit {
 
   actualizarFactura(): void {
     if (!this.facturaEdit.idFactura) return;
+
+    this.facturaEdit.pagos = this.pagosFacturaEdit;
 
     this.facturaService.updateFactura(this.facturaEdit.idFactura, this.facturaEdit).subscribe(() => {
       this.cargarDatos();
@@ -268,7 +341,13 @@ export class FacturaComponent implements OnInit {
 
   getFileName(base64String: string | null | undefined): string {
     if (!base64String) return 'No archivo';
-    return base64String.split(';')[0].split(':')[1] || 'archivo_adjunto';
+    const parts = base64String.split(';');
+    if (parts.length > 0 && parts[0].startsWith('data:')) {
+      const mimeType = parts[0].substring(5);
+      const extension = mimeType.split('/')[1];
+      return `archivo.${extension || 'bin'}`;
+    }
+    return 'archivo_adjunto';
   }
 
   openFile(base64String: string | null | undefined): void {

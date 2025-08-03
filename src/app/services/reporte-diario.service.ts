@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface ReporteDiario {
-  reporteDiario_Id?: number; // opcional para editar
+  reporteDiario_Id?: number; 
   fecha: Date;
   clienteCedula: string;
   volquetaId: number;

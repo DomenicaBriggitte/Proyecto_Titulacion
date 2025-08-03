@@ -36,25 +36,23 @@
     </tbody>
   </table>
 
- 
-<nav>
-  <ul class="pagination m-0">
-    <li class="page-item" [class.disabled]="currentPage === 1">
-      <button class="page-link" (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Anterior</button>
-    </li>
+  <nav>
+    <ul class="pagination m-0">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Anterior</button>
+      </li>
 
-    <li class="page-item" *ngFor="let page of visiblePages" [class.active]="currentPage === page">
-      <button class="page-link" (click)="currentPage = page">{{ page }}</button>
-    </li>
+      <li class="page-item" *ngFor="let page of visiblePages" [class.active]="currentPage === page">
+        <button class="page-link" (click)="currentPage = page">{{ page }}</button>
+      </li>
 
-    <li class="page-item" [class.disabled]="currentPage === totalPages">
-      <button class="page-link" (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages">Siguiente</button>
-    </li>
-  </ul>
-</nav>
-
-  
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages">Siguiente</button>
+      </li>
+    </ul>
+  </nav>
 </div>
+
 <!-- Modal Nueva Cotización -->
 <div class="modal fade" id="nuevoCotModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -67,7 +65,7 @@
         <form #formNuevo="ngForm" (ngSubmit)="guardarNuevaCotizacion()">
           <div class="mb-3">
             <label class="form-label">Fecha</label>
-            <input type="date" class="form-control" [(ngModel)]="cotizacionNuevo.fecha" name="fechaNuevo" required>
+            <input type="date" class="form-control" [(ngModel)]="cotizacionNuevo.fecha" name="fechaNuevo" [min]="todayDate" [max]="todayDate" required>
           </div>
 
           <div class="mb-3">
@@ -112,10 +110,10 @@
 
           <div class="d-flex justify-content-start gap-2">
            <button type="submit"
-  class="btn btn-success"
-  [disabled]="formNuevo.invalid || cotizacionNuevo.materiales.length === 0 || tieneMaterialesInvalidos(cotizacionNuevo) || !esClienteValido(cotizacionNuevo.cliente)">
-  Guardar
-</button>
+            class="btn btn-success"
+            [disabled]="formNuevo.invalid || cotizacionNuevo.materiales.length === 0 || tieneMaterialesInvalidos(cotizacionNuevo) || !esClienteValido(cotizacionNuevo.cliente)">
+            Guardar
+          </button>
 
 
             <button type="button" class="btn btn-secondary" (click)="cerrarModal('nuevoCotModal')">Cancelar</button>
@@ -195,7 +193,7 @@
         <form #formEditar="ngForm" (ngSubmit)="actualizarCotizacion()">
           <div class="mb-3">
             <label class="form-label">Fecha</label>
-            <input type="date" class="form-control" [(ngModel)]="cotizacionEdit.fecha" name="fechaEditar" required>
+            <input type="date" class="form-control" [(ngModel)]="cotizacionEdit.fecha" name="fechaEditar" readonly>
           </div>
 
           <div class="mb-3">
