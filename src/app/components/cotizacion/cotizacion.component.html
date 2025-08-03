@@ -72,7 +72,8 @@
             <label class="form-label">Cliente</label>
             <input type="text" class="form-control" [(ngModel)]="cotizacionNuevo.cliente" name="clienteNuevo"
               [ngbTypeahead]="searchClientes" [resultFormatter]="nombreClienteFormatter" [inputFormatter]="nombreClienteFormatter"
-              (selectItem)="onSelectCliente($event, 'nuevo')" required />
+              (selectItem)="onSelectCliente($event, 'nuevo')"
+              placeholder="Escriba el nombre del cliente..." required />
           </div>
 
           <table class="table table-bordered text-center">
