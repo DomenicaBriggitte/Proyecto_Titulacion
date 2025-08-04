@@ -152,6 +152,7 @@ button[type="button"] {
   height: 80px;
   color:#28a745
 }
+
 @keyframes rotateReverse {
   0% {
     transform: rotate(0deg); /* inicia */
@@ -162,4 +163,17 @@ button[type="button"] {
 }
 .animate-check {
   animation: rotateReverse 0.3s ease-in-out forwards; /* duración */
+}
+
+.filtrofecha .form-control {
+  width: 40px;
+  height: 27px;
+  display: inline-block;
+  margin-left: 0px;
+  background-color: #ffffffbc;
+}
+
+.filtrofecha .form-control:hover {
+  border-color: #f47c00;
+  box-shadow: 0 0 5px rgba(244, 124, 0, 0.5);
 }

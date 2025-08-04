@@ -52,7 +52,7 @@ export class PedidoComponent implements OnInit {
   }
 
   cargarDatos(): void {
-    this.todayDate = new Date().toISOString().substring(0, 10); // Obtener fecha actual
+    this.todayDate = this.getLocalDateString(); // Obtener fecha actual
     this.pedidoService.getPedidos().subscribe(data => {
       this.pedidos = data;
       this.pedidosFiltrados = [...data];
@@ -63,6 +63,15 @@ export class PedidoComponent implements OnInit {
     this.volquetaService.getAll().subscribe(volquetas => {
       this.volquetas = volquetas;
     });
+  }
+
+  getLocalDateString(): string { //Obtener fecha local Ecuador
+    const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const day = today.getDate().toString().padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
   }
 
   resetPedido(): Pedido {

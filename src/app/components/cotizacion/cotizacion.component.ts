@@ -23,6 +23,8 @@ export class CotizacionComponent implements OnInit {
   searchQuery: string = '';
   clientes: any[] = [];
   materiales: any[] = [];
+  startDateFilter: string = '';
+  endDateFilter: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 10;
 
@@ -36,7 +38,7 @@ export class CotizacionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.todayDate = new Date().toISOString().split('T')[0]; //obtener fecha actual
+    this.todayDate = this.getLocalDateString(); //obtener fecha actual zona horaia local
     this.cotizacionService.getCotizaciones().subscribe(data => {
       this.cotizaciones = data;
       this.cotizacionesFiltradas = [...data];
@@ -65,6 +67,15 @@ export class CotizacionComponent implements OnInit {
       pages.push(i);
     }
     return pages;
+  }
+
+  getLocalDateString(): string { //Obtener fecha local Ecuador
+    const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const day = today.getDate().toString().padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
   }
 
   resetearCotizacion() {
@@ -105,7 +116,7 @@ export class CotizacionComponent implements OnInit {
       m.subtotal = (m.cantidad || 0) * (m.precioUnitario || 0);
     });
     cot.subTotal = cot.materiales.reduce((sum: number, m: any) => sum + (m.subtotal || 0), 0);
-    cot.iva = cot.subTotal * 0.12;
+    cot.iva = cot.subTotal * 0.15;
     cot.total = cot.subTotal + cot.iva;
   }
 
@@ -336,7 +347,7 @@ abrirModalEditar(index: number): void {
     }
 
     doc.text(`Subtotal: $${cot.subTotal.toFixed(2)}`, 140, finalY + 10);
-    doc.text(`IVA 12%: $${cot.iva.toFixed(2)}`, 140, finalY + 20);
+    doc.text(`IVA 15%: $${cot.iva.toFixed(2)}`, 140, finalY + 20);
     doc.text(`Total: $${cot.total.toFixed(2)}`, 140, finalY + 30);
 
     const pdfBlob = doc.output('blob');
@@ -406,7 +417,7 @@ abrirModalEditar(index: number): void {
     }
 
     doc.text(`Subtotal: $${cot.subTotal.toFixed(2)}`, 140, finalY + 10);
-    doc.text(`IVA 12%: $${cot.iva.toFixed(2)}`, 140, finalY + 20);
+    doc.text(`IVA 15%: $${cot.iva.toFixed(2)}`, 140, finalY + 20);
     doc.text(`Total: $${cot.total.toFixed(2)}`, 140, finalY + 30);
 
     doc.save(`Cotizacion_${cot.numeroCot}.pdf`);
@@ -414,13 +425,25 @@ abrirModalEditar(index: number): void {
 
   filtrarCotizaciones(): void {
     const query = (this.searchQuery || '').toLowerCase();
+    const start = this.startDateFilter ? new Date(this.startDateFilter) : null;
+    const end = this.endDateFilter ? new Date(this.endDateFilter) : null;
+
     this.cotizacionesFiltradas = this.cotizaciones.filter(c => {
       const cliente = this.clientes.find(cl => cl.cedula === c.clienteCedula);
-      return (
+      const fechaCotizacion = new Date(c.fecha);
+
+      const matchesText = (
         c.numeroCot.toLowerCase().includes(query) ||
         cliente?.nombre?.toLowerCase().includes(query)
       );
+
+      const matchesDate = (!start || fechaCotizacion >= start) && (!end || fechaCotizacion <= end);
+
+      return matchesText && matchesDate;
     });
+
+    // Resetear a la primera página después de filtrar
+    this.currentPage = 1;
   }
 
   get paginatedCotizaciones(): Cotizacion[] {
