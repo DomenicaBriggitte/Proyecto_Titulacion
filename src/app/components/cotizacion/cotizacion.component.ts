@@ -340,15 +340,22 @@ abrirModalEditar(index: number): void {
           textColor: [255, 255, 255],
           fontStyle: 'bold'
         },
+        columnStyles: {
+          3: { halign: 'right' },
+          4: { halign: 'right' }
+        },
         didDrawPage: (data) => {
           finalY = data.cursor?.y ?? finalY;
         }
       });
     }
 
-    doc.text(`Subtotal: $${cot.subTotal.toFixed(2)}`, 140, finalY + 10);
-    doc.text(`IVA 15%: $${cot.iva.toFixed(2)}`, 140, finalY + 20);
-    doc.text(`Total: $${cot.total.toFixed(2)}`, 140, finalY + 30);
+    doc.text('Subtotal:', 180, finalY + 10, { align: 'right' });
+    doc.text(`$${cot.subTotal.toFixed(2)}`, 200, finalY + 10, { align: 'right' });
+    doc.text('IVA 15%:', 180, finalY + 20, { align: 'right' });
+    doc.text(`$${cot.iva.toFixed(2)}`, 200, finalY + 20, { align: 'right' });
+    doc.text('Total:', 180, finalY + 30, { align: 'right' });
+    doc.text(`$${cot.total.toFixed(2)}`, 200, finalY + 30, { align: 'right' });
 
     const pdfBlob = doc.output('blob');
     const file = new File([pdfBlob], `Cotizacion_${cot.numeroCot}.pdf`, { type: 'application/pdf' });
@@ -410,15 +417,22 @@ abrirModalEditar(index: number): void {
           textColor: [255, 255, 255],
           fontStyle: 'bold'
         },
+        columnStyles: {
+          3: { halign: 'right' },
+          4: { halign: 'right' }
+        },
         didDrawPage: (data) => {
           finalY = data.cursor?.y ?? finalY;
         }
       });
     }
 
-    doc.text(`Subtotal: $${cot.subTotal.toFixed(2)}`, 140, finalY + 10);
-    doc.text(`IVA 15%: $${cot.iva.toFixed(2)}`, 140, finalY + 20);
-    doc.text(`Total: $${cot.total.toFixed(2)}`, 140, finalY + 30);
+    doc.text('Subtotal:', 180, finalY + 10, { align: 'right' });
+    doc.text(`$${cot.subTotal.toFixed(2)}`, 200, finalY + 10, { align: 'right' });
+    doc.text('IVA 15%:', 180, finalY + 20, { align: 'right' });
+    doc.text(`$${cot.iva.toFixed(2)}`, 200, finalY + 20, { align: 'right' });
+    doc.text('Total:', 180, finalY + 30, { align: 'right' });
+    doc.text(`$${cot.total.toFixed(2)}`, 200, finalY + 30, { align: 'right' });
 
     doc.save(`Cotizacion_${cot.numeroCot}.pdf`);
   }

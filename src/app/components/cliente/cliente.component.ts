@@ -195,7 +195,7 @@ addClient(form: NgForm) {
             setTimeout(() => {
               successModal.hide();
 
-              // 🔹 Limpiar cualquier backdrop residual
+              // Limpiar cualquier backdrop residual
               document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
             }, 1500);
           }
