@@ -68,7 +68,6 @@ agregarVolqueta(form: NgForm): void {
   });
 }
 
-
   editVolqueta(volqueta: Volqueta): void {
     this.selectedVolqueta = { ...volqueta };
     this.closeModal('nuevoVolquetaModal');

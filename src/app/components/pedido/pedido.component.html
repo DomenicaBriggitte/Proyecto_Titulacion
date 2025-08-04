@@ -155,9 +155,9 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Volqueta</label>
+              <label class="form-label">Volquetas Disponibles</label>
               <select class="form-select" [(ngModel)]="nuevoPedido.volquetaId" name="volquetaId" (change)="actualizarEstadoEntrega('nuevo')">
-                <option *ngFor="let volqueta of volquetas" [value]="volqueta.id">{{ volqueta.placa }}</option>
+                <option *ngFor="let volqueta of volquetasDisponibles" [value]="volqueta.id">{{ volqueta.placa }}</option>
               </select>
             </div>
                         
@@ -260,9 +260,9 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label">Volqueta</label>
+              <label class="form-label">Volquetas Disponibles</label>
               <select class="form-select" [(ngModel)]="pedidoEdit.volquetaId" name="volquetaId" (change)="actualizarEstadoEntrega('editar')">
-                <option *ngFor="let volqueta of volquetas" [value]="volqueta.id">{{ volqueta.placa }}</option>
+                <option *ngFor="let volqueta of volquetasDisponibles" [value]="volqueta.id">{{ volqueta.placa }}</option>
               </select>
             </div>
 

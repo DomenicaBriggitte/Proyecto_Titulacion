@@ -19,6 +19,7 @@ export class PedidoComponent implements OnInit {
   clientes: Cliente[] = [];
   cotizaciones: any [] = [];
   volquetas: any[] = [];
+  volquetasDisponibles: any[] = [];
   facturas: Factura[] = [];
   filtroEstado: string = '';
   searchQuery: string = '';
@@ -62,6 +63,7 @@ export class PedidoComponent implements OnInit {
     this.facturaService.getFacturas().subscribe(data => this.facturas = data);
     this.volquetaService.getAll().subscribe(volquetas => {
       this.volquetas = volquetas;
+      this.volquetasDisponibles = volquetas.filter(v => v.estado !== 'En mantenimiento'); //filtar volquetas disponibles
     });
   }
 
