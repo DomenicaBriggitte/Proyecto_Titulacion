@@ -202,8 +202,8 @@
                 <tr *ngFor="let m of materialesCotizacion">
                   <td>{{ m.materialCodigo }}</td>
                   <td>{{ m.cantidad }}</td>
-                  <td>{{ m.precioUnitario | currency }}</td>
-                  <td>{{ m.subtotal | currency }}</td>
+                  <td class="alinearI">{{ m.precioUnitario | currency }}</td>
+                  <td class="alinearI">{{ m.subtotal | currency }}</td>
                 </tr>
               </tbody>
             </table>
@@ -316,8 +316,8 @@
                 <tr *ngFor="let m of materialesCotizacionEdit">
                   <td>{{ m.materialCodigo }}</td>
                   <td>{{ m.cantidad }}</td>
-                  <td>{{ m.precioUnitario | currency }}</td>
-                  <td>{{ m.subtotal | currency }}</td>
+                  <td class="alinearI">{{ m.precioUnitario | currency }}</td>
+                  <td class="alinearI">{{ m.subtotal | currency }}</td>
                 </tr>
               </tbody>
             </table>

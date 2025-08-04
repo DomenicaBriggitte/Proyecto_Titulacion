@@ -27,7 +27,7 @@
           <td>{{ c.numeroCot }}</td>
           <td>{{ c.fecha | date:'yyyy-MM-dd' }}</td>
           <td>{{ obtenerNombreCliente(c.clienteCedula) }}</td>
-          <td>${{ c.total.toFixed(2) }}</td>
+          <td class="alinearI">${{ c.total.toFixed(2) }}</td>
           <td class="text-center">
             <div class="d-flex justify-content-center gap-2">
               <button class="btn btn-info btn-sm" (click)="abrirModalEditar(i)"><i class="fas fa-edit"></i></button>
@@ -100,8 +100,8 @@
                     (selectItem)="onSelectMaterial($event, i, 'nuevo')" placeholder="Escriba material..." required />
                 </td>
                 <td><input type="number" class="form-control" [(ngModel)]="m.cantidad" [name]="'cantNuevo' + i" (ngModelChange)="calcularTotales(cotizacionNuevo)" required></td>
-                <td> <input type="number" class="form-control" [(ngModel)]="m.precioUnitario" [name]="'precioNuevo' + i" readonly> </td>
-                <td>{{ m.subtotal?.toFixed(2) || '0.00' }}</td>
+                <td class="alinearI"> ${{ m.precioUnitario?.toFixed(2) || '0.00' }}</td>
+                <td class="alinearI">${{ m.subtotal?.toFixed(2) || '0.00' }}</td>
                 <td><button type="button" class="btn btn-danger btn-sm" (click)="eliminarMaterial(cotizacionNuevo, i)">
                   <i class="fas fa-trash-alt"></i></button>
                 </td>

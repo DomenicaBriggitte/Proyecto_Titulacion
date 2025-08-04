@@ -34,6 +34,10 @@ h2 {
   vertical-align: middle;
 }
 
+.table .alinearI {
+  text-align: right;
+}
+
 .table .thead-dark {
   background-color: #343a40;
   color: #ffffff;
