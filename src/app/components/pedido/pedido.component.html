@@ -208,18 +208,18 @@
               </tbody>
             </table>
           </div>
-          <div *ngIf="cotizacionSeleccionada" class="resumen-totales">
+        <div *ngIf="cotizacionSeleccionada" class="resumen-totales">
           <div class="row">
-            <div class="col-6 label"><i class="bi bi-cash-coin"></i> Subtotal:</div>
-            <div class="col-6 valor">{{ cotizacionSeleccionada.subTotal | currency }}</div>
+            <div class="col-7 label"><i class="bi bi-cash-coin"></i> Subtotal:</div>
+            <div class="col-5 valor">{{ cotizacionSeleccionada.subTotal | currency }}</div>
           </div>
           <div class="row">
-            <div class="col-6 label"><i class="bi bi-percent"></i>IVA:</div>
-            <div class="col-6 valor">{{ cotizacionSeleccionada.iva | currency }}</div>
+            <div class="col-7 label"><i class="bi bi-percent"></i>IVA:</div>
+            <div class="col-5 valor">{{ cotizacionSeleccionada.iva | currency }}</div>
           </div>
           <div class="row">
-            <div class="col-6 label total"><i class="bi bi-calculator-fill"></i> Total:</div>
-            <div class="col-6 valor total">{{ cotizacionSeleccionada.total | currency }}</div>
+            <div class="col-7 label total"><i class="bi bi-calculator-fill"></i> Total:</div>
+            <div class="col-5 valor total">{{ cotizacionSeleccionada.total | currency }}</div>
           </div>
         </div>
           <button type="submit" class="btn btn-success w-100 mt-3" [disabled]="form.invalid">Guardar</button>
@@ -324,16 +324,16 @@
           </div>
           <div *ngIf="cotizacionSeleccionadaEdit" class="resumen-totales">
             <div class="row">
-              <div class="col-6 label"><i class="bi bi-cash-coin"></i> Subtotal:</div>
-              <div class="col-6 valor">{{ cotizacionSeleccionadaEdit.subTotal | currency }}</div>
+            <div class="col-7 label"><i class="bi bi-cash-coin"></i> Subtotal:</div>
+            <div class="col-5 valor">{{ cotizacionSeleccionadaEdit.subTotal | currency }}</div>
             </div>
             <div class="row">
-              <div class="col-6 label"><i class="bi bi-percent"></i>IVA:</div>
-              <div class="col-6 valor">{{ cotizacionSeleccionadaEdit.iva | currency }}</div>
+            <div class="col-7 label"><i class="bi bi-percent"></i>IVA:</div>
+            <div class="col-5 valor">{{ cotizacionSeleccionadaEdit.iva | currency }}</div>
             </div>
             <div class="row">
-              <div class="col-6 label total"><i class="bi bi-calculator-fill"></i>Total:</div>
-              <div class="col-6 valor total">{{ cotizacionSeleccionadaEdit.total | currency }}</div>
+            <div class="col-7 label total"><i class="bi bi-calculator-fill"></i>Total:</div>
+            <div class="col-5 valor total">{{ cotizacionSeleccionadaEdit.total | currency }}</div>
             </div>
           </div>
           <button type="submit" class="btn btn-primary w-100 mt-3">Actualizar</button>
