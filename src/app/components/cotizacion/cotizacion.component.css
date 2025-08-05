@@ -181,3 +181,10 @@ button[type="button"] {
   border-color: #f47c00;
   box-shadow: 0 0 5px rgba(244, 124, 0, 0.5);
 }
+
+.text-danger{
+  color: red;
+  font-weight: bold;
+  font-size: 12px;
+  margin-top: 10px;
+}

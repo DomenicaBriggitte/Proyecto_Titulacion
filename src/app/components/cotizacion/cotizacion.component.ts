@@ -27,9 +27,8 @@ export class CotizacionComponent implements OnInit {
   endDateFilter: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 10;
-
-  //Propiedad para almacenar la fecha actual en formato YYYY-MM-DD
-  todayDate: string = '';    
+  validationMessage: string = '';
+  todayDate: string = ''; //Propiedad para almacenar la fecha actual
 
   constructor(
     private clienteService: ClienteService,
@@ -98,9 +97,19 @@ export class CotizacionComponent implements OnInit {
     const random = Math.floor(Math.random() * 900000 + 100000);
     return `COT_${anio}${mes}${dia}${random}`;
   }
-  tieneMaterialesInvalidos(cot: any): boolean {
-  return cot.materiales.some((m: any) => !m.material || !m.material.codigo);
-}
+    tieneMaterialesInvalidos(cot: any): boolean {
+    return cot.materiales.some((m: any) => !m.material || !m.material.codigo);
+  }
+
+  getValidationMessage(): string {
+    if (!this.esClienteValido(this.cotizacionNuevo.cliente)) {
+      return "*Debe seleccionar un cliente válido.";
+    }
+    if (this.cotizacionNuevo.materiales.length === 0 || this.tieneMaterialesInvalidos(this.cotizacionNuevo)) {
+      return "*Debe seleccionar al menos un material válido para cotizar.";
+    }
+    return ""; // No hay mensaje si todo es válido
+  }
 
   agregarMaterial(cot: any): void {
     cot.materiales.push({ material: null, cantidad: 1, precioUnitario: 0, subtotal: 0 });
