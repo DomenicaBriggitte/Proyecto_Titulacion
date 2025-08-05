@@ -5,6 +5,8 @@ import { PedidoService, Pedido } from 'src/app/services/pedido.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-factura',
@@ -69,6 +71,30 @@ export class FacturaComponent implements OnInit {
       pagos: []
     };
   }
+
+  exportarExcel() { 
+  // Mapea las facturas filtradas para incluir solo las columnas deseadas
+  const dataToExport = this.facturasFiltradas.map(f => ({
+   '# Factura': f.numeroFactura,
+   'Fecha': f.fecha,
+   'Cliente': this.getNombreCliente(f.clienteCedula), 
+   'Pedido Asociado': this.getNumeroPedido(f.pedidoId), 
+   'Estado Pago': f.estadoPago
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+  const workbook = {
+   Sheets: { 'Facturas': worksheet },
+   SheetNames: ['Facturas']
+  };
+  const excelBuffer: any = XLSX.write(workbook, {
+   bookType: 'xlsx',
+   type: 'array'
+  });
+
+  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  FileSaver.saveAs(blob, 'Facturas.xlsx');
+ }
 
   generarNumeroFacturaTemporal(): string {
     const fecha = new Date();
