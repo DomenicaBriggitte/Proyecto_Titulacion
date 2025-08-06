@@ -469,6 +469,13 @@ abrirModalEditar(index: number): void {
     this.currentPage = 1;
   }
 
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.startDateFilter = '';
+    this.endDateFilter = '';
+    this.filtrarCotizaciones();
+  }
+
   get paginatedCotizaciones(): Cotizacion[] {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;

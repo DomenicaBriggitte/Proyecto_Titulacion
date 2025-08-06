@@ -5,6 +5,9 @@
     <h2 class="text-center mb-4">Gestión de Cotizaciones</h2>
     <div class="d-flex mb-3 justify-content-between">
       <button class="btn btn-primary" (click)="abrirModalNuevo()">+ Nueva Cotización</button>
+      <button class="btnfiltro btn-secondary" (click)="resetFilters()">Reiniciar Filtros</button>
+      <input type="date" class="filtrofecha" [(ngModel)]="startDateFilter" (ngModelChange)="filtrarCotizaciones()" placeholder="Fecha Inicio">
+      <input type="date" class="filtrofecha" [(ngModel)]="endDateFilter" (ngModelChange)="filtrarCotizaciones()" placeholder="Fecha Fin">
       <input type="text" class="form-control w-25" placeholder="Buscar por cliente o número" [(ngModel)]="searchQuery" (ngModelChange)="filtrarCotizaciones()">
     </div>
 
@@ -12,11 +15,7 @@
       <thead class="thead-dark">
         <tr>
           <th># Cotización</th>
-          <th class="filtrofecha">
-            <input type="date" class="form-control" [(ngModel)]="startDateFilter" (ngModelChange)="filtrarCotizaciones()" placeholder="Fecha Inicio">
-            Fecha
-            <input type="date" class="form-control" [(ngModel)]="endDateFilter" (ngModelChange)="filtrarCotizaciones()" placeholder="Fecha Fin">
-          </th>
+          <th>Fecha</th>
           <th>Cliente</th>
           <th>Total ($)</th>
           <th>Acciones</th>
