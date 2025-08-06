@@ -80,12 +80,13 @@ export class CotizacionComponent implements OnInit {
   resetearCotizacion() {
     return {
       numeroCot: this.generarNumeroCotizacion(),
-      cliente: null,
+      cliente: '',
       fecha: this.todayDate,
       materiales: [],
       subTotal: 0,
       iva: 0,
-      total: 0
+      total: 0,
+      porcentIVA: 15
     };
   }
 
@@ -97,7 +98,7 @@ export class CotizacionComponent implements OnInit {
     const random = Math.floor(Math.random() * 900000 + 100000);
     return `COT_${anio}${mes}${dia}${random}`;
   }
-    tieneMaterialesInvalidos(cot: any): boolean {
+    tieneMaterialesInvalidos(cot: Cotizacion): boolean {
     return cot.materiales.some((m: any) => !m.material || !m.material.codigo);
   }
 
@@ -125,7 +126,7 @@ export class CotizacionComponent implements OnInit {
       m.subtotal = (m.cantidad || 0) * (m.precioUnitario || 0);
     });
     cot.subTotal = cot.materiales.reduce((sum: number, m: any) => sum + (m.subtotal || 0), 0);
-    cot.iva = cot.subTotal * 0.15;
+    cot.iva = cot.subTotal * (cot.porcentIVA / 100);
     cot.total = cot.subTotal + cot.iva;
   }
 
@@ -168,6 +169,7 @@ onSelectMaterial(event: any, index: number, modo: 'nuevo' | 'editar') {
   const materialSeleccionado = event.item;
   const target = modo === 'nuevo' ? this.cotizacionNuevo : this.cotizacionEdit;
 
+  target.materiales[index].materialCodigo = materialSeleccionado.codigo;
   target.materiales[index].material = materialSeleccionado;
   target.materiales[index].precioUnitario = materialSeleccionado.costoSinIva;
   target.materiales[index].subtotal = materialSeleccionado.costoSinIva * (target.materiales[index].cantidad || 1);
@@ -189,7 +191,8 @@ onSelectMaterial(event: any, index: number, modo: 'nuevo' | 'editar') {
       })),
       subTotal: this.cotizacionNuevo.subTotal,
       iva: this.cotizacionNuevo.iva,
-      total: this.cotizacionNuevo.total
+      total: this.cotizacionNuevo.total,
+      porcentIVA: this.cotizacionNuevo.porcentIVA
     };
 
     this.cotizacionService.addCotizacion(nueva).subscribe(() => {
@@ -200,6 +203,7 @@ onSelectMaterial(event: any, index: number, modo: 'nuevo' | 'editar') {
       this.cerrarModal('nuevoCotModal');
       this.mostrarModal('successModal');
       this.cotizacionNuevo = this.resetearCotizacion();
+      this.agregarMaterial(this.cotizacionNuevo);
     });
   }
 
@@ -209,12 +213,14 @@ abrirModalEditar(index: number): void {
   const original = this.cotizacionesFiltradas[realIndex];
 
   this.cotizacionEdit = {
+    cotizacionId: original.cotizacionId,
     numeroCot: original.numeroCot,
     fecha: new Date(original.fecha).toISOString().split('T')[0],
     cliente: this.clientes.find(c => c.cedula === original.clienteCedula),
     materiales: original.materiales.map((m: any) => {
       const matEncontrado = this.materiales.find(mat => mat.codigo === m.materialCodigo);
       return {
+        materialCodigo: m.materialCodigo,
         material: matEncontrado || null,
         cantidad: m.cantidad,
         precioUnitario: m.precioUnitario,
@@ -223,13 +229,15 @@ abrirModalEditar(index: number): void {
     }),
     subTotal: original.subTotal,
     iva: original.iva,
-    total: original.total
+    total: original.total,
+    porcentIVA: original.porcentIVA || 15
   };
 
+  this.calcularTotales(this.cotizacionEdit);
   this.mostrarModal('editarCotModal');
 }
 
-  actualizarCotizacion(): void {
+actualizarCotizacion(): void {
   if (this.indiceEditando !== -1 && this.cotizacionEdit.cliente?.cedula) {
     const actualizada: Cotizacion = {
       numeroCot: this.cotizacionEdit.numeroCot,
@@ -243,7 +251,8 @@ abrirModalEditar(index: number): void {
       })),
       subTotal: this.cotizacionEdit.subTotal,
       iva: this.cotizacionEdit.iva,
-      total: this.cotizacionEdit.total
+      total: this.cotizacionEdit.total,
+      porcentIVA: this.cotizacionEdit.porcentIVA
     };
 
     const id = this.cotizaciones[this.indiceEditando].cotizacionId;
@@ -283,9 +292,10 @@ abrirModalEditar(index: number): void {
     const cliente = this.clientes.find(c => c.cedula === cedula);
     return cliente ? cliente.nombre : cedula;
   }
+
   esClienteValido(cliente: any): boolean {
-  return cliente && typeof cliente === 'object' && 'cedula' in cliente;
-}
+    return cliente && typeof cliente === 'object' && 'cedula' in cliente;
+  }
 
   eliminarCotizacion(index: number): void {
     this.deleteIndex = index;
@@ -361,7 +371,7 @@ abrirModalEditar(index: number): void {
 
     doc.text('Subtotal:', 180, finalY + 10, { align: 'right' });
     doc.text(`$${cot.subTotal.toFixed(2)}`, 200, finalY + 10, { align: 'right' });
-    doc.text('IVA 15%:', 180, finalY + 20, { align: 'right' });
+    doc.text(`IVA ${cot.porcentIVA}%:`, 180, finalY + 20, { align: 'right' });
     doc.text(`$${cot.iva.toFixed(2)}`, 200, finalY + 20, { align: 'right' });
     doc.text('Total:', 180, finalY + 30, { align: 'right' });
     doc.text(`$${cot.total.toFixed(2)}`, 200, finalY + 30, { align: 'right' });
@@ -438,7 +448,7 @@ abrirModalEditar(index: number): void {
 
     doc.text('Subtotal:', 180, finalY + 10, { align: 'right' });
     doc.text(`$${cot.subTotal.toFixed(2)}`, 200, finalY + 10, { align: 'right' });
-    doc.text('IVA 15%:', 180, finalY + 20, { align: 'right' });
+    doc.text(`IVA ${cot.porcentIVA}%:`, 180, finalY + 20, { align: 'right' });
     doc.text(`$${cot.iva.toFixed(2)}`, 200, finalY + 20, { align: 'right' });
     doc.text('Total:', 180, finalY + 30, { align: 'right' });
     doc.text(`$${cot.total.toFixed(2)}`, 200, finalY + 30, { align: 'right' });

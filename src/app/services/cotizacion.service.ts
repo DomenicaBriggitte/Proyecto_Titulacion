@@ -3,10 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface CotizacionMaterial {
+  cotizacionMaterialId?: number;
+  cotizacionId?: number;
   materialCodigo: string;
   cantidad: number;
   precioUnitario: number;
   subtotal: number;
+  material?: any;
 }
 
 export interface Cotizacion {
@@ -18,6 +21,7 @@ export interface Cotizacion {
   subTotal: number;
   iva: number;
   total: number;
+  porcentIVA: number; 
 }
 
 @Injectable({

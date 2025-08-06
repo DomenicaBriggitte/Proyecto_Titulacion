@@ -102,6 +102,11 @@ button[type="button"] {
   justify-content: center;
 }
 
+.mb-3-iva {
+  width: 100px;
+  margin-bottom: 10px;
+}
+
 /* BOTONES */
 .btn {
   margin: 5px;

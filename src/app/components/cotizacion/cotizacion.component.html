@@ -80,6 +80,11 @@
               placeholder="Escriba el nombre del cliente..." required />
           </div>
 
+          <div class="mb-3-iva">
+            <label class="form-label">IVA (%)</label>
+            <input type="number" class="form-control" [(ngModel)]="cotizacionNuevo.porcentIVA" name="porcentIVANuevo" (ngModelChange)="calcularTotales(cotizacionNuevo)" min="0" step="0.01" required>
+          </div>
+
           <table class="table table-bordered text-center">
             <thead class="table-light">
               <tr>
@@ -111,7 +116,7 @@
 
           <div class="text-end">
             <p><strong>Subtotal:</strong> ${{ cotizacionNuevo.subTotal.toFixed(2) }}</p>
-            <p><strong>IVA (15%):</strong> ${{ cotizacionNuevo.iva.toFixed(2) }}</p>
+            <p><strong>IVA ({{ cotizacionNuevo.porcentIVA }}%):</strong> ${{ cotizacionNuevo.iva.toFixed(2) }}</p>
             <h5><strong>Total:</strong> ${{ cotizacionNuevo.total.toFixed(2) }}</h5>
           </div>
 
@@ -211,6 +216,11 @@
               (selectItem)="onSelectCliente($event, 'editar')" required />
           </div>
 
+          <div class="mb-3-iva">
+            <label class="form-label">IVA (%)</label>
+            <input type="number" class="form-control" [(ngModel)]="cotizacionEdit.porcentIVA" name="porcentIVAEdit" (ngModelChange)="calcularTotales(cotizacionEdit)" min="0" step="0.01" readonly>
+          </div>
+
           <table class="table table-bordered text-center">
             <thead class="table-light">
               <tr>
@@ -244,7 +254,7 @@
 
           <div class="text-end">
             <p><strong>Subtotal:</strong> ${{ cotizacionEdit.subTotal.toFixed(2) }}</p>
-            <p><strong>IVA (15%):</strong> ${{ cotizacionEdit.iva.toFixed(2) }}</p>
+            <p><strong>IVA ({{ cotizacionEdit.porcentIVA }}%):</strong> ${{ cotizacionEdit.iva.toFixed(2) }}</p>
             <h5><strong>Total:</strong> ${{ cotizacionEdit.total.toFixed(2) }}</h5>
           </div>
 
