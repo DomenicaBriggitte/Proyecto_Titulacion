@@ -3,31 +3,95 @@
 <div class="content">
   <div class="container mt-5">
     <h2 class="text-center mb-4">Gestión de Pedidos</h2>
+    
+    <div class="filter-carousel-container justify-content-center align-items-center mb-2">
+      <i class="bi bi-arrow-left-circle-fill fs-4 me-2 cursor-pointer" (click)="previousFilterType()"></i>
+      <h5 class="text-center mb-0">{{ getFilterTitle() }}</h5>
+      <i class="bi bi-arrow-right-circle-fill fs-4 ms-2 cursor-pointer" (click)="nextFilterType()"></i>
+    </div>
 
     <div class="mb-4 d-flex justify-content-center flex-wrap gap-3 resumen-estados">
-      <div class="card-resumen" [class.activo]="filtroEstado === 'Cerrado'" (click)="filtrarPorEstado('Cerrado')">
-        <i class="bi bi-check-circle text-success fs-5"></i>
-        <div class="texto">
-          <div class="titulo">Cerrados</div>
-          <div class="cantidad">{{ pedidosCerrados.length }}</div>
+      <!-- Filtro por Estado de Pedido -->
+      <ng-container *ngIf="currentFilterType === 'pedido'">
+        <div class="card-resumen" [class.activo]="filtroEstado === 'Cerrado'" (click)="filtrarPorEstado('Cerrado')">
+          <i class="bi bi-check-circle text-success fs-5"></i>
+          <div class="texto">
+            <div class="titulo">Cerrados</div>
+            <div class="cantidad">{{ pedidosCerrados.length }}</div>
+          </div>
         </div>
-      </div>
+        <div class="card-resumen" [class.activo]="filtroEstado === 'Abierto'" (click)="filtrarPorEstado('Abierto')">
+          <i class="bi bi-hourglass-split text-warning fs-5"></i>
+          <div class="texto">
+            <div class="titulo">Abiertos</div>
+            <div class="cantidad">{{ pedidosAbiertos.length }}</div>
+          </div>
+        </div>
+        <div class="card-resumen" [class.activo]="!filtroEstado" (click)="filtrarPorEstado('')">
+          <i class="bi bi-list-ul text-secondary fs-5"></i>
+          <div class="texto">
+            <div class="titulo">Todos</div>
+            <div class="cantidad">{{ pedidos.length }}</div>
+          </div>
+        </div>
+      </ng-container>
 
-      <div class="card-resumen" [class.activo]="filtroEstado === 'Abierto'" (click)="filtrarPorEstado('Abierto')">
-        <i class="bi bi-hourglass-split text-warning fs-5"></i>
-        <div class="texto">
-          <div class="titulo">Abiertos</div>
-          <div class="cantidad">{{ pedidosAbiertos.length }}</div>
+      <!-- Filtro por Estado de Entrega -->
+      <ng-container *ngIf="currentFilterType === 'entrega'">
+        <div class="card-resumen" [class.activo]="filtroEstado === 'Entregado'" (click)="filtrarPorEstado('Entregado')">
+          <i class="bi bi-truck text-success fs-5"></i>
+          <div class="texto">
+            <div class="titulo">Entregados</div>
+            <div class="cantidad">{{ pedidosEntregados.length }}</div>
+          </div>
         </div>
-      </div>
+        <div class="card-resumen" [class.activo]="filtroEstado === 'En Curso'" (click)="filtrarPorEstado('En Curso')">
+          <i class="bi bi-truck-flatbed text-warning fs-5"></i>
+          <div class="texto">
+            <div class="titulo">En Curso</div>
+            <div class="cantidad">{{ pedidosEnCurso.length }}</div>
+          </div>
+        </div>
+        <div class="card-resumen" [class.activo]="filtroEstado === 'Pendiente'" (click)="filtrarPorEstado('Pendiente')">
+          <i class="bi bi-box-seam text-danger fs-5"></i>
+          <div class="texto">
+            <div class="titulo">Pendientes</div>
+            <div class="cantidad">{{ pedidosPendientesEntrega.length }}</div>
+          </div>
+        </div>
+        <div class="card-resumen" [class.activo]="!filtroEstado" (click)="filtrarPorEstado('')">
+          <i class="bi bi-list-ul text-secondary fs-5"></i>
+          <div class="texto">
+            <div class="titulo">Todos</div>
+            <div class="cantidad">{{ pedidos.length }}</div>
+          </div>
+        </div>
+      </ng-container>
 
-      <div class="card-resumen" [class.activo]="!filtroEstado" (click)="filtrarPorEstado('')">
-        <i class="bi bi-list-ul text-secondary fs-5"></i>
-        <div class="texto">
-          <div class="titulo">Todos</div>
-          <div class="cantidad">{{ pedidos.length }}</div>
+      <!-- Filtro por Estado de Pago -->
+      <ng-container *ngIf="currentFilterType === 'pago'">
+        <div class="card-resumen" [class.activo]="filtroEstado === 'Cancelado'" (click)="filtrarPorEstado('Cancelado')">
+          <i class="bi bi-currency-dollar text-success fs-5"></i>
+          <div class="texto">
+            <div class="titulo">Cancelados</div>
+            <div class="cantidad">{{ pedidosCanceladosPago.length }}</div>
+          </div>
         </div>
-      </div>
+        <div class="card-resumen" [class.activo]="filtroEstado === 'Pendiente'" (click)="filtrarPorEstado('Pendiente')">
+          <i class="bi bi-cash-coin text-danger fs-5"></i>
+          <div class="texto">
+            <div class="titulo">Pendientes</div>
+            <div class="cantidad">{{ pedidosPendientesPago.length }}</div>
+          </div>
+        </div>
+        <div class="card-resumen" [class.activo]="!filtroEstado" (click)="filtrarPorEstado('')">
+          <i class="bi bi-list-ul text-secondary fs-5"></i>
+          <div class="texto">
+            <div class="titulo">Todos</div>
+            <div class="cantidad">{{ pedidos.length }}</div>
+          </div>
+        </div>
+      </ng-container>
     </div>
 
     <div class="d-flex mb-3 justify-content-between align-items-center">
@@ -221,8 +285,8 @@
             <div class="col-5 valor">{{ cotizacionSeleccionada.iva | currency }}</div>
           </div>
           <div class="row">
-            <div class="col-7 label total"><i class="bi bi-calculator-fill"></i> Total:</div>
-            <div class="col-5 valor total">{{ cotizacionSeleccionada.total | currency }}</div>
+            <div class="col-7 label"><i class="bi bi-calculator-fill"></i> Total:</div>
+            <div class="col-5 valor">{{ cotizacionSeleccionada.total | currency }}</div>
           </div>
         </div>
           <button type="submit" class="btn btn-success w-100 mt-3" [disabled]="form.invalid">Guardar</button>
@@ -335,8 +399,8 @@
             <div class="col-5 valor">{{ cotizacionSeleccionadaEdit.iva | currency }}</div>
             </div>
             <div class="row">
-            <div class="col-7 label total"><i class="bi bi-calculator-fill"></i>Total:</div>
-            <div class="col-5 valor total">{{ cotizacionSeleccionadaEdit.total | currency }}</div>
+            <div class="col-7 label"><i class="bi bi-calculator-fill"></i>Total:</div>
+            <div class="col-5 valor">{{ cotizacionSeleccionadaEdit.total | currency }}</div>
             </div>
           </div>
           <button type="submit" class="btn btn-primary w-100 mt-3">Actualizar</button>

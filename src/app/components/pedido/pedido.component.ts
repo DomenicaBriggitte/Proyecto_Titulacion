@@ -29,6 +29,7 @@ export class PedidoComponent implements OnInit {
   itemsPerPage: number = 10;
   itemsPerPageOptions: number[] = [10, 15, 20];
   todayDate: string = ''; 
+  currentFilterType: 'pedido' | 'entrega' | 'pago' = 'pedido';
 
   nuevoPedido: Pedido = this.resetPedido();
   pedidoEdit: Pedido = this.resetPedido();
@@ -192,6 +193,7 @@ export class PedidoComponent implements OnInit {
     });
   }
 
+  // Método principal de filtrado
   filterPedidos(): void {
     const estado = this.filtroEstado;
     const start = this.startDateFilter ? new Date(this.startDateFilter) : null;
@@ -199,17 +201,27 @@ export class PedidoComponent implements OnInit {
     const texto = this.searchQuery.toLowerCase();
 
     this.pedidosFiltrados = this.pedidos.filter(p => {
-      const coincideEstado = estado ? p.estadoPedido === estado : true;
-      const cliente = this.clientes.find(c => c.cedula === p.clienteCedula);
-      const fechaFactura = new Date(p.fecha);
-      
-      const coincideBusqueda =
-        p.numeroPedido.toLowerCase().includes(texto) ||
-        cliente?.nombre?.toLowerCase().includes(texto);
+    let coincideEstado = true;
+        if (estado) {
+          if (this.currentFilterType === 'pedido') {
+            coincideEstado = p.estadoPedido === estado;
+          } else if (this.currentFilterType === 'entrega') {
+            coincideEstado = p.estadoEntrega === estado;
+          } else if (this.currentFilterType === 'pago') {
+            coincideEstado = p.estadoPago === estado;
+          }
+        }
 
-      const matchesDate = (!start || fechaFactura >= start) && (!end || fechaFactura <= end);
+    const cliente = this.clientes.find(c => c.cedula === p.clienteCedula);
+    const fechaPedido = new Date(p.fecha);
+    
+    const coincideBusqueda =
+      p.numeroPedido.toLowerCase().includes(texto) ||
+      cliente?.nombre?.toLowerCase().includes(texto);
 
-      return coincideEstado && coincideBusqueda && matchesDate;
+    const matchesDate = (!start || fechaPedido >= start) && (!end || fechaPedido <= end);
+
+    return coincideEstado && coincideBusqueda && matchesDate;
     });
 
     this.currentPage = 1;
@@ -292,8 +304,10 @@ export class PedidoComponent implements OnInit {
         this.pedidoEdit.estadoEntrega = 'Pendiente';
       }
     }
+    this.verificarEstadoPedido(tipo);
   }
 
+  //getters para estados de pedidos
   get pedidosCerrados(): Pedido[] {
     return this.pedidos.filter(p => p.estadoPedido === 'Cerrado');
   }
@@ -302,10 +316,66 @@ export class PedidoComponent implements OnInit {
     return this.pedidos.filter(p => p.estadoPedido === 'Abierto');
   }
 
+  //getters para estados de entrega
+  get pedidosEntregados(): Pedido[] {
+    return this.pedidos.filter(p => p.estadoEntrega === 'Entregado');
+  }
+
+  get pedidosEnCurso(): Pedido[] {
+    return this.pedidos.filter(p => p.estadoEntrega === 'En Curso');
+  }
+
+  get pedidosPendientesEntrega(): Pedido[] {
+    return this.pedidos.filter(p => p.estadoEntrega === 'Pendiente');
+  }
+
+  //getters para estados de pago
+  get pedidosCanceladosPago(): Pedido[] {
+    return this.pedidos.filter(p => p.estadoPago === 'Cancelado');
+  }
+
+  get pedidosPendientesPago(): Pedido[] {
+    return this.pedidos.filter(p => p.estadoPago === 'Pendiente');
+  }
+
   filtrarPorEstado(estado: string): void {
     this.filtroEstado = estado;
     this.filterPedidos();
     this.currentPage = 1;
+  }
+
+  // Métodos para el carrusel de filtros
+  getFilterTitle(): string {
+    switch (this.currentFilterType) {
+      case 'pedido': return 'Estado de Pedidos';
+      case 'entrega': return 'Estado de Entrega';
+      case 'pago': return 'Estado de Pago';
+      default: return 'Filtro de Pedidos';
+    }
+  }
+
+  nextFilterType(): void {
+    if (this.currentFilterType === 'pedido') {
+      this.currentFilterType = 'entrega';
+    } else if (this.currentFilterType === 'entrega') {
+      this.currentFilterType = 'pago';
+    } else {
+      this.currentFilterType = 'pedido';
+    }
+    this.filtroEstado = ''; // Resetear el estado específico al cambiar el tipo de filtro
+    this.filterPedidos();
+  }
+
+  previousFilterType(): void {
+    if (this.currentFilterType === 'pago') {
+      this.currentFilterType = 'entrega';
+    } else if (this.currentFilterType === 'entrega') {
+      this.currentFilterType = 'pedido';
+    } else {
+      this.currentFilterType = 'pago';
+    }
+    this.filtroEstado = ''; // Resetear el estado específico al cambiar el tipo de filtro
+    this.filterPedidos();
   }
 
   getMensajeEstado(p: Pedido): string {
@@ -345,7 +415,7 @@ export class PedidoComponent implements OnInit {
       map(term => term.length < 2 ? [] :
         this.cotizaciones.filter(c =>
           c.numeroCot.toLowerCase().includes(term.toLowerCase())
-        ).slice(0, 10))
+        ).slice(0, 10)) 
     );
 
   formatearCotizacion = (c: any) => c.numeroCot || '';

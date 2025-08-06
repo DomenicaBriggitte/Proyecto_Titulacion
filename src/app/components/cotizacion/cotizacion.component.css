@@ -91,6 +91,13 @@ button[type="button"] {
   margin-left: 300px;
 }
 
+.btnfiltro:hover {
+  background-color: #726f6f56;
+  color: rgba(31, 30, 30, 0.781);
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
 .modal-footer {
   justify-content: center;
 }
