@@ -34,6 +34,9 @@
       <!--<button class="btn btn-primary" (click)="abrirModalNuevo()">+ Nueva Factura</button>-->
       Exportar Tabla:
       <button class="btn btn-success" (click)="exportarExcel()">XLS</button>
+      <button class="btnfiltro btn-secondary" (click)="resetFilters()">Reiniciar Filtros</button>
+      <input type="date" class="filtrofecha" [(ngModel)]="startDateFilter" (ngModelChange)="filterFacturas()" placeholder="Fecha Inicio">
+      <input type="date" class="filtrofecha" [(ngModel)]="endDateFilter" (ngModelChange)="filterFacturas()" placeholder="Fecha Fin">
       <input type="text" class="form-control w-25" placeholder="Buscar Factura..." [(ngModel)]="searchQuery" (ngModelChange)="filterFacturas()">
     </div>
 

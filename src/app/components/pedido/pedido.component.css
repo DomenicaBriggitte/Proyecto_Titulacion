@@ -19,7 +19,7 @@ h2 {
   border: 1px solid #ced4da;
   box-shadow: none;
   transition: border-color 0.3s ease;
-  margin-left: auto;
+  margin-left: 10px;
 }
 
 .form-control:focus {
@@ -153,6 +153,16 @@ button[type="button"].btn-primary {
 button[type="button"].btn-secondary {
   background-color: #dcdcdc;
   color: #000000;
+}
+
+.btnfiltro {
+  margin: 5px;
+  border-radius: 8px;
+  background-color: #8e8a8a56;
+  font-weight: normal;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-left: 300px;
 }
 
 .modal-footer {
@@ -379,4 +389,24 @@ form textarea {
 .resumen-totales .label, .resumen-totales .valor {
    margin: 0;  
   padding: 0; 
+}
+
+.filtrofecha {
+  width: 130px;
+  height: 30px;
+  display: inline-block;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  transition: border-color 0.3s ease; 
+  margin-left: 10px ;
+  background-color: #ffffffbc;
+  padding: 2px;
+  font-size: 14px;
+  font-weight: normal;
+  margin-top: 2px;
+} 
+
+.filtrofecha:hover {
+  border-color: #f47c00;
+  box-shadow: 0 0 5px rgba(244, 124, 0, 0.5);
 }

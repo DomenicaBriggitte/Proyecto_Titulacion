@@ -32,6 +32,9 @@
 
     <div class="d-flex mb-3 justify-content-between align-items-center">
       <button class="btn btn-primary" (click)="abrirModalNuevo()">+ Nuevo Pedido</button>
+      <button class="btnfiltro btn-secondary" (click)="resetFilters()">Reiniciar Filtros</button>
+      <input type="date" class="filtrofecha" [(ngModel)]="startDateFilter" (ngModelChange)="filterPedidos()" placeholder="Fecha Inicio">
+      <input type="date" class="filtrofecha" [(ngModel)]="endDateFilter" (ngModelChange)="filterPedidos()" placeholder="Fecha Fin">
       <input type="text" class="form-control w-25" placeholder="Buscar Pedido..." [(ngModel)]="searchQuery" (ngModelChange)="filterPedidos()">
     </div>
 

@@ -20,6 +20,8 @@ export class FacturaComponent implements OnInit {
   clientes: any[] = [];
   filtroEstado: string = '';
   searchQuery: string = '';
+  startDateFilter: string = '';
+  endDateFilter: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 10;
   itemsPerPageOptions: number[] = [5, 10, 15];
@@ -277,22 +279,35 @@ export class FacturaComponent implements OnInit {
 
   filterFacturas(): void {
     const estado = this.filtroEstado;
+    const start = this.startDateFilter ? new Date(this.startDateFilter) : null;
+    const end = this.endDateFilter ? new Date(this.endDateFilter) : null;
     const texto = this.searchQuery.toLowerCase();
 
     this.facturasFiltradas = this.facturas.filter(f => {
       const coincideEstado = estado ? f.estadoPago === estado : true;
       const cliente = this.clientes.find(c => c.cedula === f.clienteCedula);
       const pedido = this.pedidos.find(p => p.pedidoId === f.pedidoId);
+      const fechaFactura = new Date(f.fecha);
 
       const coincideBusqueda =
         f.numeroFactura.toLowerCase().includes(texto) ||
         cliente?.nombre?.toLowerCase().includes(texto) ||
         pedido?.numeroPedido?.toLowerCase().includes(texto);
+      
+      const matchesDate = (!start || fechaFactura >= start) && (!end || fechaFactura <= end);
 
-      return coincideEstado && coincideBusqueda;
+      return coincideEstado && coincideBusqueda && matchesDate;
     });
 
     this.currentPage = 1;
+  }
+
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.startDateFilter = '';
+    this.endDateFilter = '';
+    this.filtroEstado = '';
+    this.filterFacturas();
   }
 
   get paginatedFacturas(): Factura[] {
