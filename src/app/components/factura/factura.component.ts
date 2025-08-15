@@ -145,9 +145,22 @@ export class FacturaComponent implements OnInit {
   }
 
   abrirModalEliminar(factura: Factura): void {
-    this.facturaParaEliminar = factura;
-    const modalEl = document.getElementById('confirmarEliminarFacturaModal');
-    if (modalEl) new bootstrap.Modal(modalEl).show();
+    // Verificar si la factura tiene un pedidoId asociado
+    if (factura.pedidoId) {
+      // Si está asociado, mostrar el modal de advertencia
+      this.showModal('facturaAsociadaModal');
+    } else {
+      this.facturaParaEliminar = factura;
+      this.showModal('confirmarEliminarFacturaModal');
+    }
+  }
+
+  private showModal(modalId: string): void {
+    const modalEl = document.getElementById(modalId);
+    if (modalEl) {
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    }
   }
 
   onFileSelected(event: any): void {
@@ -250,12 +263,6 @@ export class FacturaComponent implements OnInit {
     }, error => {
       console.error('Error al actualizar la factura:', error);
     });
-  }
-
-  eliminarFactura(factura: Factura): void {
-    this.facturaParaEliminar = factura;
-    const modalEl = document.getElementById('confirmarEliminarFacturaModal');
-    if (modalEl) new bootstrap.Modal(modalEl).show();
   }
 
   confirmarEliminarFactura(): void {

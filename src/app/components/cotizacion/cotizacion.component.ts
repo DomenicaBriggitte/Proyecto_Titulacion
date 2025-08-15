@@ -28,6 +28,7 @@ export class CotizacionComponent implements OnInit {
   currentPage: number = 1;
   itemsPerPage: number = 10;
   validationMessage: string = '';
+  errorMessage: string = '';
   todayDate: string = ''; //Propiedad para almacenar la fecha actual
 
   constructor(
@@ -304,13 +305,22 @@ actualizarCotizacion(): void {
 
   confirmDeleteCotizacion(): void {
     if (this.deleteIndex !== null && this.deleteIndex > -1) {
-      const id = this.cotizaciones[this.deleteIndex].cotizacionId!;
-      this.cotizacionService.deleteCotizacion(id).subscribe(() => {
-        this.cotizaciones.splice(this.deleteIndex!, 1);
-        this.cotizacionesFiltradas = [...this.cotizaciones];
-        this.deleteIndex = null;
-        this.cerrarModal('deleteConfirmationModal');
-        this.mostrarModal('deleteModal');
+      const id = this.cotizacionesFiltradas[this.deleteIndex].cotizacionId!;
+      // Modificamos la suscripción para incluir el manejo de errores
+      this.cotizacionService.deleteCotizacion(id).subscribe({
+        next: () => {
+          this.cotizaciones.splice(this.cotizaciones.findIndex(c => c.cotizacionId === id), 1);
+          this.cotizacionesFiltradas = [...this.cotizaciones];
+          this.deleteIndex = null;
+          this.cerrarModal('deleteConfirmationModal');
+          this.mostrarModal('deleteModal');
+        },
+        error: (err) => {
+          console.error("Error al eliminar cotización:", err);
+          this.errorMessage = 'No es posible eliminar esta cotización porque está asociada a un pedido.';
+          this.cerrarModal('deleteConfirmationModal');
+          this.mostrarModal('errorModal');
+        }
       });
     }
   }

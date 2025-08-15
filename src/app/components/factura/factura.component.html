@@ -74,7 +74,7 @@
           <td class="text-center">
             <div class="d-flex justify-content-center gap-2">
               <button class="btn btn-info btn-sm" (click)="abrirModalEditar(f)"><i class="fas fa-edit"></i></button>
-              <button class="btn btn-danger btn-sm" (click)="eliminarFactura(f)"><i class="fas fa-trash-alt"></i></button>
+              <button class="btn btn-danger btn-sm" (click)="abrirModalEliminar(f)"><i class="fas fa-trash-alt"></i></button>
             </div>
           </td>
         </tr>
@@ -321,6 +321,24 @@
         </svg>
         <h4>Factura eliminada con éxito</h4>
         <button type="button" class="btn btn-primary mt-3" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Advertencia para Factura Asociada -->
+<div class="modal fade" id="facturaAsociadaModal" tabindex="-1" aria-labelledby="facturaAsociadaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="facturaAsociadaModalLabel">Error al Eliminar Factura</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>No es posible eliminar esta factura porque está asociada a un pedido.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>

@@ -128,9 +128,16 @@ export class PedidoComponent implements OnInit {
   }
 
   abrirModalEliminar(pedido: Pedido): void {
-    this.pedidoParaEliminar = pedido;
-    const modalEl = document.getElementById('confirmarEliminarPedidoModal');
-    if (modalEl) new bootstrap.Modal(modalEl).show();
+    // Verificar si el pedido tiene un cotizacionId asociado
+    if (pedido.cotizacionId) {
+      // Si está asociado, mostrar un modal de advertencia
+      const modalEl = document.getElementById('pedidoAsociadoModal');
+      if (modalEl) new bootstrap.Modal(modalEl).show();
+    } else {
+      this.pedidoParaEliminar = pedido;
+      const modalEl = document.getElementById('confirmarEliminarPedidoModal');
+      if (modalEl) new bootstrap.Modal(modalEl).show();
+    }
   }
 
   guardarPedido(): void {
@@ -171,9 +178,7 @@ export class PedidoComponent implements OnInit {
   }
 
   eliminarPedido(pedido: Pedido): void {
-    this.pedidoParaEliminar = pedido;
-    const modalEl = document.getElementById('confirmarEliminarPedidoModal');
-    if (modalEl) new bootstrap.Modal(modalEl).show();
+    this.abrirModalEliminar(pedido);
   }
 
   confirmarEliminarPedido(): void {
